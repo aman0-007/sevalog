@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join the Mission | SevaLog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="public-layout.css">
+    <link rel="stylesheet" href="join-us.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-visual">
+            <div class="visual-content">
+                <a href="index.html" class="auth-logo">
+                    <i data-lucide="heart"></i> SevaLog
+                </a>
+                <h1>Start your <span class="text-gradient">Seva Journey.</span></h1>
+                <p>Join a community of students making a real impact. Complete your profile to get personalized recommendations.</p>
+            </div>
+        </div>
+
+        <div class="auth-form-side">
+            <div class="form-wrapper reveal">
+                <div class="form-header">
+                    <div class="header-top">
+                        <h2>Volunteer Registration</h2>
+                        <div class="already-registered">
+                            Already registered? <a href="login.html">Sign In</a>
+                        </div>
+                    </div>
+                    <p>New here? Create your profile to join the initiative.</p>
+                </div>
+
+                <form id="registration-form">
+                    <div class="form-grid">
+                        <div class="input-group"><label>Full Name</label><div class="input-field"><i data-lucide="user"></i><input type="text" id="reg-name" placeholder="John Doe" required></div></div>
+                        <div class="input-group"><label>Email</label><div class="input-field"><i data-lucide="mail"></i><input type="email" id="reg-email" placeholder="john@example.com" required></div></div>
+                        <div class="input-group"><label>Phone</label><div class="input-field"><i data-lucide="phone"></i><input type="tel" id="reg-phone" placeholder="+91..." required></div></div>
+                        
+                        <div class="input-group">
+                            <label>Employment Status</label>
+                            <div class="input-field"><i data-lucide="briefcase"></i>
+                                <select id="reg-employment" required>
+                                    <option value="Student">Student</option>
+                                    <option value="Employed">Employed</option>
+                                    <option value="Freelance">Freelance</option>
+                                    <option value="Retired">Retired</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width"><label>College / Institution</label><div class="input-field"><i data-lucide="graduation-cap"></i><input type="text" id="reg-college" placeholder="University Name" required></div></div>
+                        <div class="input-group"><label>Year of Study</label><div class="input-field"><i data-lucide="calendar"></i><input type="text" id="reg-year" placeholder="e.g. 3rd Year"></div></div>
+                        <div class="input-group"><label>City</label><div class="input-field"><i data-lucide="map"></i><input type="text" id="reg-city" placeholder="Mumbai" required></div></div>
+
+                        <div class="input-group full-width"><label>Full Address</label><div class="input-field"><i data-lucide="home"></i><input type="text" id="reg-address" placeholder="Street, Locality..."></div></div>
+                        <div class="input-group full-width"><label>Short Bio</label><div class="input-field"><textarea id="reg-bio" rows="2" placeholder="Tell us why you want to volunteer..."></textarea></div></div>
+
+                        <div class="input-group full-width">
+                            <label>Skills</label>
+                            <div class="chip-container">
+                                <label class="chip"><input type="checkbox" name="skills" value="Teaching"><span>Teaching</span></label>
+                                <label class="chip"><input type="checkbox" name="skills" value="First Aid"><span>First Aid</span></label>
+                                <label class="chip"><input type="checkbox" name="skills" value="Social Media"><span>Social Media</span></label>
+                                <label class="chip"><input type="checkbox" name="skills" value="Event Mgmt"><span>Event Mgmt</span></label>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width">
+                            <label>Interests</label>
+                            <div class="chip-container">
+                                <label class="chip"><input type="checkbox" name="interests" value="Environment"><span>Environment</span></label>
+                                <label class="chip"><input type="checkbox" name="interests" value="Education"><span>Education</span></label>
+                                <label class="chip"><input type="checkbox" name="interests" value="Health"><span>Healthcare</span></label>
+                            </div>
+                        </div>
+
+                        <div class="input-group full-width"><label>Password</label><div class="input-field"><i data-lucide="lock"></i><input type="password" id="reg-password" required></div></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary auth-btn">Create Profile</button>
+                    
+                    <div class="mobile-login-hint">
+                        Already have an account? <a href="login.html">Login here</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public-main.js"></script>
+    <script src="join-us.js"></script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seva Admin Dashboard</title>
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body class="preload">
+
+    <div class="dashboard-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="heart" class="brand-icon"></i>
+                <h2 class="nav-text">SevaLog</h2>
+                <!-- Mobile Close Button -->
+                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" title="Dashboard">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="events.html" class="nav-item" title="Events Management">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Events Management</span>
+                </a>
+                <a href="volunteers.html" class="nav-item" title="Volunteers">
+                    <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
+                </a>
+                <a href="gallery.html" class="nav-item" title="Gallery">
+                    <i data-lucide="image"></i> <span class="nav-text">Gallery</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <script>
+            if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        </script>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content" id="main-content">
+            <!-- TOP HEADER -->
+            <header class="top-header">
+                <div class="header-left">
+                    <!-- Menu button now works on Desktop and Mobile -->
+                    <button class="icon-btn" onclick="toggleSidebar()">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="search-bar">
+                        <i data-lucide="search"></i>
+                        <input type="text" placeholder="Search events, volunteers...">
+                    </div>
+                </div>
+                
+                <div class="header-right">
+                    <!-- Theme Toggle Button -->
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i data-lucide="moon" id="theme-icon-moon"></i>
+                        <i data-lucide="sun" id="theme-icon-sun" style="display: none;"></i>
+                    </button>
+                    <button class="icon-btn"><i data-lucide="bell"></i></button>
+                    
+                    <div class="admin-profile">
+                        <div class="avatar">A</div>
+                        <div class="admin-info">
+                            <span class="admin-name">Admin User</span>
+                            <span class="admin-role">Super Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- DASHBOARD CONTENT -->
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div>
+                        <h1>Dashboard Overview</h1>
+                        <p>Welcome back! Here's the latest impact of your Seva.</p>
+                    </div>
+                    <!-- Updated Primary Button -->
+                    <button class="primary-btn">
+                        <i data-lucide="plus"></i> New Event
+                    </button>
+                </div>
+
+                <!-- STATS GRID -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i data-lucide="users"></i></div>
+                        <div class="stat-details">
+                            <p>Total Volunteers</p>
+                            <h3 id="stat-volunteers">--</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i data-lucide="calendar-check"></i></div>
+                        <div class="stat-details">
+                            <p>Upcoming Events</p>
+                            <h3 id="stat-events">--</h3>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple"><i data-lucide="activity"></i></div>
+                        <div class="stat-details">
+                            <p>Active Participants</p>
+                            <h3 id="stat-participants">--</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECENT ACTIVITY SECTION -->
+                <section class="recent-activity">
+                    <h2>Recent Registrations</h2>
+                    <div class="activity-list" id="recent-reg-list">
+                        <p class="loading-text">Fetching data...</p>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Supabase & Custom JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

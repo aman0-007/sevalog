@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome Back | SevaLog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="public-layout.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <div class="auth-container">
+        <div class="auth-visual">
+            <div class="visual-content">
+                <a href="index.html" class="auth-logo">
+                    <i data-lucide="heart"></i> SevaLog
+                </a>
+                <h1>Welcome back, <span class="text-gradient">Changemaker.</span></h1>
+                <p>Log in to access your dashboard, track your hours, and discover new opportunities.</p>
+            </div>
+        </div>
+
+        <div class="auth-form-side">
+            <div class="form-wrapper reveal">
+                <div class="form-header">
+                    <h2>Sign In</h2>
+                    <p>Don't have an account? <a href="join-us.html">Create one</a></p>
+                </div>
+
+                <form id="login-form">
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <div class="input-field">
+                            <i data-lucide="mail"></i>
+                            <input type="email" id="login-email" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <label style="margin-bottom: 0;">Password</label>
+                            <a href="#" style="font-size: 13px; color: var(--accent-primary); text-decoration: none; font-weight: 600;">Forgot?</a>
+                        </div>
+                        <div class="input-field">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary auth-btn">
+                        Sign In to Dashboard <i data-lucide="log-in"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public-main.js"></script>
+    <script src="login.js"></script>
+</body>
+</html>

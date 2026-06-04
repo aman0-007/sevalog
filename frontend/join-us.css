@@ -1,0 +1,126 @@
+/* =========================================
+   JOIN-US.CSS (Updated with Auth Redirects)
+   ========================================= */
+
+.auth-container { display: flex; min-height: 100vh; width: 100%; }
+
+/* --- VISUAL SIDE --- */
+.auth-visual {
+    flex: 1;
+    position: relative;
+    background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    color: white;
+}
+
+.auth-visual::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(11, 17, 32, 0.9) 0%, rgba(37, 99, 235, 0.4) 100%);
+}
+
+.visual-content { position: relative; z-index: 2; max-width: 450px; }
+.auth-logo { display: flex; align-items: center; gap: 8px; color: white; text-decoration: none; font-weight: 800; font-size: 24px; margin-bottom: 40px; }
+.auth-logo i { color: #60A5FA; }
+.visual-content h1 { font-size: 42px; margin-bottom: 20px; letter-spacing: -0.02em; }
+.visual-content p { color: #CBD5E1; font-size: 17px; line-height: 1.6; }
+
+/* --- FORM SIDE --- */
+.auth-form-side {
+    flex: 1.4;
+    background: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    overflow-y: auto;
+}
+
+.form-wrapper { width: 100%; max-width: 600px; }
+.form-header { margin-bottom: 32px; }
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 8px;
+}
+
+.form-header h2 { font-size: 28px; color: var(--text-main); margin-bottom: 0; }
+
+.already-registered {
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.already-registered a {
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.form-header p { color: var(--text-muted); font-size: 15px; }
+
+/* Form Grid */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.full-width { grid-column: span 2; }
+
+textarea {
+    width: 100%; padding: 14px;
+    border: none; outline: none;
+    font-family: inherit; resize: none;
+    background: transparent;
+}
+
+.input-group label { display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.02em; }
+
+.input-field {
+    display: flex; align-items: center;
+    background: white; border: 1px solid var(--border-light);
+    border-radius: 12px; padding: 0 16px;
+    transition: all 0.2s ease;
+}
+
+.input-field:focus-within { border-color: var(--accent-primary); box-shadow: 0 0 0 4px var(--accent-glow); }
+.input-field i { width: 18px; color: var(--text-muted); }
+.input-field input, .input-field select { width: 100%; padding: 14px; border: none; outline: none; font-family: inherit; font-size: 15px; background: transparent; }
+
+/* Chips */
+.chip-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
+.chip input { display: none; }
+.chip span {
+    display: inline-block; padding: 6px 14px;
+    background: white; border: 1px solid var(--border-light);
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: 0.2s;
+}
+
+.chip input:checked + span { background: var(--accent-primary); color: white; border-color: var(--accent-primary); }
+
+.auth-btn { width: 100%; justify-content: center; padding: 18px; margin-top: 30px; font-size: 16px; }
+
+/* Mobile Redirect Hint */
+.mobile-login-hint {
+    display: none; /* Hidden on desktop */
+    margin-top: 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.mobile-login-hint a { color: var(--accent-primary); text-decoration: none; font-weight: 700; }
+
+@media (max-width: 1024px) {
+    .auth-visual { display: none; }
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: span 1; }
+    .header-top { flex-direction: column; align-items: flex-start; }
+    .already-registered { display: none; } /* Hide top link on mobile */
+    .mobile-login-hint { display: block; } /* Show bottom link on mobile */
+}

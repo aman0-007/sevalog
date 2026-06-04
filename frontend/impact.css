@@ -1,0 +1,257 @@
+/* =========================================
+   IMPACT.CSS (Our Impact Page Specifics)
+   ========================================= */
+
+/* --- HERO SECTION --- */
+.impact-hero {
+    position: relative;
+    color: white;
+    
+    /* THE FIX: Forces the image to take up 100% of the screen height */
+    min-height: 100vh; 
+    padding: 0 24px;
+    
+    /* Perfectly centers the text in the middle of the screen */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    
+    /* Background Image */
+    background-image: url('https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Keeps it smooth on scroll */
+    
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+    overflow: hidden;
+}
+
+/* Protective Dark Overlay */
+.impact-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(11, 17, 32, 0.95) 0%, rgba(11, 17, 32, 0.7) 40%, rgba(11, 17, 32, 0.1) 100%);
+    z-index: 1;
+}
+
+.impact-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2; /* Keeps text above the dark overlay */
+}
+
+.hero-badge {
+    display: inline-block;
+    padding: 8px 16px;
+    /* Updated badge colors for dark background */
+    background: rgba(37, 99, 235, 0.2);
+    color: #60A5FA;
+    border: 1px solid rgba(37, 99, 235, 0.4);
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+}
+
+/* Updated text colors for dark background */
+.impact-hero h1 { font-size: 56px; margin-bottom: 24px; color: #F8FAFC; }
+.impact-hero p { font-size: 18px; color: #CBD5E1; line-height: 1.8; max-width: 600px; margin: 0 auto; }
+
+/* --- METRICS GRID --- */
+.impact-metrics {
+    padding: 80px 24px;
+    max-width: var(--max-width);
+    margin: -80px auto 0; /* Pulls the grid up into the hero section */
+    position: relative;
+    z-index: 10;
+}
+
+.metrics-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+}
+
+.impact-stat-card {
+    background: white;
+    padding: 32px 24px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05);
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.impact-stat-card:hover { transform: translateY(-5px); }
+
+.stat-icon {
+    width: 56px; height: 56px;
+    background: var(--bg-surface);
+    color: var(--accent-primary);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.impact-stat-card h3 { font-size: 36px; color: var(--text-main); margin-bottom: 4px; }
+.impact-stat-card p { font-size: 14px; color: var(--text-muted); font-weight: 600; }
+
+/* --- ZIGZAG OPPORTUNITIES SECTION --- */
+.student-opportunities { padding: 120px 24px; background: white; }
+.section-title { text-align: center; margin-bottom: 80px; }
+.section-title h2 { font-size: 40px; margin-bottom: 16px; color: var(--text-main); }
+.section-title p { color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto; line-height: 1.6; }
+
+.zigzag-row {
+    max-width: 1000px;
+    margin: 0 auto 120px;
+    display: flex;
+    align-items: center;
+    gap: 80px;
+}
+.zigzag-row:last-child { margin-bottom: 0; }
+.zigzag-row.reverse { flex-direction: row-reverse; }
+
+.zigzag-image {
+    flex: 1;
+    position: relative;
+}
+
+.zigzag-image img {
+    width: 100%;
+    border-radius: var(--radius-lg);
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.15);
+}
+
+/* Offset geometric decoration behind the image */
+.image-decoration {
+    position: absolute;
+    top: -20px; left: -20px;
+    width: 100%; height: 100%;
+    border: 2px dashed var(--accent-primary);
+    border-radius: var(--radius-lg);
+    z-index: 1;
+    opacity: 0.3;
+}
+.image-decoration.alternate { left: auto; right: -20px; border-color: #06B6D4; }
+
+.zigzag-content { flex: 1; }
+.feature-icon { width: 48px; height: 48px; background: var(--accent-glow); color: var(--accent-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.zigzag-content h3 { font-size: 32px; margin-bottom: 16px; color: var(--text-main); }
+.zigzag-content p { color: var(--text-muted); font-size: 16px; line-height: 1.8; margin-bottom: 24px; }
+
+.benefit-list { list-style: none; padding: 0; }
+.benefit-list li { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-weight: 600; color: var(--text-main); }
+.benefit-list li i { color: #10B981; width: 20px; }
+
+/* --- THE LEADERBOARD PODIUM --- */
+.leaderboard-section { padding: 120px 24px; background: var(--bg-surface); border-top: 1px solid var(--border-light); }
+.leaderboard-container { max-width: 800px; margin: 0 auto; background: white; padding: 60px 40px; border-radius: var(--radius-lg); border: 1px solid var(--border-light); box-shadow: 0 20px 40px -15px rgba(0,0,0,0.05); }
+
+.podium-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 16px;
+    height: 350px;
+    margin-top: 40px;
+}
+
+.podium-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 140px;
+}
+
+/* Avatar base styles (Hidden initially for animation) */
+.podium-avatar {
+    width: 64px; height: 64px;
+    background: white; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; font-weight: 800; color: var(--accent-primary);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1); margin-bottom: 16px; border: 3px solid white;
+    z-index: 2;
+    /* Setup for drop-in animation */
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rank-1 .podium-avatar {
+    width: 80px; height: 80px; font-size: 32px;
+    border-color: #F59E0B; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+}
+
+.podium-name { font-weight: 700; color: var(--text-main); text-align: center; margin-bottom: 4px; font-size: 14px; }
+.podium-hrs { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; font-weight: 600; }
+
+/* The physical blocks (Start at Height 0) */
+.podium-block {
+    width: 100%;
+    height: 0px; /* START AT 0 */
+    border-radius: 16px 16px 0 0;
+    display: flex; justify-content: center; padding-top: 16px;
+    font-size: 32px; font-weight: 800; color: rgba(255,255,255,0.8);
+    box-shadow: inset 0 4px 10px rgba(255,255,255,0.2);
+    overflow: hidden; /* Hides text until it grows */
+    transition: height 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Set background colors */
+.rank-2 .podium-block { background: linear-gradient(180deg, #94A3B8, #64748B); }
+.rank-1 .podium-block { background: linear-gradient(180deg, #FBBF24, #D97706); }
+.rank-3 .podium-block { background: linear-gradient(180deg, #D97706, #92400E); filter: grayscale(0.5); }
+
+/* ========================================================
+   THE ANIMATION TRIGGER (Fires when scrolled into view)
+   ======================================================== */
+
+/* Build the towers! */
+.leaderboard-container.active .rank-2 .podium-block { height: 180px; }
+.leaderboard-container.active .rank-1 .podium-block { height: 240px; }
+.leaderboard-container.active .rank-3 .podium-block { height: 140px; }
+
+/* Drop in the avatars! */
+.leaderboard-container.active .podium-avatar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Stagger the timing so Bronze, then Silver, then Gold animate */
+.leaderboard-container.active .rank-3 .podium-block,
+.leaderboard-container.active .rank-3 .podium-avatar { transition-delay: 0.1s; }
+
+.leaderboard-container.active .rank-2 .podium-block,
+.leaderboard-container.active .rank-2 .podium-avatar { transition-delay: 0.3s; }
+
+.leaderboard-container.active .rank-1 .podium-block,
+.leaderboard-container.active .rank-1 .podium-avatar { transition-delay: 0.6s; }
+
+
+/* --- Mobile Fixes --- */
+@media (max-width: 900px) {
+    /* Keep your existing mobile queries... */
+    .metrics-container { grid-template-columns: 1fr 1fr; }
+    .zigzag-row, .zigzag-row.reverse { flex-direction: column; gap: 40px; text-align: center; }
+    .benefit-list li { justify-content: center; }
+    
+    .podium-wrapper { height: auto; align-items: center; flex-direction: column; gap: 32px; }
+    .podium-item { flex-direction: row; width: 100%; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 16px; border-radius: 12px; }
+    .podium-block { display: none; }
+    
+    /* Reset avatar animations for mobile list view */
+    .podium-avatar { transform: none; opacity: 1; margin-bottom: 0; width: 48px; height: 48px; font-size: 18px; }
+    .rank-1 .podium-avatar { width: 48px; height: 48px; font-size: 18px; }
+    
+    .podium-name { margin-bottom: 0; font-size: 16px; text-align: left; flex: 1; margin-left: 16px; }
+    .podium-hrs { margin-bottom: 0; }
+}

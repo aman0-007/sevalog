@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SevaLog | Empowering Communities</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="public-layout.css">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo">
+                <i data-lucide="heart"></i>
+                SevaLog
+            </a>
+            
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="nav-links" id="nav-links">
+                <a href="about.html" class="nav-link">Our Mission</a>
+                <a href="opportunities.html" class="nav-link">Seva Hub</a>
+                <a href="impact.html" class="nav-link">Our Impact</a>
+                <a href="get-started.html" class="btn btn-primary" style="padding: 10px 24px;">Volunteer With Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <div class="badge reveal" style="transition-delay: 0s;">
+                    <span class="live-dot"></span>
+                    Live Data Active
+                </div>
+                <h1 class="reveal" style="transition-delay: 0.1s;">Empower communities through <span class="text-gradient">Action.</span></h1>
+                <p class="reveal" style="transition-delay: 0.2s;">Join thousands of volunteers dedicating their time to make a tangible difference. Track your hours, meet like-minded people, and elevate society.</p>
+                
+                <div class="hero-actions reveal" style="transition-delay: 0.3s;">
+                    <a href="get-started.html" class="btn btn-primary">
+                        Volunteer With Us <i data-lucide="arrow-right" style="width: 18px;"></i>
+                    </a>
+                    <a href="opportunities.html" class="btn btn-outline">
+                        Explore Seva Hub
+                    </a>
+                </div>
+            </div>
+
+            <div class="hero-visual reveal" style="transition-delay: 0.4s;">
+                <div class="visual-circle"></div>
+                <div class="visual-card">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; text-align: left;">
+                        <div style="width: 48px; height: 48px; background: var(--accent-glow); color: var(--accent-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i data-lucide="calendar-check"></i>
+                        </div>
+                        <div>
+                            <h4 id="hero-event-title" style="font-weight: 700;">Loading...</h4>
+                            <p id="hero-event-date" style="font-size: 13px; color: var(--text-muted);">Finding next Seva...</p>
+                        </div>
+                    </div>
+                    <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 16px;">
+                        <span>Volunteers Needed</span>
+                        <span id="hero-event-count" style="color: var(--accent-primary);">-- / --</span>
+                    </div>
+                    <a href="opportunities.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;">Join Event</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="metrics">
+            <div class="metrics-grid">
+                <div class="metric-item reveal" style="transition-delay: 0.1s;">
+                    <h3 class="counter" data-target="15" data-suffix="k+">0</h3>
+                    <p>Hours Served</p>
+                    <span style="font-size: 13px; color: var(--text-muted);">By our dedicated community</span>
+                </div>
+                <div class="metric-item reveal" style="transition-delay: 0.2s;">
+                    <h3 class="counter" data-target="3200">0</h3>
+                    <p>Active Volunteers</p>
+                    <span style="font-size: 13px; color: var(--text-muted);">Across 12 different cities</span>
+                </div>
+                <div class="metric-item reveal" style="transition-delay: 0.3s;">
+                    <h3 class="counter" data-target="500" data-suffix="+">0</h3>
+                    <p>Successful Events</p>
+                    <span style="font-size: 13px; color: var(--text-muted);">From education to healthcare</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-it-works">
+            <div class="section-title reveal">
+                <h2>How SevaLog Works</h2>
+                <p>We make it incredibly simple to find causes you care about, track your personal impact, and build a verified portfolio of community service.</p>
+            </div>
+            <div class="step-grid">
+                <div class="step-card reveal" style="transition-delay: 0.1s;">
+                    <div class="step-icon"><i data-lucide="user-plus"></i></div>
+                    <h4>1. Register</h4>
+                    <p>Create your free volunteer profile in under 60 seconds. Tell us your skills and the causes you care most about.</p>
+                </div>
+                <div class="step-card reveal" style="transition-delay: 0.2s;">
+                    <div class="step-icon"><i data-lucide="map-pin"></i></div>
+                    <h4>2. Join an Event</h4>
+                    <p>Browse our live feed of upcoming community drives, food banks, and educational events happening near you.</p>
+                </div>
+                <div class="step-card reveal" style="transition-delay: 0.3s;">
+                    <div class="step-icon"><i data-lucide="award"></i></div>
+                    <h4>3. Track Impact</h4>
+                    <p>Check in via the dashboard at the event. Earn verified hours, badges, and build a resume of your civic engagement.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="gallery-section">
+            <div class="section-title reveal">
+                <h2>Impact in Action</h2>
+                <p>Take a look at the incredible work our volunteers are doing on the ground every single weekend.</p>
+            </div>
+            <div class="gallery-grid">
+                <div class="gallery-card reveal" style="transition-delay: 0.1s;">
+                    <div class="img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1593113514676-5925204b6fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Food Drive">
+                    </div>
+                    <div class="gallery-info">
+                        <h4>Community Food Drive</h4>
+                        <p>Providing over 500 hot meals to unhoused residents in the downtown district.</p>
+                    </div>
+                </div>
+                <div class="gallery-card reveal" style="transition-delay: 0.2s;">
+                    <div class="img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1526976663112-00a525206003?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Beach Cleanup">
+                    </div>
+                    <div class="gallery-info">
+                        <h4>Coastal Cleanup Day</h4>
+                        <p>A massive weekend effort that removed 2 tons of plastic waste from local beaches.</p>
+                    </div>
+                </div>
+                <div class="gallery-card reveal" style="transition-delay: 0.3s;">
+                    <div class="img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Education">
+                    </div>
+                    <div class="gallery-info">
+                        <h4>Weekend Mentorship</h4>
+                        <p>Connecting college volunteers with high school students for coding and math tutoring.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="reveal" style="text-align: center; margin-top: 48px;">
+                <a href="opportunities.html" class="btn btn-outline" style="background: white;">
+                    View All Opportunities <i data-lucide="arrow-right" style="width: 16px;"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="brand-logo" style="color: white;">
+                    <i data-lucide="heart" style="color: var(--accent-primary);"></i>
+                    SevaLog
+                </a>
+                <p>Building a better tomorrow through organized, impactful community service. Join thousands of volunteers making a difference today.</p>
+                <div style="display: flex; gap: 16px; margin-top: 24px;">
+                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="twitter" style="width: 20px;"></i></a>
+                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="instagram" style="width: 20px;"></i></a>
+                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="linkedin" style="width: 20px;"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <a href="opportunities.html">Seva Hub</a>
+                <a href="impact.html">Our Impact</a>
+                <a href="get-started.html">Become a Volunteer</a>
+                <a href="about.html">About the Team</a>
+            </div>
+
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Community Guidelines</a>
+                <a href="#">Partner With Us</a>
+            </div>
+
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="admin/login.html" style="margin-top: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 12px;">
+                    <i data-lucide="lock" style="width: 12px;"></i> Admin Portal
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div>&copy; 2026 SevaLog Initiative. All rights reserved.</div>
+            <div style="display: flex; gap: 20px;">
+                <span>System Status: <span style="color: #10B981;">● Online</span></span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+/* =========================================
+   GET-STARTED.CSS (Clean & Simple)
+   ========================================= */
+
+body { background-color: var(--bg-dark); overflow-x: hidden; }
+
+/* 100vh Full Screen Setup */
+.choice-container {
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 80px 24px 24px;
+    
+    background-image: url('https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80');
+    background-size: cover;
+    background-position: center;
+}
+
+/* Dark gradient overlay */
+.choice-container::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(11, 17, 32, 0.9) 0%, rgba(37, 99, 235, 0.4) 100%);
+    z-index: 1;
+}
+
+.choice-wrapper { position: relative; z-index: 2; max-width: 900px; width: 100%; animation: fadeUp 0.8s ease forwards; }
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.choice-header { text-align: center; margin-bottom: 48px; }
+.choice-header h1 { font-size: 48px; color: #FFFFFF; margin-bottom: 12px; }
+.choice-header p { color: #CBD5E1; font-size: 18px; }
+
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+
+/* Simple Glass Cards with Standard Hover */
+.choice-card {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 48px 40px;
+    border-radius: var(--radius-lg);
+    text-align: center;
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.choice-card:hover {
+    transform: translateY(-8px); /* Simple float effect */
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.choice-icon { width: 80px; height: 80px; background: rgba(37, 99, 235, 0.2); color: #60A5FA; border: 1px solid rgba(37, 99, 235, 0.3); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; }
+.icon-green { background: rgba(16, 185, 129, 0.2); color: #34D399; border-color: rgba(16, 185, 129, 0.3); }
+
+.choice-icon i { width: 36px; height: 36px; }
+.choice-card h2 { font-size: 28px; margin-bottom: 16px; color: #FFFFFF; }
+.choice-card p { color: #94A3B8; line-height: 1.6; margin-bottom: 32px; flex: 1; font-size: 15px; }
+
+.choice-card .btn-outline { color: white; border-color: rgba(255,255,255,0.3); }
+.choice-card .btn-outline:hover { background: white; color: var(--text-main); }
+
+#navbar { background: transparent; border: none; backdrop-filter: none; box-shadow: none; }
+#navbar .brand-logo, #navbar .nav-link { color: white; }
+#navbar .brand-logo i { color: #60A5FA; }
+
+@media (max-width: 768px) {
+    .choice-container { height: auto; padding: 100px 24px 60px; }
+    .choice-grid { grid-template-columns: 1fr; }
+    .choice-header h1 { font-size: 36px; }
+}

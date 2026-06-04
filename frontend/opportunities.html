@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seva Opportunities | SevaLog</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="public-layout.css">
+    <link rel="stylesheet" href="opportunities.css">
+</head>
+<body class="hero-top">
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo">
+                <i data-lucide="heart"></i>
+                SevaLog
+            </a>
+            
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="nav-links" id="nav-links">
+                <a href="about.html" class="nav-link">Our Mission</a>
+                <a href="opportunities.html" class="nav-link active">Seva Hub</a>
+                <a href="impact.html" class="nav-link">Our Impact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hub-hero">
+            <div class="hub-hero-content">
+                <span class="badge reveal" style="transition-delay: 0s;">The Action Center</span>
+                <h1 class="reveal" style="transition-delay: 0.1s;">Find Your Calling.<br><span class="text-gradient">Make an Impact.</span></h1>
+                <p class="reveal" style="transition-delay: 0.2s;">Whether you are looking to join your first food drive, browse our legacy of past events, or hear from our active student volunteers, everything you need is right here.</p>
+                <div class="hero-actions reveal" style="transition-delay: 0.3s;">
+                    <a href="#upcoming" class="btn btn-primary">Find Seva Hub</a>
+                    <a href="#gallery" class="btn btn-outline" style="color: white; border-color: rgba(255,255,255,0.3);">View Gallery</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="upcoming" class="hub-section">
+            <div class="section-header reveal">
+                <h2>Ready to Serve?</h2>
+                <p>Browse our upcoming community events and register to secure your spot.</p>
+            </div>
+            
+            <div class="events-grid" id="upcoming-grid">
+                <div class="loading-state">Loading upcoming events...</div>
+            </div>
+        </section>
+
+        <section id="past" class="hub-section bg-surface">
+            <div class="section-header reveal">
+                <h2>A Legacy of Action</h2>
+                <p>A look back at the events we've successfully completed together.</p>
+            </div>
+            
+            <div class="past-events-scroll" id="past-grid">
+                <div class="loading-state">Loading past events...</div>
+            </div>
+        </section>
+
+        <section id="gallery" class="hub-section">
+            <div class="section-header reveal">
+                <h2>Moments of Joy</h2>
+                <p>Our community in action across various cities and causes.</p>
+            </div>
+            
+            <div class="masonry-gallery">
+                <div class="gallery-item large reveal"><img src="https://images.unsplash.com/photo-1593113514676-5925204b6fde?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Food drive"></div>
+                <div class="gallery-item reveal" style="transition-delay: 0.1s;"><img src="https://images.unsplash.com/photo-1526976663112-00a525206003?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Cleanup"></div>
+                <div class="gallery-item reveal" style="transition-delay: 0.2s;"><img src="https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Tutoring"></div>
+                <div class="gallery-item wide reveal" style="transition-delay: 0.1s;"><img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Team meeting"></div>
+                <div class="gallery-item reveal" style="transition-delay: 0.2s;"><img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Students"></div>
+            </div>
+        </section>
+
+        <section id="experiences" class="hub-section bg-surface" style="border-top: 1px solid var(--border-light);">
+            <div class="section-header reveal">
+                <h2>Voices of our Volunteers</h2>
+                <p>Hear directly from the students who are dedicating their time to the community.</p>
+            </div>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal" style="transition-delay: 0.1s;">
+                    <i data-lucide="quote" class="quote-icon"></i>
+                    <p class="quote-text">"SevaLog made it incredibly easy to find causes I actually care about. The verified hours I earned here directly helped me land my university scholarship."</p>
+                    <div class="student-info">
+                        <div class="student-avatar">A</div>
+                        <div>
+                            <h4>Aisha Patel</h4>
+                            <span>120 Hours Served</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal" style="transition-delay: 0.2s;">
+                    <i data-lucide="quote" class="quote-icon"></i>
+                    <p class="quote-text">"I started as a regular volunteer and eventually led my own beach cleanup. The leadership skills I gained organizing 50 volunteers were invaluable."</p>
+                    <div class="student-info">
+                        <div class="student-avatar" style="background: #10B981;">R</div>
+                        <div>
+                            <h4>Rahul Desai</h4>
+                            <span>85 Hours Served</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal" style="transition-delay: 0.3s;">
+                    <i data-lucide="quote" class="quote-icon"></i>
+                    <p class="quote-text">"It's more than just a tracking app; it's a community. I've met some of my best friends while packing meals for the downtown shelter on Sunday mornings."</p>
+                    <div class="student-info">
+                        <div class="student-avatar" style="background: #F59E0B;">S</div>
+                        <div>
+                            <h4>Samira Khan</h4>
+                            <span>200+ Hours Served</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="brand-logo" style="color: white;">
+                    <i data-lucide="heart" style="color: var(--accent-primary);"></i>
+                    SevaLog
+                </a>
+                <p>Building a better tomorrow through organized, impactful community service. Join thousands of volunteers making a difference today.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <a href="opportunities.html" style="color: white;">Seva Hub</a>
+                <a href="impact.html">Our Impact</a>
+                <a href="join-us.html">Become a Volunteer</a>
+            </div>
+
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="admin/login.html" style="margin-top: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 12px;">
+                    <i data-lucide="lock" style="width: 12px;"></i> Admin Portal
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div>&copy; 2026 SevaLog Initiative. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public-main.js"></script>
+    <script src="opportunities.js"></script>
+</body>
+</html>

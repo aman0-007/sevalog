@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started | SevaLog</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="public-layout.css">
+    <link rel="stylesheet" href="get-started.css">
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo">
+                <i data-lucide="heart"></i>
+                SevaLog
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" style="display: flex; align-items: center; gap: 6px; font-weight: 600;">
+                    <i data-lucide="arrow-left" style="width: 18px;"></i> Back to Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="choice-container">
+        <div class="choice-wrapper">
+            
+            <div class="choice-header">
+                <h1>Welcome to SevaLog</h1>
+                <p>How would you like to proceed today?</p>
+            </div>
+            
+            <div class="choice-grid">
+                <div class="choice-card" onclick="window.location.href='join-us.html'">
+                    <div class="choice-icon">
+                        <i data-lucide="user-plus"></i>
+                    </div>
+                    <h2>I'm a New Volunteer</h2>
+                    <p>Create a free account to discover upcoming events, track your service hours, and build your digital portfolio.</p>
+                    <a href="join-us.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 16px; pointer-events: none;">Create Account</a>
+                </div>
+
+                <div class="choice-card" onclick="window.location.href='login.html'">
+                    <div class="choice-icon icon-green">
+                        <i data-lucide="log-in"></i>
+                    </div>
+                    <h2>I Have an Account</h2>
+                    <p>Welcome back! Sign in to access your dashboard, view your registered events, and log your hours.</p>
+                    <a href="login.html" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 16px; pointer-events: none;">Sign In</a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public-main.js"></script>
+    
+</body>
+</html>

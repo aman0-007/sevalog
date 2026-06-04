@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | SevaLog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="../public-layout.css">
+    <link rel="stylesheet" href="volunteer-layout.css">
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><i data-lucide="heart" style="color: var(--accent-primary);"></i> SevaLog</div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <a href="my-events.html" class="nav-item"><i data-lucide="calendar"></i> My Events</a>
+            <a href="community.html" class="nav-item"><i data-lucide="users"></i> Community Hub</a>
+            <a href="documents.html" class="nav-item"><i data-lucide="file-text"></i> Documents</a>
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-light);">
+                <a href="settings.html" class="nav-item active"><i data-lucide="settings"></i> Settings</a>
+                <a href="#" id="logout-btn" class="nav-item" style="color: #EF4444;"><i data-lucide="log-out"></i> Log Out</a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="app-content">
+        <header class="top-bar">
+            <button id="mobile-menu-btn" class="icon-btn mobile-menu-btn" aria-label="Open navigation"><i data-lucide="menu"></i></button>
+            <div class="page-title"><h3>Settings</h3></div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="icon-btn"><i data-lucide="bell"></i></button>
+                <div class="user-profile-menu">
+                    <div class="avatar" id="user-initial">U</div>
+                    <span id="user-name-top" style="font-weight: 700; font-size: 14px;">User</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-viewport">
+            
+            <div class="settings-layout">
+                <div class="settings-nav">
+                    <button class="s-nav-btn active">Public Profile</button>
+                    <button class="s-nav-btn">Account Details</button>
+                    <button class="s-nav-btn">Notifications</button>
+                    <button class="s-nav-btn">Privacy & Security</button>
+                </div>
+
+                <div class="settings-content">
+                    <div class="settings-panel">
+                        <h2>Public Profile</h2>
+                        <p class="panel-desc">Manage how your profile appears to other volunteers and organizers.</p>
+                        
+                        <div class="form-group">
+                            <label>Short Bio</label>
+                            <textarea rows="4" placeholder="Tell the community about yourself..."></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>City / Location</label>
+                                <input type="text" value="Mumbai, India">
+                            </div>
+                            <div class="form-group">
+                                <label>Institution / College</label>
+                                <input type="text" value="IIT Bombay">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Add More Skills (Comma separated)</label>
+                            <input type="text" placeholder="e.g. Photography, Data Entry, Cooking">
+                        </div>
+
+                        <div style="margin-top: 32px; border-top: 1px solid var(--border-light); padding-top: 24px; display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" id="save-btn">Save Changes</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-panel" style="margin-top: 24px;">
+                        <h2>Email Notifications</h2>
+                        <div class="toggle-row">
+                            <div>
+                                <h4>Event Reminders</h4>
+                                <p>Get notified 24 hours before your upcoming Seva.</p>
+                            </div>
+                            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <h4>Impact Reports</h4>
+                                <p>Receive a monthly summary of your verified hours.</p>
+                            </div>
+                            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../public-main.js"></script>
+    <script src="settings.js"></script>
+</body>
+</html>

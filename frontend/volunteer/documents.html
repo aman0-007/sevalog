@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Documents | SevaLog</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="../public-layout.css">
+    <link rel="stylesheet" href="volunteer-layout.css">
+    <link rel="stylesheet" href="documents.css">
+</head>
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><i data-lucide="heart" style="color: var(--accent-primary);"></i> SevaLog</div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+            <a href="my-events.html" class="nav-item"><i data-lucide="calendar"></i> My Events</a>
+            <a href="community.html" class="nav-item"><i data-lucide="users"></i> Community Hub</a>
+            <a href="documents.html" class="nav-item active"><i data-lucide="file-text"></i> Documents</a>
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-light);">
+                <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
+                <a href="#" id="logout-btn" class="nav-item" style="color: #EF4444;"><i data-lucide="log-out"></i> Log Out</a>
+            </div>
+        </nav>
+    </aside>
+
+    <div class="app-content">
+        <header class="top-bar">
+            <button id="mobile-menu-btn" class="icon-btn mobile-menu-btn" aria-label="Open navigation"><i data-lucide="menu"></i></button>
+            <div class="page-title"><h3>Verified Documents</h3></div>
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="icon-btn"><i data-lucide="bell"></i></button>
+                <div class="user-profile-menu">
+                    <div class="avatar" id="user-initial">U</div>
+                    <span id="user-name-top" style="font-weight: 700; font-size: 14px;">User</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-viewport">
+            
+            <div class="doc-controls reveal">
+                <div>
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">Official Service Record</h2>
+                    <p style="color: var(--text-muted); font-size: 15px;">Your digitally verified community service certificate.</p>
+                </div>
+                <button class="btn btn-primary" onclick="alert('PDF Download Initialized!')">
+                    <i data-lucide="download"></i> Download as PDF
+                </button>
+            </div>
+
+            <div class="certificate-wrapper reveal" style="transition-delay: 0.1s;">
+                <div class="certificate-frame">
+                    <div class="certificate-inner">
+                        
+                        <div class="cert-header">
+                            <i data-lucide="heart" style="color: #2563EB; width: 32px; height: 32px;"></i>
+                            <span style="font-weight: 800; font-size: 20px; color: #1E293B; letter-spacing: 0.1em; text-transform: uppercase;">SevaLog Initiative</span>
+                        </div>
+
+                        <h1 class="cert-title">Certificate of Appreciation</h1>
+                        
+                        <p class="cert-text">This is proudly presented to</p>
+                        
+                        <h2 class="cert-name" id="cert-name">Loading Name...</h2>
+                        
+                        <p class="cert-text">for outstanding dedication and service to the community. <br> They have successfully completed</p>
+                        
+                        <div class="cert-hours">
+                            <span id="cert-hours">0</span> <small>Verified Hours</small>
+                        </div>
+
+                        <div class="gold-seal">
+                            <div class="seal-inner">Verified</div>
+                            <div class="ribbon ribbon-left"></div>
+                            <div class="ribbon ribbon-right"></div>
+                        </div>
+
+                        <div class="cert-footer">
+                            <div class="signature-block">
+                                <div class="signature-line"></div>
+                                <p>Platform Administrator</p>
+                            </div>
+                            <div class="signature-block">
+                                <div class="date-text" id="cert-date">Date</div>
+                                <div class="signature-line"></div>
+                                <p>Date of Issuance</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../public-main.js"></script>
+    <script src="documents.js"></script>
+</body>
+</html>

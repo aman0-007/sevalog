@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Management | SevaLog</title>
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="events.css"> <link rel="stylesheet" href="gallery.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body class="preload">
+
+    <div class="dashboard-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="heart" class="brand-icon"></i>
+                <h2 class="nav-text">SevaLog</h2>
+                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()"><i data-lucide="x"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item" title="Dashboard">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="events.html" class="nav-item" title="Events">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Events Management</span>
+                </a>
+                <a href="volunteers.html" class="nav-item" title="Volunteers">
+                    <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
+                </a>
+                <a href="gallery.html" class="nav-item active" title="Gallery">
+                    <i data-lucide="image"></i> <span class="nav-text">Gallery</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <script>
+            if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        </script>
+
+        <main class="main-content" id="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="icon-btn" onclick="toggleSidebar()"><i data-lucide="menu"></i></button>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                        <i data-lucide="moon" id="theme-icon-moon"></i>
+                        <i data-lucide="sun" id="theme-icon-sun" style="display: none;"></i>
+                    </button>
+                    
+                    <div class="admin-profile">
+                        <div class="avatar">A</div>
+                        <div class="admin-info">
+                            <span class="admin-name">Admin User</span>
+                            <span class="admin-role">Super Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div>
+                        <h1>Activity Gallery</h1>
+                        <p>Showcase the organization's work and track total beneficiaries.</p>
+                    </div>
+                    <button class="primary-btn" onclick="openModal()">
+                        <i data-lucide="upload-cloud"></i> Post Activity
+                    </button>
+                </div>
+
+                <div class="gallery-grid" id="gallery-grid">
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="activityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>New Activity Post</h2>
+                <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <form id="activityForm">
+                <div class="form-group full" style="margin-bottom: 16px;">
+                    <label class="form-label">Activity Image</label>
+                    <div class="image-upload-zone" onclick="document.getElementById('file-input').click()">
+                        <i data-lucide="image-plus" style="width: 32px; height: 32px; margin-bottom: 8px; color: var(--text-muted);"></i>
+                        <p style="font-size: 13px; color: var(--text-muted);">Click to upload photo</p>
+                        <input type="file" id="file-input" hidden accept="image/*" onchange="previewImage(event)">
+                        <img id="image-preview" alt="Preview">
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label class="form-label">Title</label>
+                        <input type="text" id="act-title" class="form-input" required placeholder="e.g. Winter Clothes Distribution">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Beneficiaries Reached</label>
+                        <input type="number" id="act-reached" class="form-input" placeholder="e.g. 150">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="act-category" class="form-input">
+                            <option value="Food">Food</option>
+                            <option value="Education">Education</option>
+                            <option value="Health">Health</option>
+                            <option value="Environment">Environment</option>
+                        </select>
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">Description</label>
+                        <textarea id="act-desc" class="form-input" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="primary-btn" id="submit-btn">Publish Post</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="gallery.js"></script>
+</body>
+</html>

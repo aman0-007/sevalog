@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification | SevaLog</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="login.css">
+
+    <style>
+        /* --- GLOBAL & PRANK GAME STYLES --- */
+        body { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            background: var(--bg-color, #F8FAFC); 
+            margin: 0; 
+            padding: 20px;
+            touch-action: none; /* Critical: Prevents mobile pull-to-refresh while dragging */
+            overflow: hidden; 
+        }
+
+        #game-container { 
+            text-align: center; 
+            width: 100%; 
+            max-width: 500px; 
+            transition: all 0.4s ease; 
+        }
+
+        .play-area { 
+            position: relative; /* Critical for dragging */
+            height: 380px; 
+            background: var(--surface, #FFFFFF); 
+            border: 2px dashed var(--border, #E2E8F0); 
+            border-radius: var(--radius-lg, 16px); 
+            margin: 20px 0; 
+            overflow: hidden; 
+            box-shadow: var(--shadow-soft);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            70% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .trash-item { 
+            position: absolute; /* Critical: Allows JS to move it */
+            cursor: grab; 
+            font-size: 32px; 
+            user-select: none; /* Prevents text highlighting */
+            z-index: 10; 
+            animation: popIn 0.4s ease-out forwards;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .trash-item:hover { transform: scale(1.2) rotate(10deg); }
+        .trash-item.dragging { transform: scale(1.4) !important; z-index: 100; cursor: grabbing; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2)); }
+        .trash-item.near { transform: scale(1.5) !important; filter: drop-shadow(0 0 15px var(--accent, #2563EB)); }
+
+        .bin { 
+            position: absolute; /* Critical: Allows JS to move it */
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            font-size: 55px; 
+            cursor: grab; 
+            z-index: 5; 
+            transition: transform 0.2s ease; 
+            user-select: none;
+        }
+
+        .bin:hover { transform: translateX(-50%) scale(1.1); }
+        .bin.dragging { transform: translateX(-50%) scale(1.2) !important; filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)); cursor: grabbing; }
+        .bin.near { transform: translateX(-50%) scale(1.15); }
+    </style>
+</head>
+<body class="preload">
+
+    <div id="game-container">
+        <h2 id="game-title" style="font-weight: 800; letter-spacing: -0.02em;">Security Verification</h2>
+        <p id="game-msg" style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Prove you are a volunteer: Clean the park to enter.</p>
+        
+        <div style="margin-top: 15px; font-weight: 800; color: var(--accent); font-size: 13px;">
+            TRASH COLLECTED: <span id="score">0</span>
+        </div>
+
+        <div class="play-area" id="play-area">
+            <div id="bin" class="bin" title="Drag me to the title!">🗑️</div>
+        </div>
+        
+        <p style="font-size: 11px; color: var(--text-muted); opacity: 0.5;">Manual Verification Required (Error 402)</p>
+    </div>
+
+    <div class="login-card" id="loginCard">
+        <div class="login-inner">
+            
+            <div class="login-brand">
+                <div class="brand-ring"><i data-lucide="shield-check"></i></div>
+            </div>
+
+            <div class="login-intro">
+                <h1>Admin Portal</h1>
+                <p>Verify your identity to access SevaLog.</p>
+            </div>
+
+            <div id="error-msg" class="error-msg">
+                <i data-lucide="alert-circle" style="width: 16px; height: 16px;"></i>
+                <span id="error-text">Invalid credentials.</span>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="input-group">
+                    <label for="email">Work Email</label>
+                    <div class="input-field">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="email" placeholder="admin@sevalog.org" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="label-row">
+                        <label for="password">Password</label>
+                        <a href="#" class="text-link">Forgot password?</a>
+                    </div>
+                    <div class="input-field">
+                        <i data-lucide="key-round"></i>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="login-btn" class="submit-btn">
+                    <span>Unlock Dashboard</span>
+                    <i data-lucide="chevron-right"></i>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Not an authorized user? <a href="#" onclick="location.reload()">Exit Portal</a></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="login.js"></script>
+
+</body>
+</html>

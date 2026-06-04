@@ -1,0 +1,82 @@
+/* =========================================
+   COMMUNITY.CSS (Social Feed & Leaderboards)
+   ========================================= */
+
+.community-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.section-header { margin-bottom: 24px; }
+.section-header h2 { font-size: 24px; color: var(--text-main); margin-bottom: 8px; }
+.section-header p { font-size: 14px; color: var(--text-muted); }
+
+/* --- LIVE FEED --- */
+.social-feed { display: flex; flex-direction: column; gap: 24px; }
+
+.feed-post {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.post-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--bg-surface); display: flex; align-items: center; justify-content: center; font-weight: 700; color: var(--accent-primary); }
+.post-meta h4 { font-size: 15px; color: var(--text-main); display: flex; align-items: center; gap: 6px; }
+.post-meta span { font-size: 12px; color: var(--text-muted); }
+
+.post-body { font-size: 15px; line-height: 1.6; color: var(--text-main); margin-bottom: 16px; }
+.post-highlight { font-weight: 700; color: var(--accent-primary); }
+
+.post-actions { display: flex; gap: 16px; border-top: 1px solid var(--border-light); padding-top: 16px; }
+.action-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: none; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+.action-btn:hover { color: var(--accent-primary); }
+.action-btn.active { color: #F59E0B; }
+.action-btn.active i { fill: #F59E0B; color: #F59E0B; }
+
+/* --- LEADERBOARD CARD --- */
+.leaderboard-card {
+    background: white; border-radius: 16px; border: 1px solid var(--border-light);
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 32px;
+}
+
+.lb-header { padding: 24px; border-bottom: 1px solid var(--border-light); background: var(--bg-surface); }
+.lb-header h3 { font-size: 18px; margin-bottom: 16px; }
+
+.lb-tabs { display: flex; background: white; border-radius: 8px; padding: 4px; border: 1px solid var(--border-light); }
+.lb-tab { flex: 1; padding: 8px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: 0.2s; }
+.lb-tab.active { background: var(--accent-glow); color: var(--accent-primary); }
+
+.lb-content { padding: 0; }
+.lb-row { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-light); transition: background 0.2s; }
+.lb-row:hover { background: var(--bg-surface); }
+.lb-row:last-child { border-bottom: none; }
+
+.lb-rank { width: 30px; font-weight: 800; color: var(--text-muted); font-size: 15px; }
+.rank-1 { color: #F59E0B; } /* Gold */
+.rank-2 { color: #94A3B8; } /* Silver */
+.rank-3 { color: #D97706; } /* Bronze */
+
+.lb-user { flex: 1; display: flex; align-items: center; gap: 12px; }
+.lb-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent-glow); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+.lb-user-info h5 { font-size: 14px; color: var(--text-main); }
+.lb-user-info span { font-size: 12px; color: var(--text-muted); }
+
+.lb-score { font-weight: 800; color: var(--text-main); font-size: 15px; }
+
+/* --- SPOTLIGHT CARD --- */
+.spotlight-card { background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-radius: 16px; padding: 32px; color: white; position: relative; overflow: hidden; }
+.spotlight-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(245, 158, 11, 0.2); color: #FBBF24; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 24px; border: 1px solid rgba(245, 158, 11, 0.3); }
+.spotlight-user { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+.spotlight-avatar { width: 56px; height: 56px; background: #F59E0B; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; border: 3px solid rgba(255,255,255,0.2); }
+.spotlight-user h4 { font-size: 18px; margin-bottom: 4px; }
+.spotlight-user span { font-size: 13px; color: #94A3B8; }
+.spotlight-quote { font-style: italic; color: #CBD5E1; line-height: 1.6; font-size: 15px; }
+
+@media (max-width: 900px) {
+    .community-grid { grid-template-columns: 1fr; }
+}

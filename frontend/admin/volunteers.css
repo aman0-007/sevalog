@@ -1,0 +1,42 @@
+/* =========================================
+   VOLUNTEERS.CSS (Tables and Profile Modals)
+   ========================================= */
+
+/* --- TABLES --- */
+.table-container { background: var(--surface); border-radius: var(--radius-lg); border: 1px solid var(--border); overflow-x: auto; box-shadow: var(--shadow-soft); }
+.data-table { width: 100%; border-collapse: collapse; text-align: left; }
+.data-table th { padding: 16px 24px; background: var(--bg-color); color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+.data-table td { padding: 16px 24px; border-bottom: 1px solid var(--border); color: var(--text-main); font-size: 14px; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tbody tr:hover { background: var(--bg-color); }
+
+/* Volunteer specific table elements */
+.volunteer-name-cell { display: flex; align-items: center; gap: 12px; }
+.mini-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-color); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 12px; color: var(--accent); }
+.role-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+.role-admin { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+.role-volunteer { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+
+/* Action Button */
+.btn-text { background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: 0.2s; }
+.btn-text:hover { background: rgba(59, 130, 246, 0.1); }
+
+/* --- PROFILE MODAL --- */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; }
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: var(--radius-lg); padding: 32px; transform: translateY(20px); transition: 0.3s ease; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); box-shadow: var(--shadow-hover); }
+.modal-overlay.active .modal-content { transform: translateY(0); }
+
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.profile-title { display: flex; align-items: center; gap: 16px; }
+.profile-title .avatar { width: 56px; height: 56px; font-size: 20px; }
+.profile-title h2 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.profile-title p { color: var(--text-muted); font-size: 14px; }
+
+.profile-section { margin-bottom: 20px; }
+.profile-section h4 { font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 8px; }
+.profile-section p { font-size: 14px; color: var(--text-main); line-height: 1.5; }
+
+/* Tags for Skills & Interests */
+.tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
+.skill-tag { background: var(--bg-color); border: 1px solid var(--border); color: var(--text-main); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }

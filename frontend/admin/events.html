@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Events | SevaLog</title>
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="events.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body class="preload">
+
+    <div class="dashboard-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="heart" class="brand-icon"></i>
+                <h2 class="nav-text">SevaLog</h2>
+                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item" title="Dashboard">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="events.html" class="nav-item active" title="Events Management">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Events Management</span>
+                </a>
+                <a href="volunteers.html" class="nav-item" title="Volunteers">
+                    <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
+                </a>
+                <a href="gallery.html" class="nav-item" title="Gallery">
+                    <i data-lucide="image"></i> <span class="nav-text">Gallery</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <script>
+            if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        </script>
+
+        <main class="main-content" id="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="icon-btn" onclick="toggleSidebar()">
+                        <i data-lucide="menu"></i>
+                    </button>
+                </div>
+                
+                <div class="header-right">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i data-lucide="moon" id="theme-icon-moon"></i>
+                        <i data-lucide="sun" id="theme-icon-sun" style="display: none;"></i>
+                    </button>
+                    <div class="admin-profile">
+                        <div class="avatar">A</div>
+                        <div class="admin-info">
+                            <span class="admin-name">Admin User</span>
+                            <span class="admin-role">Super Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div>
+                        <h1>Events Management</h1>
+                        <p>Create, edit, and monitor your Seva Hub activities.</p>
+                    </div>
+                    <button class="primary-btn" onclick="openModal()">
+                        <i data-lucide="plus"></i> Create Event
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Event Title</th>
+                                <th>Date & Time</th>
+                                <th>Location</th>
+                                <th>Volunteers</th> <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="events-table-body">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading events...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="eventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Event</h2>
+                <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <form id="createEventForm">
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label class="form-label">Event Title</label>
+                        <input type="text" id="ev-title" class="form-input" required placeholder="e.g. Sunday Food Drive">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" id="ev-date" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="ev-category" class="form-input" required>
+                            <option value="Food Drive">Food Drive</option>
+                            <option value="Cleanliness">Cleanliness</option>
+                            <option value="Teaching">Teaching</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <input type="time" id="ev-start" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                        <input type="time" id="ev-end" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" id="ev-location" class="form-input" required placeholder="e.g. Central Station">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Volunteers Needed</label>
+                        <input type="number" id="ev-max-volunteers" class="form-input" required placeholder="e.g. 15" min="1" value="10">
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">Description</label>
+                        <textarea id="ev-desc" class="form-input" rows="3" placeholder="What will volunteers be doing?"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="primary-btn">Save Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="events.js"></script>
+</body>
+</html>

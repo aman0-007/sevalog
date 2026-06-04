@@ -1,0 +1,99 @@
+/* =========================================
+   GALLERY.CSS (Impact Grid & Upload Forms)
+   ========================================= */
+
+/* --- GALLERY GRID --- */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.activity-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.activity-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+}
+
+.activity-image {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background: var(--bg-color);
+    border-bottom: 1px solid var(--border);
+}
+
+.activity-content {
+    padding: 20px;
+}
+
+.activity-content h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.activity-content p {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+/* Impact Stats on the card */
+.impact-badges {
+    display: flex;
+    gap: 12px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.impact-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.impact-item i {
+    width: 14px;
+    height: 14px;
+    color: var(--accent);
+}
+
+/* --- UPLOAD PREVIEW --- */
+.image-upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: 40px;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s;
+    margin-bottom: 20px;
+}
+
+.image-upload-zone:hover {
+    border-color: var(--accent);
+    background: var(--bg-color);
+}
+
+#image-preview {
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    margin-top: 10px;
+    display: none;
+    border-radius: var(--radius-md);
+}

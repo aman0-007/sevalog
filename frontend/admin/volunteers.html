@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Volunteers | SevaLog</title>
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="volunteers.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body class="preload">
+
+    <div class="dashboard-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="heart" class="brand-icon"></i>
+                <h2 class="nav-text">SevaLog</h2>
+                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()"><i data-lucide="x"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item" title="Dashboard">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="events.html" class="nav-item" title="Events Management">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Events Management</span>
+                </a>
+                <a href="volunteers.html" class="nav-item active" title="Volunteers">
+                    <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
+                </a>
+                <a href="gallery.html" class="nav-item" title="Gallery">
+                    <i data-lucide="image"></i> <span class="nav-text">Gallery</span>
+                </a>
+            </nav>
+        </aside>
+        
+        <script>
+            if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        </script>
+
+        <main class="main-content" id="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="icon-btn" onclick="toggleSidebar()"><i data-lucide="menu"></i></button>
+                    <div class="search-bar">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="search-input" placeholder="Search by name or email...">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                        <i data-lucide="moon" id="theme-icon-moon"></i>
+                        <i data-lucide="sun" id="theme-icon-sun" style="display: none;"></i>
+                    </button>
+                    <div class="admin-profile">
+                        <div class="avatar">A</div>
+                        <div class="admin-info">
+                            <span class="admin-name">Admin User</span>
+                            <span class="admin-role">Super Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <div class="page-header">
+                    <div>
+                        <h1>Volunteers Directory</h1>
+                        <p>View profiles, track hours, and manage your community members.</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Volunteer Name</th>
+                                <th>Contact Info</th>
+                                <th>Role</th>
+                                <th>Total Hours</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="volunteers-table-body">
+                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading volunteers...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="profile-title">
+                    <div class="avatar" id="modal-avatar">V</div>
+                    <div>
+                        <h2 id="modal-name">Volunteer Name</h2>
+                        <p id="modal-role">Volunteer</p>
+                    </div>
+                </div>
+                <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="profile-section">
+                <h4>Contact & Background</h4>
+                <p><strong>Email:</strong> <span id="modal-email">--</span></p>
+                <p><strong>Phone:</strong> <span id="modal-phone">--</span></p>
+                <p><strong>Education:</strong> <span id="modal-edu">--</span></p>
+            </div>
+
+            <div class="profile-section">
+                <h4>Bio</h4>
+                <p id="modal-bio" style="color: var(--text-muted); font-style: italic;">No bio provided.</p>
+            </div>
+
+            <div class="profile-section">
+                <h4>Skills</h4>
+                <div class="tag-container" id="modal-skills">
+                    </div>
+            </div>
+
+            <div class="profile-section">
+                <h4>Impact Stats</h4>
+                <div style="display: flex; gap: 24px; margin-top: 8px;">
+                    <div>
+                        <p style="font-size: 24px; font-weight: 700; color: var(--text-main);" id="modal-hours">0</p>
+                        <p style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Hours Served</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 24px; font-weight: 700; color: var(--text-main);" id="modal-events">0</p>
+                        <p style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Events Attended</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="main.js"></script>
+    <script src="volunteers.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Impact | SevaLog</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <link rel="stylesheet" href="public-layout.css">
+    <link rel="stylesheet" href="impact.css">
+</head>
+<body class="hero-top">
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="brand-logo">
+                <i data-lucide="heart"></i>
+                SevaLog
+            </a>
+            
+            <button id="mobile-menu-btn" class="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+
+            <div class="nav-links" id="nav-links">
+                <a href="about.html" class="nav-link">Our Mission</a>
+                <a href="opportunities.html" class="nav-link">Seva Hub</a>
+                <a href="impact.html" class="nav-link active">Our Impact</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="impact-hero">
+            <div class="impact-hero-content">
+                <div class="reveal" style="transition-delay: 0s;">
+                    <span class="hero-badge">Measuring What Matters</span>
+                </div>
+                <h1 class="reveal" style="transition-delay: 0.1s;">Numbers that tell a <span class="text-gradient">Story.</span></h1>
+                <p class="reveal" style="transition-delay: 0.2s;">Every hour logged is a life touched, a park cleaned, or a student mentored. Here is the collective footprint of the SevaLog community.</p>
+            </div>
+        </section>
+
+        <section class="impact-metrics">
+            <div class="metrics-container">
+                <div class="impact-stat-card reveal" style="transition-delay: 0.1s;">
+                    <div class="stat-icon"><i data-lucide="utensils"></i></div>
+                    <h3 class="counter" data-target="12500" data-suffix="+">0</h3>
+                    <p>Meals Distributed</p>
+                </div>
+                <div class="impact-stat-card reveal" style="transition-delay: 0.2s;">
+                    <div class="stat-icon"><i data-lucide="trees"></i></div>
+                    <h3 class="counter" data-target="4200">0</h3>
+                    <p>Trees Planted</p>
+                </div>
+                <div class="impact-stat-card reveal" style="transition-delay: 0.3s;">
+                    <div class="stat-icon"><i data-lucide="book-open"></i></div>
+                    <h3 class="counter" data-target="850" data-suffix="+">0</h3>
+                    <p>Hours of Tutoring</p>
+                </div>
+                <div class="impact-stat-card reveal" style="transition-delay: 0.4s;">
+                    <div class="stat-icon"><i data-lucide="users"></i></div>
+                    <h3 class="counter" data-target="320">0</h3>
+                    <p>NGO Partners</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="student-opportunities">
+            <div class="section-title reveal">
+                <h2>Empowering the Next Generation</h2>
+                <p>SevaLog isn't just about helping communities; it's about giving students the platform to lead, learn, and grow.</p>
+            </div>
+
+            <div class="zigzag-row reveal">
+                <div class="zigzag-image">
+                    <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Students leading">
+                    <div class="image-decoration"></div>
+                </div>
+                <div class="zigzag-content">
+                    <div class="feature-icon"><i data-lucide="trending-up"></i></div>
+                    <h3>Leadership Opportunities</h3>
+                    <p>Students transition from participants to organizers. By using our platform, young volunteers learn event management, team coordination, and real-world problem-solving skills that textbooks can't teach.</p>
+                    <ul class="benefit-list">
+                        <li><i data-lucide="check-circle-2"></i> Verified Leadership Certificates</li>
+                        <li><i data-lucide="check-circle-2"></i> Project Management Experience</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="zigzag-row reverse reveal">
+                <div class="zigzag-image">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Students networking">
+                    <div class="image-decoration alternate"></div>
+                </div>
+                <div class="zigzag-content">
+                    <div class="feature-icon"><i data-lucide="briefcase"></i></div>
+                    <h3>Building a Verified Portfolio</h3>
+                    <p>Every hour a student serves is digitally verified by administrators. This creates an unforgeable, lifelong portfolio of civic engagement that dramatically strengthens college applications and resumes.</p>
+                    <ul class="benefit-list">
+                        <li><i data-lucide="check-circle-2"></i> Unforgeable Digital Resume</li>
+                        <li><i data-lucide="check-circle-2"></i> Stand out in University Admissions</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="leaderboard-section">
+            <div class="section-title reveal">
+                <h2>Hall of Fame</h2>
+                <p>Recognizing the students who have dedicated the most hours to uplifting our community this year.</p>
+            </div>
+
+            <div class="leaderboard-container reveal" style="transition-delay: 0.2s;">
+                <div class="podium-wrapper" id="podium-container">
+                    <p style="text-align: center; color: var(--text-muted); width: 100%;">Loading Top Volunteers...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <a href="index.html" class="brand-logo" style="color: white;">
+                    <i data-lucide="heart" style="color: var(--accent-primary);"></i>
+                    SevaLog
+                </a>
+                <p>Building a better tomorrow through organized, impactful community service. Join thousands of volunteers making a difference today.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Platform</h4>
+                <a href="opportunities.html">Upcoming Events</a>
+                <a href="impact.html" style="color: white;">Our Impact</a>
+                <a href="join-us.html">Become a Volunteer</a>
+            </div>
+
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="admin/login.html" style="margin-top: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 12px;">
+                    <i data-lucide="lock" style="width: 12px;"></i> Admin Portal
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div>&copy; 2026 SevaLog Initiative. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public-main.js"></script>
+    <script src="impact.js"></script>
+</body>
+</html>
