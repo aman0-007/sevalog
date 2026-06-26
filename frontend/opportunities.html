@@ -15,7 +15,7 @@
 
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="index.html" class="brand-logo">
+            <a href="../index.html" class="brand-logo">
                 <i data-lucide="heart"></i>
                 SevaLog
             </a>
@@ -33,6 +33,7 @@
     </nav>
 
     <main>
+        <!-- 1. HERO -->
         <section class="hub-hero">
             <div class="hub-hero-content">
                 <span class="badge reveal" style="transition-delay: 0s;">The Action Center</span>
@@ -45,7 +46,102 @@
             </div>
         </section>
 
-        <section id="upcoming" class="hub-section">
+        <!-- 2. WAYS TO SERVE (Upgraded Image Cards) -->
+        <section id="initiatives" class="hub-section">
+            <div class="section-header reveal">
+                <h2>Ways You Can Serve</h2>
+                <p>Discover the diverse range of initiatives and programs you can be a part of. There is a role for every skill and passion.</p>
+            </div>
+            
+            <div class="initiatives-grid">
+                <!-- Card 1 -->
+                <div class="initiative-card reveal">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1618477461853-cf6ed80faba5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Swachhata Drive">
+                        <div class="init-badge"><i data-lucide="leaf"></i> Environment</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>Swachhata Drive</h3>
+                        <p>Join hands in mass cleanliness drives to restore and protect our local neighborhoods and public spaces.</p>
+                    </div>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="initiative-card reveal" style="transition-delay: 0.1s;">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="MBM Competitions">
+                        <div class="init-badge"><i data-lucide="award"></i> Culture</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>MBM Competitions</h3>
+                        <p>Participate in or organize 'Mera Bharat Mahan' patriotic and cultural competitions to inspire the youth.</p>
+                    </div>
+                </div>
+                
+                <!-- Card 3 -->
+                <div class="initiative-card reveal" style="transition-delay: 0.2s;">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Youth Awareness">
+                        <div class="init-badge"><i data-lucide="zap"></i> Empowerment</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>Youth Awareness</h3>
+                        <p>Conduct dynamic workshops and seminars focusing on civic duties, mental health, and leadership.</p>
+                    </div>
+                </div>
+                
+                <!-- Card 4 -->
+                <div class="initiative-card reveal" style="transition-delay: 0.3s;">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="English Teaching">
+                        <div class="init-badge"><i data-lucide="book-open"></i> Education</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>English Teaching</h3>
+                        <p>Empower underprivileged children by volunteering your time to teach essential language and communication skills.</p>
+                    </div>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="initiative-card reveal">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Student Engagement">
+                        <div class="init-badge"><i data-lucide="users"></i> Mentorship</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>Student Engagement</h3>
+                        <p>Lead interactive mentoring, career guidance, and skill-building sessions for school and college students.</p>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="initiative-card reveal" style="transition-delay: 0.1s;">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Bhajans & Culture">
+                        <div class="init-badge"><i data-lucide="music"></i> Spiritual</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>Bhajans & Culture</h3>
+                        <p>Organize and participate in musical evenings, kirtans, and cultural gatherings for spiritual upliftment.</p>
+                    </div>
+                </div>
+
+                <!-- Card 7 -->
+                <div class="initiative-card reveal" style="transition-delay: 0.2s;">
+                    <div class="init-img">
+                        <img src="https://images.unsplash.com/photo-1593460354583-4224ba8bfbf8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Village Visits">
+                        <div class="init-badge"><i data-lucide="map"></i> Outreach</div>
+                    </div>
+                    <div class="init-content">
+                        <h3>Village Visits</h3>
+                        <p>Take part in rural outreach programs to directly understand and solve grassroots challenges in local villages.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. UPCOMING EVENTS (Switched to bg-surface for contrast) -->
+        <section id="upcoming" class="hub-section bg-surface">
             <div class="section-header reveal">
                 <h2>Ready to Serve?</h2>
                 <p>Browse our upcoming community events and register to secure your spot.</p>
@@ -56,7 +152,8 @@
             </div>
         </section>
 
-        <section id="past" class="hub-section bg-surface">
+        <!-- 4. PAST EVENTS -->
+        <section id="past" class="hub-section">
             <div class="section-header reveal">
                 <h2>A Legacy of Action</h2>
                 <p>A look back at the events we've successfully completed together.</p>
@@ -67,7 +164,8 @@
             </div>
         </section>
 
-        <section id="gallery" class="hub-section">
+        <!-- 5. GALLERY (Switched to bg-surface) -->
+        <section id="gallery" class="hub-section bg-surface">
             <div class="section-header reveal">
                 <h2>Moments of Joy</h2>
                 <p>Our community in action across various cities and causes.</p>
@@ -82,7 +180,8 @@
             </div>
         </section>
 
-        <section id="experiences" class="hub-section bg-surface" style="border-top: 1px solid var(--border-light);">
+        <!-- 6. TESTIMONIALS -->
+        <section id="experiences" class="hub-section" style="border-top: 1px solid var(--border-light);">
             <div class="section-header reveal">
                 <h2>Voices of our Volunteers</h2>
                 <p>Hear directly from the students who are dedicating their time to the community.</p>
@@ -126,21 +225,35 @@
         </section>
     </main>
 
+    <!-- FOOTER -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-brand">
-                <a href="index.html" class="brand-logo" style="color: white;">
+                <a href="../index.html" class="brand-logo" style="color: white;">
                     <i data-lucide="heart" style="color: var(--accent-primary);"></i>
                     SevaLog
                 </a>
                 <p>Building a better tomorrow through organized, impactful community service. Join thousands of volunteers making a difference today.</p>
+                <div style="display: flex; gap: 16px; margin-top: 24px;">
+                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="twitter" style="width: 20px;"></i></a>
+                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="instagram" style="width: 20px;"></i></a>
+                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="linkedin" style="width: 20px;"></i></a>
+                </div>
             </div>
             
             <div class="footer-links">
                 <h4>Platform</h4>
-                <a href="opportunities.html" style="color: white;">Seva Hub</a>
+                <a href="opportunities.html">Upcoming Events</a>
                 <a href="impact.html">Our Impact</a>
-                <a href="join-us.html">Become a Volunteer</a>
+                <a href="get-started.html">Become a Volunteer</a>
+                <a href="about.html">About the Team</a>
+            </div>
+
+            <div class="footer-links">
+                <h4>Resources</h4>
+                <a href="#">Help Center</a>
+                <a href="#">Community Guidelines</a>
+                <a href="#">Partner With Us</a>
             </div>
 
             <div class="footer-links">
@@ -152,8 +265,12 @@
                 </a>
             </div>
         </div>
+        
         <div class="footer-bottom">
             <div>&copy; 2026 SevaLog Initiative. All rights reserved.</div>
+            <div style="display: flex; gap: 20px;">
+                <span>System Status: <span style="color: #10B981;">● Online</span></span>
+            </div>
         </div>
     </footer>
 

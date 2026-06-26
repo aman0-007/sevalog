@@ -48,6 +48,102 @@
 
 .loading-state { text-align: center; padding: 40px; color: var(--text-muted); width: 100%; grid-column: 1 / -1; }
 
+
+/* --- WAYS TO SERVE (Image Initiative Cards) --- */
+.initiatives-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+}
+
+.initiative-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+}
+
+.initiative-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1);
+    border-color: var(--accent-glow);
+}
+
+/* Image Container */
+.init-img {
+    height: 220px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.init-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+/* Hover Zoom Effect */
+.initiative-card:hover .init-img img {
+    transform: scale(1.08);
+}
+
+/* Small floating badge over the image */
+.init-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.init-badge i {
+    width: 14px;
+    color: var(--accent-primary);
+}
+
+/* Text Content */
+.init-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.init-content h3 {
+    font-size: 20px;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.init-content p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    flex: 1; /* Pushes content evenly if descriptions vary in length */
+}
+
+@media (max-width: 768px) {
+    .initiatives-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
 /* --- UPCOMING EVENTS GRID --- */
 .events-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 32px; }
 
