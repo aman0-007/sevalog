@@ -256,6 +256,7 @@
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
     min-width: 0;
+    cursor: pointer;
 }
 .event-ticket:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
 
@@ -367,6 +368,104 @@
     width: 18px;
     height: 18px;
     color: white;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    border-bottom: 1px solid var(--border-light);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(16, 185, 129, 0.05));
+}
+
+.modal-title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.modal-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-title-row h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.2;
+}
+
+.modal-header p {
+    margin: 0;
+    color: var(--accent-primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.details-modal-close {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    background: white;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.details-modal-close:hover {
+    background: var(--bg-surface);
+    color: var(--accent-primary);
+    border-color: var(--accent-glow);
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.3s ease;
+    padding: 20px;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: #FFFFFF;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 20px;
+    padding: 24px;
+    transform: translateY(20px);
+    transition: 0.3s ease;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0);
 }
 
 @media (max-width: 768px) {

@@ -54,12 +54,17 @@
             </div>
 
             <div class="certificate-wrapper reveal" style="transition-delay: 0.1s;">
+                <!-- Helpful hint for mobile users -->
+                <div class="mobile-swipe-hint">
+                    <i data-lucide="chevrons-right"></i> Swipe to view full certificate
+                </div>
+
                 <div class="certificate-frame">
                     <div class="certificate-inner">
                         
                         <div class="cert-header">
-                            <i data-lucide="heart" style="color: #2563EB; width: 32px; height: 32px;"></i>
-                            <span style="font-weight: 800; font-size: 20px; color: #1E293B; letter-spacing: 0.1em; text-transform: uppercase;">SevaLog Initiative</span>
+                            <i data-lucide="award" style="color: #0F172A; width: 36px; height: 36px;"></i>
+                            <span class="cert-org">SevaLog Initiative</span>
                         </div>
 
                         <h1 class="cert-title">Certificate of Appreciation</h1>
@@ -68,23 +73,26 @@
                         
                         <h2 class="cert-name" id="cert-name">Loading Name...</h2>
                         
-                        <p class="cert-text">for outstanding dedication and service to the community. <br> They have successfully completed</p>
+                        <p class="cert-text">in recognition of their outstanding dedication and selfless service to the community. They have successfully contributed</p>
                         
                         <div class="cert-hours">
-                            <span id="cert-hours">0</span> <small>Verified Hours</small>
+                            <span id="cert-hours">0</span>
+                            <small>Verified Service Hours</small>
                         </div>
 
-                        <div class="gold-seal">
-                            <div class="seal-inner">Verified</div>
-                            <div class="ribbon ribbon-left"></div>
-                            <div class="ribbon ribbon-right"></div>
-                        </div>
-
-                        <div class="cert-footer">
+                        <!-- Perfectly aligned bottom row -->
+                        <div class="cert-bottom-row">
                             <div class="signature-block">
                                 <div class="signature-line"></div>
                                 <p>Platform Administrator</p>
                             </div>
+                            
+                            <div class="gold-seal">
+                                <div class="seal-inner">Verified</div>
+                                <div class="ribbon ribbon-left"></div>
+                                <div class="ribbon ribbon-right"></div>
+                            </div>
+
                             <div class="signature-block">
                                 <div class="date-text" id="cert-date">Date</div>
                                 <div class="signature-line"></div>
@@ -99,8 +107,9 @@
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
     <script src="../public-main.js"></script>
-    <script src="documents.js"></script>
+    <script src="../../js/volunteer/documents.js"></script>
 </body>
 </html>

@@ -3,6 +3,7 @@
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let globalEventsData = [];
     
     // ==========================================
     // 1. Initial Authentication Check
@@ -52,32 +53,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '<div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading events...</div>';
 
         try {
-            // Fetch upcoming events from the custom API
-            const response = await ApiClient.request('/volunteer/events', 'GET');
-            const data = response.data;
+            const response = await ApiClient.request('/volunteer/events/all', 'GET');
+            const data = response.data || [];
+            globalEventsData = data;
 
-            if (!data || data.length === 0) {
+            const upcomingEvents = data.filter(ev => ev.event_status === 'upcoming' || ev.event_status === 'live');
+
+            if (upcomingEvents.length === 0) {
                 container.innerHTML = '<p class="empty-msg">There are no upcoming events yet.</p>';
                 return;
             }
 
-            const eventCards = data.map(ev => {
+            const eventCards = upcomingEvents.map(ev => {
                 const evDate = new Date(ev.event_date);
                 const month = evDate.toLocaleString('en-US', { month: 'short' }).toUpperCase();
                 const day = String(evDate.getDate()).padStart(2, '0');
                 const time = ev.start_time ? ev.start_time.substring(0,5) : 'TBA';
 
-                // Check the status returned from the backend
                 let actionHtml = '';
                 if (ev.user_status === 'registered' || ev.user_status === 'present') {
                     actionHtml = '<span class="registered-pill">Registered</span>';
                 } else {
-                    // Show register button if they haven't applied, or if they previously 'withdrawn'
                     actionHtml = `<button class="btn-register" data-event-id="${ev.event_id}">Register</button>`;
                 }
 
                 return `
-                    <div class="event-ticket">
+                    <div class="event-ticket" onclick="openEventDetails('${ev.event_id}')">
                         <div class="ticket-date">
                             <span class="month">${month}</span>
                             <span class="day">${day}</span>
@@ -86,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <h4>${ev.title}</h4>
                             <div class="t-row"><i data-lucide="clock"></i> ${time}</div>
                             <div class="t-row"><i data-lucide="map-pin"></i> ${ev.location_name || 'Location TBD'}</div>
-                            <div class="ticket-actions">
+                            <div class="ticket-actions" onclick="event.stopPropagation()">
                                 ${actionHtml}
                                 <span style="font-size: 13px; font-weight: 700; color: var(--accent-primary);">Seva Activity</span>
                             </div>
@@ -113,6 +114,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const buttons = document.querySelectorAll('.btn-register');
         buttons.forEach(button => {
             button.addEventListener('click', async (event) => {
+                event.stopPropagation();
                 const btn = event.currentTarget;
                 const eventId = btn.dataset.eventId;
 
@@ -121,7 +123,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const success = await registerForEvent(eventId);
                 
-                // Update UI based on API response
                 if (success === true) {
                     btn.closest('.ticket-actions').innerHTML = '<span class="registered-pill">Registered</span>';
                 } else if (success === 'ALREADY_REGISTERED') {
@@ -212,6 +213,64 @@ document.addEventListener('DOMContentLoaded', async () => {
             circle.style.strokeDashoffset = offset;
         }, 300);
     }
+
+    window.openEventDetails = function(eventId) {
+        const ev = globalEventsData.find(e => e.event_id === eventId);
+        if (!ev) return;
+
+        document.getElementById('detail-title').innerText = ev.title;
+        document.getElementById('detail-category').innerText = ev.category || 'Seva Activity';
+
+        const badge = document.getElementById('detail-status-badge');
+        if (ev.user_status === 'registered' || ev.user_status === 'present') {
+            badge.style.display = 'inline-flex';
+            badge.innerHTML = ev.user_status === 'present'
+                ? '<i data-lucide="award" style="width: 14px;"></i> Verified Attendance'
+                : '<i data-lucide="check-circle" style="width: 14px;"></i> Registered';
+        } else {
+            badge.style.display = 'none';
+        }
+
+        const evDate = new Date(ev.event_date).toLocaleDateString();
+        const time = ev.start_time ? `${ev.start_time.substring(0,5)} - ${ev.end_time.substring(0,5)}` : 'TBA';
+        document.getElementById('detail-datetime').innerText = `${evDate}\n${time}`;
+
+        const contactName = ev.contact_person_name || 'Not provided';
+        const contactPhone = ev.contact_person_phone ? `\n${ev.contact_person_phone}` : '';
+        document.getElementById('detail-contact').innerText = `${contactName}${contactPhone}`;
+
+        document.getElementById('detail-location-name').innerText = ev.location_name || 'Location TBD';
+
+        const addrElement = document.getElementById('detail-address');
+        if (ev.location_address && ev.location_address !== ev.location_name) {
+            addrElement.innerText = ev.location_address;
+            addrElement.style.display = 'block';
+        } else {
+            addrElement.style.display = 'none';
+        }
+
+        const mapLink = document.getElementById('detail-map-link');
+        const mapEmbed = document.getElementById('detail-map-embed');
+        const mapIframe = document.getElementById('detail-map-iframe');
+
+        if (ev.google_maps_link) {
+            mapLink.href = ev.google_maps_link;
+            mapLink.style.display = 'inline-flex';
+            mapIframe.src = ev.google_maps_link;
+            mapEmbed.style.display = 'block';
+        } else {
+            mapLink.style.display = 'none';
+            mapEmbed.style.display = 'none';
+        }
+
+        document.getElementById('detail-desc').innerText = ev.description || 'No description provided.';
+        document.getElementById('eventDetailsModal').classList.add('active');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+
+    window.closeDetailsModal = function() {
+        document.getElementById('eventDetailsModal').classList.remove('active');
+    };
 
     function loadCommunityFeed() {
         const feed = document.getElementById('community-feed');
