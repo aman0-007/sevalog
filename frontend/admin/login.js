@@ -170,44 +170,6 @@ function unlockPortal() {
     }, 500);
 }
 
-// 5. SUPABASE AUTH
-document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('login-btn');
-    const errBox = document.getElementById('error-msg');
-    const errText = document.getElementById('error-text');
-    
-    btn.innerHTML = `<span>Authenticating...</span>`;
-    btn.disabled = true;
-    errBox.style.display = 'none';
-    
-    const { data, error } = await _supabase.auth.signInWithPassword({
-        email: document.getElementById('email').value,
-        password: document.getElementById('password').value
-    });
-
-    if (error) {
-        errText.innerText = "Invalid credentials. Unauthorized access logged.";
-        errBox.style.display = "flex";
-        btn.innerHTML = `<span>Unlock Dashboard</span><i data-lucide="chevron-right"></i>`;
-        lucide.createIcons();
-        btn.disabled = false;
-        return;
-    }
-
-    const { data: profile } = await _supabase.from('profiles').select('role').eq('id', data.user.id).single();
-    if (profile?.role === 'admin') {
-        window.location.href = 'admin.html';
-    } else {
-        await _supabase.auth.signOut();
-        errText.innerText = "Access Denied: Not an Admin.";
-        errBox.style.display = "flex";
-        btn.innerHTML = `<span>Unlock Dashboard</span><i data-lucide="chevron-right"></i>`;
-        lucide.createIcons();
-        btn.disabled = false;
-    }
-});
-
 // Start the game loop
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();

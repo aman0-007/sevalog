@@ -38,3 +38,47 @@
     .form-grid { grid-template-columns: 1fr; }
     .form-group.full { grid-column: span 1; }
 }
+
+/* --- CLICKABLE ROWS --- */
+.data-table tbody tr {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.data-table tbody tr:hover { 
+    background: var(--bg-color); 
+}
+
+/* --- DETAILS MODAL SPECIFICS --- */
+.modal-content.details-modal {
+    max-width: 800px; /* Wider to accommodate the inner table */
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    background: var(--bg-color);
+    padding: 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-value {
+    font-size: 14px;
+    color: var(--text-main);
+    font-weight: 500;
+}

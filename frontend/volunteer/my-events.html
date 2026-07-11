@@ -43,28 +43,115 @@
         <main class="main-viewport">
             
             <div class="events-container">
+                <div class="events-container">
                 <div class="tab-header">
-                    <button class="tab-btn active" data-target="upcoming-tab">Upcoming Seva</button>
+                    <!-- My Registrations is now First and Active -->
+                    <button class="tab-btn active" data-target="my-regs-tab">My Registrations</button>
+                    <button class="tab-btn" data-target="upcoming-tab">All Upcoming</button>
                     <button class="tab-btn" data-target="past-tab">Past Events</button>
                 </div>
 
-                <div class="tab-content active" id="upcoming-tab">
-                    <div class="ticket-grid" id="upcoming-grid">
-                        <div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading schedule...</div>
+                <div class="tab-content active" id="my-regs-tab">
+                    <div class="ticket-grid" id="my-regs-grid">
+                        <div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading your schedule...</div>
                     </div>
                 </div>
 
+                <div class="tab-content" id="upcoming-tab">
+                    <div class="ticket-grid" id="upcoming-grid"></div>
+                </div>
+
                 <div class="tab-content" id="past-tab">
-                    <div class="ticket-grid" id="past-grid">
-                        </div>
+                    <div class="ticket-grid" id="past-grid"></div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Upgraded Event Details Modal -->
+    <div class="modal-overlay" id="eventDetailsModal">
+        <div class="modal-content details-modal" style="padding: 0; overflow: hidden;">
+            
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-title-block">
+                    <div class="modal-title-row">
+                        <h2 id="detail-title">Event Title</h2>
+                        <span class="registered-pill" id="detail-status-badge" style="display: none;">Registered</span>
+                    </div>
+                    <p id="detail-category"></p>
+                </div>
+                <button class="details-modal-close" onclick="closeDetailsModal()" aria-label="Close event details">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Body -->
+            <div class="details-body" style="padding: 24px; max-height: 65vh; overflow-y: auto;">
+                
+                <!-- Quick Info Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; color: var(--accent-primary); flex-shrink: 0;">
+                            <i data-lucide="calendar" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <span style="display:block; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Date & Time</span>
+                            <span id="detail-datetime" style="font-size: 14px; font-weight: 600; color: var(--text-main); line-height: 1.4; display: block; margin-top: 2px;">--</span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; align-items: flex-start;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: rgba(16, 185, 129, 0.1); display: flex; align-items: center; justify-content: center; color: #10B981; flex-shrink: 0;">
+                            <i data-lucide="user" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <span style="display:block; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Contact Person</span>
+                            <span id="detail-contact" style="font-size: 14px; font-weight: 600; color: var(--text-main); line-height: 1.4; display: block; margin-top: 2px;">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--border-light); margin: 24px 0;">
+
+                <!-- Location Highlight Box -->
+                <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+                    <div style="display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
+                        <div style="display: flex; gap: 12px; align-items: flex-start; flex: 1; min-width: 0; margin-bottom: 12px;">
+                            <i data-lucide="map-pin" style="width: 20px; color: var(--text-muted); margin-top: 2px; flex-shrink: 0;"></i>
+                            <div style="flex: 1; min-width: 0;">
+                                <span style="display:block; font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Location</span>
+                                
+                                <!-- Shows Location Name -->
+                                <strong id="detail-location-name" style="font-size: 15px; color: var(--text-main); display: block; margin-bottom: 4px;">--</strong>
+                                
+                                <!-- Shows Full Address Details -->
+                                <span id="detail-address" style="font-size: 14px; color: var(--text-muted); line-height: 1.5; display: block;">--</span>
+                            </div>
+                        </div>
+                        
+                        <a id="detail-map-link" href="#" target="_blank" style="font-size: 13px; font-weight: 700; color: var(--accent-primary); display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; text-decoration: none; background: white; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border-light); transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); white-space: nowrap; flex-shrink: 0;">
+                            <i data-lucide="external-link" style="width: 14px;"></i> Open in Google Maps
+                        </a>
+                    </div>
+                    <div id="detail-map-embed" style="margin-top: 16px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-light); background: white; display: none;">
+                        <iframe id="detail-map-iframe" title="Location map" style="width: 100%; height: 220px; border: 0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <span style="display:block; font-size: 14px; color: var(--text-main); font-weight: 700; margin-bottom: 8px;">About this Activity</span>
+                    <p id="detail-desc" style="font-size: 14px; color: var(--text-muted); line-height: 1.7; white-space: pre-wrap;">--</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
     <script src="../public-main.js"></script>
-    <script src="my-events.js"></script>
+    <script src="../../js/volunteer/my-events.js"></script>
 </body>
 </html>

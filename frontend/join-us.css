@@ -2,11 +2,17 @@
    JOIN-US.CSS (Updated with Auth Redirects)
    ========================================= */
 
-.auth-container { display: flex; min-height: 100vh; width: 100%; }
+.auth-container { 
+    display: flex; 
+    height: 100vh; /* Changed from min-height to fixed height */
+    width: 100%; 
+    overflow: hidden; /* Prevents the whole page from scrolling */
+}
 
 /* --- VISUAL SIDE --- */
 .auth-visual {
-    flex: 1;
+    flex: 0 0 35%;
+    height: 100%;
     position: relative;
     background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
     background-size: cover;
@@ -31,13 +37,26 @@
 
 /* --- FORM SIDE --- */
 .auth-form-side {
-    flex: 1.4;
-    background: var(--bg-surface);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 40px;
+    flex: 1;
+    height: 100%;
     overflow-y: auto;
+    padding: 60px 40px;
+    background: var(--bg-surface);
+}
+
+/* New style for the group headers to make them look clean */
+.form-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-light);
+}
+.form-section-title:first-child {
+    margin-top: 0;
 }
 
 .form-wrapper { width: 100%; max-width: 600px; }

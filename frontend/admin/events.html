@@ -139,13 +139,33 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Location</label>
-                        <input type="text" id="ev-location" class="form-input" required placeholder="e.g. Central Station">
+                        <label class="form-label">Location Name</label>
+                        <input type="text" id="ev-location-name" class="form-input" required placeholder="e.g. Central Station">
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Volunteers Needed</label>
                         <input type="number" id="ev-max-volunteers" class="form-input" required placeholder="e.g. 15" min="1" value="10">
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">Full Location Address</label>
+                        <input type="text" id="ev-location-address" class="form-input" required placeholder="e.g. 123 Main St, Chembur, Mumbai">
+                    </div>
+
+                    <div class="form-group full">
+                        <label class="form-label">Google Maps Link (Optional)</label>
+                        <input type="url" id="ev-maps-link" class="form-input" placeholder="https://maps.google.com/...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Person Name (Optional)</label>
+                        <input type="text" id="ev-contact-name" class="form-input" placeholder="e.g. Rahul Sharma">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Phone (Optional)</label>
+                        <input type="tel" id="ev-contact-phone" class="form-input" placeholder="e.g. +91 9876543210">
                     </div>
 
                     <div class="form-group full">
@@ -161,8 +181,71 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <div class="modal-overlay" id="eventDetailsModal">
+        <div class="modal-content details-modal">
+            <div class="modal-header">
+                <div>
+                    <h2 id="detail-title">Loading...</h2>
+                    <p id="detail-category" style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"></p>
+                </div>
+                <button class="icon-btn" onclick="closeDetailsModal()"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div class="details-body" id="detail-body-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">Date & Time</span>
+                        <span class="info-value" id="detail-datetime">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location</span>
+                        <span class="info-value" id="detail-location">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Contact Person</span>
+                        <span class="info-value" id="detail-contact">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Capacity</span>
+                        <span class="info-value" id="detail-capacity">--</span>
+                    </div>
+                </div>
+
+                <div class="info-desc" style="margin-top: 16px;">
+                    <span class="info-label">Description</span>
+                    <p class="info-value" id="detail-desc" style="margin-top: 4px;">--</p>
+                </div>
+
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">
+
+                <div class="volunteers-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="font-size: 16px; font-weight: 600;">Registered Volunteers</h3>
+                    </div>
+                    
+                    <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                        <table class="data-table">
+                            <thead style="position: sticky; top: 0; z-index: 10;">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Contact</th>
+                                    <th>Status</th>
+                                    <th>Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detail-volunteers-body">
+                                <tr><td colspan="4" style="text-align: center;">Loading volunteers...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
     <script src="main.js"></script>
-    <script src="events.js"></script>
+    <script src="../../js/admin/events.js"></script>
 </body>
 </html>

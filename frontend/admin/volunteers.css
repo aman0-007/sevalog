@@ -40,3 +40,44 @@
 /* Tags for Skills & Interests */
 .tag-container { display: flex; flex-wrap: wrap; gap: 8px; }
 .skill-tag { background: var(--bg-color); border: 1px solid var(--border); color: var(--text-main); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+
+/* --- CLICKABLE ROWS --- */
+.data-table tbody tr { cursor: pointer; transition: background-color 0.2s; }
+.data-table tbody tr:hover { background: var(--bg-color); }
+
+/* --- ENHANCED PROFILE MODAL --- */
+.modal-content.profile-modal { max-width: 700px; padding: 0; overflow: hidden; }
+.profile-modal .modal-header { padding: 24px; margin: 0; background: var(--bg-color); border-bottom: 1px solid var(--border); }
+#modal-body-content { padding: 24px; max-height: 75vh; overflow-y: auto; }
+
+/* Stats Banner */
+.stats-banner { display: flex; gap: 16px; margin-bottom: 24px; }
+.stat-box { flex: 1; background: var(--bg-color); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.stat-value { font-size: 24px; font-weight: 700; color: var(--accent); }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+
+/* Grid & Cards */
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.profile-card { border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px; }
+.profile-card.full-width { grid-column: span 2; }
+.profile-card h4 { font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+/* Info Rows */
+.info-row { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 8px; font-size: 13px; }
+.info-row .lbl { color: var(--text-muted); width: 100px; flex-shrink: 0; }
+.info-row .val { color: var(--text-main); font-weight: 500; text-align: right; word-break: break-word; }
+
+/* Emergency Box Specifics */
+.bg-light-red { background: rgba(239, 68, 68, 0.05); border-color: rgba(239, 68, 68, 0.2); }
+.bg-light-red h4 { color: #EF4444; border-color: rgba(239, 68, 68, 0.2); }
+.emergency-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 13px; }
+.emergency-grid .lbl { display: block; color: var(--text-muted); margin-bottom: 4px; }
+.emergency-grid .val { color: var(--text-main); font-weight: 500; }
+.font-red { color: #EF4444 !important; }
+.font-bold { font-weight: 700 !important; }
+
+/* Tags */
+.tag-section { display: flex; align-items: flex-start; gap: 12px; }
+.tag-section .lbl { font-size: 13px; color: var(--text-muted); margin-top: 4px; width: 80px; }
+.tag-container { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.skill-tag { background: var(--bg-color); border: 1px solid var(--border); color: var(--text-main); padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }

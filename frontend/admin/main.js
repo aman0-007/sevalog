@@ -2,13 +2,6 @@
    MAIN.JS (Global Layout, Theme & Database)
    ========================================= */
 
-// 1. SUPABASE INITIALIZATION (Global Variable)
-// Because this is in main.js, ALL other JS files can now use the `_supabase` variable!
-const SB_URL = "https://lvkgvmtmeyonifmxzcmo.supabase.co";
-const SB_KEY = "sb_publishable_Zu5ag__-tMgzRkt7ATDtjQ_dZQAR-XF";                   
-const _supabase = supabase.createClient(SB_URL, SB_KEY);
-
-
 // 2. THEME MANAGEMENT
 function toggleTheme() {
     const html = document.documentElement;
@@ -72,43 +65,3 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('preload');
     }, 1);
 });
-
-
-// ==========================================
-// 5. THE ROUTE GUARD (Security Bouncer)
-// ==========================================
-
-async function enforceAdminSecurity() {
-    // 1. Check which page we are currently on
-    const currentPath = window.location.pathname;
-    
-    // We don't want to block people from the login page or the 404 page!
-    if (currentPath.includes('login.html') || currentPath.includes('404.html')) {
-        return; 
-    }
-
-    // 2. Check if the browser has a logged-in session
-    const { data: { session } } = await _supabase.auth.getSession();
-
-    if (!session) {
-        // Not logged in! Kick them to 404.
-        window.location.replace('404.html');
-        return;
-    }
-
-    // 3. Double-check they are an Admin (in case a volunteer somehow got here)
-    const { data: profile } = await _supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
-
-    if (!profile || profile.role !== 'admin') {
-        // Log them out and kick them to 404
-        await _supabase.auth.signOut();
-        window.location.replace('404.html');
-    }
-}
-
-// 4. Run the security check the millisecond the page starts loading
-enforceAdminSecurity();

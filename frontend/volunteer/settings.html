@@ -13,6 +13,7 @@
 <body>
 
     <aside class="sidebar" id="sidebar">
+        <!-- Sidebar content same as before -->
         <div class="sidebar-logo"><i data-lucide="heart" style="color: var(--accent-primary);"></i> SevaLog</div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
@@ -31,7 +32,6 @@
             <button id="mobile-menu-btn" class="icon-btn mobile-menu-btn" aria-label="Open navigation"><i data-lucide="menu"></i></button>
             <div class="page-title"><h3>Settings</h3></div>
             <div style="display: flex; align-items: center; gap: 20px;">
-                <button class="icon-btn"><i data-lucide="bell"></i></button>
                 <div class="user-profile-menu">
                     <div class="avatar" id="user-initial">U</div>
                     <span id="user-name-top" style="font-weight: 700; font-size: 14px;">User</span>
@@ -43,68 +43,188 @@
             
             <div class="settings-layout">
                 <div class="settings-nav">
-                    <button class="s-nav-btn active">Public Profile</button>
-                    <button class="s-nav-btn">Account Details</button>
-                    <button class="s-nav-btn">Notifications</button>
-                    <button class="s-nav-btn">Privacy & Security</button>
+                    <button class="s-nav-btn active" data-target="tab-public">Background & Skills</button>
+                    <button class="s-nav-btn" data-target="tab-account">Personal Details</button>
+                    <button class="s-nav-btn" data-target="tab-medical">Emergency & Medical</button>
+                    <button class="s-nav-btn" data-target="tab-security">Security & Login</button>
                 </div>
 
                 <div class="settings-content">
-                    <div class="settings-panel">
-                        <h2>Public Profile</h2>
-                        <p class="panel-desc">Manage how your profile appears to other volunteers and organizers.</p>
+                    
+                    <form id="profile-form">
                         
-                        <div class="form-group">
-                            <label>Short Bio</label>
-                            <textarea rows="4" placeholder="Tell the community about yourself..."></textarea>
+                        <!-- TAB 1: Background & Skills -->
+                        <div class="settings-panel tab-content active" id="tab-public">
+                            <h2>Background & Skills</h2>
+                            <p class="panel-desc">Manage your professional background and the skills you bring to Seva.</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Highest Education Level</label>
+                                    <input type="text" id="education_level" placeholder="e.g. Bachelor's Degree">
+                                </div>
+                                <div class="form-group">
+                                    <label>Profession or College</label>
+                                    <input type="text" id="profession_or_college" placeholder="e.g. Software Engineer / IIT Bombay">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Skills (Comma separated)</label>
+                                <input type="text" id="skills" placeholder="e.g. Teaching, Data Entry, First Aid">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Languages Spoken (Comma separated)</label>
+                                <input type="text" id="languages_spoken" placeholder="e.g. English, Hindi, Marathi">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Interested Activities (Comma separated)</label>
+                                <input type="text" id="interested_activities" placeholder="e.g. Food Drives, Beach Cleanup">
+                            </div>
                         </div>
 
+                        <!-- TAB 2: Personal Details -->
+                        <div class="settings-panel tab-content" id="tab-account">
+                            <h2>Personal Details</h2>
+                            <p class="panel-desc">Update your core identity and residential location.</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input type="text" id="first_name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input type="text" id="last_name" required>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Date of Birth</label>
+                                    <input type="date" id="date_of_birth">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gender</label>
+                                    <select id="gender" class="form-input" style="width: 100%; padding: 14px; border: 1px solid var(--border-light); border-radius: 10px;">
+                                        <option value="">Select Gender</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Blood Group</label>
+                                <select id="blood_group" class="form-input" style="width: 100%; padding: 14px; border: 1px solid var(--border-light); border-radius: 10px;">
+                                    <option value="">Select Blood Group</option>
+                                    <option value="A+">A+</option> <option value="A-">A-</option>
+                                    <option value="B+">B+</option> <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option> <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option> <option value="O-">O-</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Residential Address</label>
+                                <textarea id="residential_address" rows="3" placeholder="Full address details"></textarea>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group"><label>City</label><input type="text" id="city"></div>
+                                <div class="form-group"><label>State</label><input type="text" id="state"></div>
+                                <div class="form-group"><label>Pincode</label><input type="text" id="pincode"></div>
+                            </div>
+                        </div>
+
+                        <!-- TAB 3: Emergency & Medical -->
+                        <div class="settings-panel tab-content" id="tab-medical">
+                            <h2>Emergency & Medical Info</h2>
+                            <p class="panel-desc">Critical information for physical Seva activities.</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Emergency Contact Name</label>
+                                    <input type="text" id="emergency_contact_name" placeholder="Name of person to contact">
+                                </div>
+                                <div class="form-group">
+                                    <label>Relationship</label>
+                                    <input type="text" id="emergency_contact_relation" placeholder="e.g. Father, Spouse">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Emergency Contact Phone</label>
+                                <input type="tel" id="emergency_contact_number" placeholder="10-digit number">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Medical Conditions (if any)</label>
+                                <textarea id="medical_conditions" rows="3" placeholder="List any allergies or physical conditions organizers should know about"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Shared Save Button for Profile Updates -->
+                        <div class="settings-panel tab-content" id="save-bar" style="margin-top: 16px; padding: 24px 32px; display: flex; justify-content: flex-end; align-items: center; gap: 16px;">
+                            <span id="profile-msg" style="font-size: 13px; font-weight: 600;"></span>
+                            <button type="submit" class="btn btn-primary" id="save-profile-btn" style="min-width: 140px; padding: 12px 24px; border-radius: 12px; background: var(--accent-primary); color: white; font-weight: 700; border: none; cursor: pointer;">Save Profile</button>
+                        </div>
+
+                    </form>
+
+                    <!-- TAB 4: Security & Login (Separate Form) -->
+                    <div class="settings-panel tab-content" id="tab-security">
+                        <h2>Login Information</h2>
+                        <p class="panel-desc">Your contact details cannot be changed here. Contact an admin to update them.</p>
+                        
                         <div class="form-row">
                             <div class="form-group">
-                                <label>City / Location</label>
-                                <input type="text" value="Mumbai, India">
+                                <label>Registered Email</label>
+                                <input type="email" id="email" class="input-readonly" readonly disabled>
                             </div>
                             <div class="form-group">
-                                <label>Institution / College</label>
-                                <input type="text" value="IIT Bombay">
+                                <label>Registered Phone</label>
+                                <input type="text" id="phone_number" class="input-readonly" readonly disabled>
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label>Add More Skills (Comma separated)</label>
-                            <input type="text" placeholder="e.g. Photography, Data Entry, Cooking">
-                        </div>
+                        <hr style="border: none; border-top: 1px solid var(--border-light); margin: 32px 0;">
 
-                        <div style="margin-top: 32px; border-top: 1px solid var(--border-light); padding-top: 24px; display: flex; justify-content: flex-end;">
-                            <button class="btn btn-primary" id="save-btn">Save Changes</button>
-                        </div>
+                        <h2>Change Password</h2>
+                        <form id="password-form" style="margin-top: 24px;">
+                            <div class="form-group">
+                                <label>Current Password</label>
+                                <input type="password" id="current_password" required placeholder="Enter current password">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>New Password</label>
+                                    <input type="password" id="new_password" required placeholder="New password (min 6 chars)" minlength="6">
+                                </div>
+                                <div class="form-group">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" id="confirm_password" required placeholder="Retype new password">
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span id="pwd-msg" style="font-size: 13px; font-weight: 600;"></span>
+                                <button type="submit" id="save-pwd-btn" style="padding: 12px 24px; border-radius: 12px; background: var(--text-main); color: white; font-weight: 700; border: none; cursor: pointer;">Update Password</button>
+                            </div>
+                        </form>
                     </div>
 
-                    <div class="settings-panel" style="margin-top: 24px;">
-                        <h2>Email Notifications</h2>
-                        <div class="toggle-row">
-                            <div>
-                                <h4>Event Reminders</h4>
-                                <p>Get notified 24 hours before your upcoming Seva.</p>
-                            </div>
-                            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div>
-                                <h4>Impact Reports</h4>
-                                <p>Receive a monthly summary of your verified hours.</p>
-                            </div>
-                            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-                        </div>
-                    </div>
                 </div>
             </div>
 
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
     <script src="../public-main.js"></script>
-    <script src="settings.js"></script>
+    <script src="../../js/volunteer/settings.js"></script>
 </body>
 </html>

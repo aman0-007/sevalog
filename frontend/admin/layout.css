@@ -40,11 +40,11 @@ body { background-color: var(--bg-color); color: var(--text-main); transition: b
 .dashboard-layout { display: flex; min-height: 100vh; overflow-x: hidden; }
 
 /* --- 3. SIDEBAR --- */
-.sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; position: fixed; height: 100vh; transition: all 0.3s ease; z-index: 100; overflow: hidden; }
+.sidebar { width: var(--sidebar-width); background: var(--surface); border-right: 1px solid var(--border); padding: 24px 16px; position: fixed; height: 100vh; transition: all 0.3s ease; z-index: 100; overflow: hidden; display: flex; flex-direction: column; }
 .sidebar-header { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; padding: 0 8px; white-space: nowrap; }
 .brand-icon { color: var(--accent); width: 24px; height: 24px; flex-shrink: 0; }
 .sidebar-header h2 { font-size: 20px; font-weight: 700; transition: opacity 0.2s; }
-.sidebar-nav { display: flex; flex-direction: column; gap: 4px; }
+.sidebar-nav { display: flex; flex-direction: column; gap: 4px; flex: 1; min-height: 0; }
 .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px; color: var(--text-muted); text-decoration: none; font-weight: 500; font-size: 14px; border-radius: var(--radius-md); transition: all 0.2s ease; white-space: nowrap; }
 .nav-item i, .brand-icon { flex-shrink: 0; width: 18px; height: 18px; }
 .nav-item:hover { background: var(--bg-color); color: var(--text-main); }

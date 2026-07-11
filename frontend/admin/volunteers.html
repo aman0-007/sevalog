@@ -84,8 +84,8 @@
                                 <th>Volunteer Name</th>
                                 <th>Contact Info</th>
                                 <th>Role</th>
+                                <th>Location & Joined</th>
                                 <th>Total Hours</th>
-                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="volunteers-table-body">
@@ -97,55 +97,94 @@
         </main>
     </div>
 
+    <!-- Beautiful, Improved Profile Modal -->
     <div class="modal-overlay" id="profileModal">
-        <div class="modal-content">
+        <div class="modal-content profile-modal">
             <div class="modal-header">
                 <div class="profile-title">
                     <div class="avatar" id="modal-avatar">V</div>
                     <div>
-                        <h2 id="modal-name">Volunteer Name</h2>
-                        <p id="modal-role">Volunteer</p>
+                        <h2 id="modal-name">Loading...</h2>
+                        <p id="modal-role-city">Fetching profile data...</p>
                     </div>
                 </div>
                 <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
             </div>
             
-            <div class="profile-section">
-                <h4>Contact & Background</h4>
-                <p><strong>Email:</strong> <span id="modal-email">--</span></p>
-                <p><strong>Phone:</strong> <span id="modal-phone">--</span></p>
-                <p><strong>Education:</strong> <span id="modal-edu">--</span></p>
-            </div>
-
-            <div class="profile-section">
-                <h4>Bio</h4>
-                <p id="modal-bio" style="color: var(--text-muted); font-style: italic;">No bio provided.</p>
-            </div>
-
-            <div class="profile-section">
-                <h4>Skills</h4>
-                <div class="tag-container" id="modal-skills">
+            <div id="modal-body-content" style="display: none;">
+                <!-- High Level Impact Stats -->
+                <div class="stats-banner">
+                    <div class="stat-box">
+                        <span class="stat-value" id="modal-hours">0</span>
+                        <span class="stat-label">Hours Served</span>
                     </div>
-            </div>
-
-            <div class="profile-section">
-                <h4>Impact Stats</h4>
-                <div style="display: flex; gap: 24px; margin-top: 8px;">
-                    <div>
-                        <p style="font-size: 24px; font-weight: 700; color: var(--text-main);" id="modal-hours">0</p>
-                        <p style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Hours Served</p>
+                    <div class="stat-box">
+                        <span class="stat-value" id="modal-events">0</span>
+                        <span class="stat-label">Events Attended</span>
                     </div>
-                    <div>
-                        <p style="font-size: 24px; font-weight: 700; color: var(--text-main);" id="modal-events">0</p>
-                        <p style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Events Attended</p>
+                    <div class="stat-box">
+                        <span class="stat-value" id="modal-status">Active</span>
+                        <span class="stat-label">Account Status</span>
+                    </div>
+                </div>
+
+                <div class="profile-grid">
+                    <!-- Core Info -->
+                    <div class="profile-card">
+                        <h4>Contact & Demographics</h4>
+                        <div class="info-row"><span class="lbl">Email</span><span class="val" id="modal-email"></span></div>
+                        <div class="info-row"><span class="lbl">Phone</span><span class="val" id="modal-phone"></span></div>
+                        <div class="info-row"><span class="lbl">DOB / Gender</span><span class="val" id="modal-demographics"></span></div>
+                        <div class="info-row"><span class="lbl">Blood Group</span><span class="val font-red font-bold" id="modal-blood"></span></div>
+                    </div>
+
+                    <!-- Background Info -->
+                    <div class="profile-card">
+                        <h4>Background</h4>
+                        <div class="info-row"><span class="lbl">Education</span><span class="val" id="modal-edu"></span></div>
+                        <div class="info-row"><span class="lbl">Profession</span><span class="val" id="modal-profession"></span></div>
+                        <div class="info-row"><span class="lbl">Address</span><span class="val" id="modal-address"></span></div>
+                    </div>
+
+                    <!-- Medical & Emergency -->
+                    <div class="profile-card full-width bg-light-red">
+                        <h4>Emergency & Medical</h4>
+                        <div class="emergency-grid">
+                            <div>
+                                <span class="lbl">Emergency Contact</span>
+                                <span class="val font-bold" id="modal-emergency-contact"></span>
+                            </div>
+                            <div>
+                                <span class="lbl">Medical Conditions</span>
+                                <span class="val" id="modal-medical"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="profile-card full-width">
+                        <h4>Skills & Languages</h4>
+                        <div class="tag-section">
+                            <span class="lbl">Skills:</span>
+                            <div class="tag-container" id="modal-skills"></div>
+                        </div>
+                        <div class="tag-section" style="margin-top: 12px;">
+                            <span class="lbl">Languages:</span>
+                            <div class="tag-container" id="modal-languages"></div>
+                        </div>
+                        <div class="tag-section" style="margin-top: 12px;">
+                            <span class="lbl">Interests:</span>
+                            <div class="tag-container" id="modal-interests"></div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
     <script src="main.js"></script>
-    <script src="volunteers.js"></script>
+    <script src="../../js/admin/volunteers.js"></script>
 </body>
 </html>
