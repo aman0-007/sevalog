@@ -1,218 +1,163 @@
 // ==========================================
-// AUTH.JS (Identity & Session Management)
+// AUTH.JS (Optimized Identity & Session)
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Helper: Manage button loading states cleanly across all forms
+    const setButtonState = (btn, isLoading, originalHtml = '') => {
+        if (isLoading) {
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:18px;"></i> Processing...`;
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+        if (window.lucide) lucide.createIcons();
+    };
+
+    // Helper: Safely get input values
+    const getVal = (id) => document.getElementById(id)?.value.trim() || '';
+    const getChecked = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+
     // ==========================================
-    // 1. GLOBAL SESSION & HEADER LOGIC
-    // (Runs on every page where auth.js is loaded)
+    // 1. GLOBAL SESSION UI
     // ==========================================
-    const logoutBtn = document.getElementById('logout-btn');
-    const nameElement = document.getElementById('user-name-top');
-    const welcomeElement = document.getElementById('welcome-text');
-    const initialElement = document.getElementById('user-initial');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (event) => {
-            event.preventDefault();
-            ApiClient.clearSession(); // Clears localStorage and redirects to login
-        });
-    }
+    document.getElementById('logout-btn')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        ApiClient.clearSession();
+    });
 
     const storedUserData = localStorage.getItem('samithi_user');
     if (storedUserData) {
-        const user = JSON.parse(storedUserData);
-        const displayName = `${user.firstName} ${user.lastName}`;
+        try {
+            const user = JSON.parse(storedUserData);
+            const nameEl = document.getElementById('user-name-top');
+            const welcomeEl = document.getElementById('welcome-text');
+            const initialEl = document.getElementById('user-initial');
 
-        if (welcomeElement) welcomeElement.innerText = `Welcome back, ${user.firstName}!`;
-        if (nameElement) nameElement.innerText = displayName;
-
-        if (initialElement && user.firstName) {
-            initialElement.innerText = user.firstName.charAt(0).toUpperCase();
+            if (welcomeEl) welcomeEl.innerText = `Welcome back, ${user.firstName}!`;
+            if (nameEl) nameEl.innerText = `${user.firstName} ${user.lastName}`;
+            if (initialEl) initialEl.innerText = user.firstName.charAt(0).toUpperCase();
+        } catch (e) {
+            console.error("Session parse error, clearing.");
+            ApiClient.clearSession();
         }
     }
 
-
     // ==========================================
-    // 2. LOGIN FORM LOGIC
-    // (Only runs on the login.html page)
+    // 2. LOGIN FORM
     // ==========================================
     const loginForm = document.getElementById('login-form'); 
-    
     if (loginForm) {
-        loginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            // Updated to match your specific HTML IDs
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const btn = loginForm.querySelector('button');
-            const originalBtnHtml = btn.innerHTML; // Saves the default button text and icon
+            const origHtml = btn.innerHTML;
             
             try {
-                // UI Feedback
-                btn.disabled = true;
-                btn.innerHTML = 'Verifying...';
-
-                // Send request to your Node.js API
-                const response = await ApiClient.request('/auth/login', 'POST', { email, password });
+                setButtonState(btn, true);
+                const email = getVal('login-email');
+                const password = getVal('login-password');
                 
-                // Save token and user data
+                const response = await ApiClient.request('/auth/login', 'POST', { email, password });
                 ApiClient.setSession(response.token, response.user);
 
-                // Redirect based on role
-                if (response.user.role === 'admin') {
-                    window.location.href = 'admin.html';
-                } else {
-                    window.location.href = 'volunteer/dashboard.html'; // Updated to your preferred path
-                }
+                window.location.href = response.user.role === 'admin' ? 'admin.html' : 'volunteer/dashboard.html';
             } catch (error) {
-                // Error Handling
-                alert(error.message || 'Login failed. Please check your credentials.');
-                
-                // Reset Button
-                btn.disabled = false;
-                btn.innerHTML = originalBtnHtml; // Restores "Sign In to Dashboard"
-                if (typeof lucide !== 'undefined') lucide.createIcons(); // Re-render the icon
+                alert(error.message);
+                setButtonState(btn, false, origHtml);
             }
         });
     }
 
-
     // ==========================================
-    // 3. REGISTRATION FORM LOGIC
-    // (Only runs on the join-us.html page)
+    // 3. REGISTRATION FORM
     // ==========================================
     const regForm = document.getElementById('registration-form');
-
     if (regForm) {
-        regForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-
+        regForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const btn = regForm.querySelector('button');
-            const originalBtnHtml = btn.innerHTML;
+            const origHtml = btn.innerHTML;
             
-            btn.disabled = true;
-            btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:18px;"></i> Processing...`;
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-
-            const getInputValue = (id) => {
-                const element = document.getElementById(id);
-                return element ? element.value.trim() : '';
-            };
-
-            const getCheckedValues = (name) => {
-                return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`))
-                            .map(checkbox => checkbox.value);
-            };
-
-            const selectedLanguages = getCheckedValues('languages_spoken');
-
             try {
-                // Extract Auth Data
-                const firstName = getInputValue('first_name');
-                const lastName = getInputValue('last_name');
-                const email = getInputValue('email');
-                const password = getInputValue('password_hash');
-                const phoneNumber = getInputValue('phone_number');
+                setButtonState(btn, true);
 
-                // Step 1: Register Account
-                const authPayload = { firstName, lastName, email, password, phoneNumber };
-                const authResponse = await ApiClient.request('/auth/register', 'POST', authPayload);
+                // Step 1: Register Core Account
+                const authPayload = {
+                    firstName: getVal('first_name'),
+                    lastName: getVal('last_name'),
+                    email: getVal('email'),
+                    password: getVal('password_hash'),
+                    phoneNumber: getVal('phone_number')
+                };
                 
-                ApiClient.setSession(authResponse.token, authResponse.user);
+                const authRes = await ApiClient.request('/auth/register', 'POST', authPayload);
+                ApiClient.setSession(authRes.token, authRes.user);
 
-                // Step 2: Update Profile Bio
+                // Step 2: Update Detailed Profile
                 const profilePayload = {
-                    firstName,
-                    lastName,
-                    phoneNumber,
-                    professionOrCollege: getInputValue('profession_or_college'),
-                    city: getInputValue('city'),
-                    residentialAddress: getInputValue('residential_address'),
-                    dateOfBirth: getInputValue('date_of_birth'),
-                    gender: getInputValue('gender'),
-                    bloodGroup: getInputValue('blood_group'),
-                    educationLevel: getInputValue('education_level'),
-                    state: getInputValue('state'),
-                    pincode: getInputValue('pincode'),
-                    emergencyContactName: getInputValue('emergency_contact_name'),
-                    emergencyContactRelation: getInputValue('emergency_contact_relation'),
-                    emergencyContactNumber: getInputValue('emergency_contact_number'),
-                    medicalConditions: getInputValue('medical_conditions'),
-                    languages: selectedLanguages,
-                    languagesSpoken: selectedLanguages,
-                    languages_spoken: selectedLanguages,
-                    skills: getCheckedValues('skills'),
-                    interestedActivities: getCheckedValues('interested_activities'),
-                    userId: authResponse.user.userId 
+                    ...authPayload,
+                    professionOrCollege: getVal('profession_or_college'),
+                    city: getVal('city'),
+                    residentialAddress: getVal('residential_address'),
+                    dateOfBirth: getVal('date_of_birth'),
+                    gender: getVal('gender'),
+                    bloodGroup: getVal('blood_group'),
+                    educationLevel: getVal('education_level'),
+                    state: getVal('state'),
+                    pincode: getVal('pincode'),
+                    emergencyContactName: getVal('emergency_contact_name'),
+                    emergencyContactRelation: getVal('emergency_contact_relation'),
+                    emergencyContactNumber: getVal('emergency_contact_number'),
+                    medicalConditions: getVal('medical_conditions'),
+                    languages: getChecked('languages_spoken'),
+                    skills: getChecked('skills'),
+                    interestedActivities: getChecked('interested_activities'),
                 };
 
                 await ApiClient.request('/volunteer/profile', 'PUT', profilePayload);
-
-                // Redirect on success
                 window.location.href = 'volunteer/dashboard.html'; 
 
             } catch (error) {
-                console.error("Registration Error:", error.message);
                 alert("Registration Failed: " + error.message);
-                
-                btn.disabled = false;
-                btn.innerHTML = originalBtnHtml;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
+                setButtonState(btn, false, origHtml);
             }
         });
     }
 
     // ==========================================
-    // 4. ADMIN PORTAL LOGIN LOGIC
-    // (Only runs on the admin verification page)
+    // 4. ADMIN PORTAL LOGIN
     // ==========================================
-    const adminLoginForm = document.getElementById('loginForm');
-
+    const adminLoginForm = document.getElementById('loginForm'); // Kept your specific ID
     if (adminLoginForm) {
-        adminLoginForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        adminLoginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             const btn = document.getElementById('login-btn');
             const errBox = document.getElementById('error-msg');
             const errText = document.getElementById('error-text');
-            
-            // UI Loading State
-            btn.innerHTML = `<span>Authenticating...</span>`;
-            btn.disabled = true;
-            errBox.style.display = 'none';
+            const origHtml = btn.innerHTML;
             
             try {
-                // Request token from Node.js backend
+                setButtonState(btn, true);
+                errBox.style.display = 'none';
+                
+                const email = getVal('email');
+                const password = getVal('password');
                 const response = await ApiClient.request('/auth/login', 'POST', { email, password });
                 
-                // Security Check: Deny access if they are not an admin
                 if (response.user.role !== 'admin') {
-                    errText.innerText = "Access Denied: Not an Admin.";
-                    errBox.style.display = "flex";
-                    
-                    btn.innerHTML = `<span>Unlock Dashboard</span><i data-lucide="chevron-right"></i>`;
-                    if (typeof lucide !== 'undefined') lucide.createIcons();
-                    btn.disabled = false;
-                    return; // Stop execution here, do NOT save token
+                    throw new Error("Access Denied: Not an Admin.");
                 }
 
-                // If authorized, save token and proceed
                 ApiClient.setSession(response.token, response.user);
                 window.location.href = 'admin.html';
 
             } catch (error) {
-                // Backend Error Handling (Wrong password, etc.)
-                errText.innerText = error.message || "Invalid credentials. Unauthorized access logged.";
+                errText.innerText = error.message;
                 errBox.style.display = "flex";
-                
-                btn.innerHTML = `<span>Unlock Dashboard</span><i data-lucide="chevron-right"></i>`;
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-                btn.disabled = false;
+                setButtonState(btn, false, origHtml);
             }
         });
     }

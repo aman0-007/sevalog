@@ -258,3 +258,56 @@
     .ticket-date { border-right: none; border-bottom: 2px dashed var(--border-light); padding: 16px; flex-direction: row; gap: 8px; }
     .ticket-date .day { font-size: 24px; }
 }
+
+/* --- REGISTRATION, WITHDRAW & CHECK-IN BUTTONS --- */
+.btn-checkin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    background: var(--accent-primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.btn-checkin:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+}
+
+.btn-checkin i {
+    width: 16px;
+    height: 16px;
+}
+
+/* Make sure action buttons wrap neatly on small mobile screens */
+.ticket-actions {
+    flex-wrap: wrap; 
+}
+
+/* --- QR SCANNER MODAL OVERRIDES --- */
+/* The html5-qrcode library injects messy inline styles and links. We override them here for a clean UI. */
+#reader {
+    width: 100%;
+}
+#reader video {
+    object-fit: cover;
+    border-radius: 16px;
+    transform: scale(1.02); /* Removes slight clipping gaps */
+}
+#reader__dashboard_section_csr span {
+    display: none !important; /* Hides the "Powered by" text */
+}
+#reader__dashboard_section_swaplink {
+    display: none !important; /* Hide camera swap if not needed, we force rear camera */
+}
+#reader__scan_region img {
+    display: none !important; /* Hides the ugly default QR overlay graphic */
+}

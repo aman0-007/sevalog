@@ -1,11 +1,10 @@
 // ==========================================
-// MY-EVENTS.JS (Custom API Integration)
+// MY-EVENTS.JS (Optimized Build with Scanner)
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', async () => {
-
-    // Store fetched events globally so the modal can access them without another API call
     let globalEventsData = [];
+    let html5QrCode = null; // Global reference for hardware cleanup
 
     // 1. Setup Tabs
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -21,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 2. Initialize
+    // 2. Initialize Auth Check
     const token = typeof ApiClient !== 'undefined' ? ApiClient.getToken() : null;
     if (!token) {
         window.location.href = '../login.html'; 
@@ -39,54 +38,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         myRegsGrid.innerHTML = '<div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Fetching your schedule...</div>';
 
         try {
-            // Hit your new unified endpoint
             const response = await ApiClient.request('/volunteer/events/all', 'GET');
-            
-            // Save to global array for the modal popup
             globalEventsData = response.data || [];
-            const allEvents = globalEventsData;
-
+            
             const upcoming = [];
             const past = [];
             const myRegistrations = [];
+            const now = new Date();
 
-            allEvents.forEach(ev => {
-                // Determine if user has an active involvement
-                const isActiveReg = ['registered', 'present', 'absent'].includes(ev.user_status);
+            globalEventsData.forEach(ev => {
+                const eventDate = new Date(`${ev.event_date.split('T')[0]}T${ev.end_time}`);
+                const isCompleted = ev.event_status === 'completed' || eventDate < now;
+                const isCancelled = ev.event_status === 'cancelled';
+                const isActiveReg = ['registered', 'waitlisted', 'present', 'absent'].includes(ev.user_registration_status);
                 
-                if (isActiveReg) {
-                    myRegistrations.push(ev);
-                }
+                if (isActiveReg) myRegistrations.push(ev);
 
-                // Categorize by timeline using your database view status
-                if (ev.event_status === 'upcoming' || ev.event_status === 'live') {
-                    upcoming.push(ev);
-                } else if (ev.event_status === 'completed') {
+                if (isCancelled || isCompleted) {
                     past.push(ev);
+                } else {
+                    // Any event that reaches here is public, not a draft, and not in the past
+                    upcoming.push(ev);
                 }
             });
 
-            // Past events should show newest first
-            past.reverse();
-            // My Regs should show upcoming first, then past
-            myRegistrations.sort((a, b) => new Date(a.event_date) - new Date(b.event_date));
+            past.sort((a, b) => new Date(b.event_date) - new Date(a.event_date)); 
+            myRegistrations.sort((a, b) => new Date(a.event_date) - new Date(b.event_date)); 
 
-            renderEvents(upcoming, upcomingGrid, 'upcoming');
-            renderEvents(myRegistrations, myRegsGrid, 'my-regs');
-            renderEvents(past, pastGrid, 'past');
+            renderEvents(upcoming, upcomingGrid);
+            renderEvents(myRegistrations, myRegsGrid);
+            renderEvents(past, pastGrid);
 
-            lucide.createIcons();
-            bindActionButtons();
+            if (window.lucide) lucide.createIcons();
 
         } catch (err) {
             console.error('Error loading events:', err);
             myRegsGrid.innerHTML = '<p class="empty-msg">Unable to load schedule.</p>';
-            upcomingGrid.innerHTML = '<p class="empty-msg">Unable to load schedule.</p>';
         }
     }
 
-    // 4. Unified Render Function
-    function renderEvents(events, container, tabType) {
+    // 4. Render Function
+    function renderEvents(events, container) {
         if (events.length === 0) {
             container.innerHTML = `<p class="empty-msg">No events found in this category.</p>`;
             return;
@@ -97,39 +89,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             const month = evDate.toLocaleString('en-US', { month: 'short' }).toUpperCase();
             const day = String(evDate.getDate()).padStart(2, '0');
             const time = ev.start_time ? ev.start_time.substring(0,5) : 'TBA';
-            const isCompleted = ev.event_status === 'completed';
+            const eventEnd = new Date(`${ev.event_date.split('T')[0]}T${ev.end_time}`);
+            const isCompleted = ev.event_status === 'completed' || eventEnd < new Date();
 
-            // Determine what buttons/badges to show based on status
             let actionHtml = '';
+            const status = ev.user_registration_status;
 
-            if (ev.user_status === 'present') {
-                actionHtml = `<span class="verified-badge"><i data-lucide="award" style="width: 14px;"></i> ${ev.hours_logged} Hours Verified</span>`;
-            } 
-            else if (ev.user_status === 'absent') {
+            if (status === 'present') {
+                actionHtml = `<span class="verified-badge"><i data-lucide="award" style="width: 14px;"></i> Verified Attendance</span>`;
+            } else if (status === 'absent') {
                 actionHtml = `<span style="font-size: 13px; font-weight: 700; color: #EF4444;">Marked Absent</span>`;
-            }
-            else if (ev.user_status === 'registered') {
+            } else if (status === 'registered') {
+                // If registered and not completed, show the check-in camera button alongside withdraw
                 actionHtml = `
-                    <button class="btn-cancel" data-event-id="${ev.event_id}">Withdraw</button>
+                    <div style="display: flex; gap: 8px;">
+                        ${!isCompleted ? `<button class="btn-checkin action-btn" data-action="scan" data-event-id="${ev.event_id}"><i data-lucide="qr-code"></i> Check-in</button>` : ''}
+                        <button class="btn-cancel action-btn" data-action="withdraw" data-event-id="${ev.event_id}">Withdraw</button>
+                    </div>
                     <span class="registered-pill">Registered</span>
                 `;
-            }
-            else {
-                // They are not registered.
+            } else if (status === 'waitlisted') {
+                actionHtml = `
+                    <button class="btn-cancel action-btn" data-action="withdraw" data-event-id="${ev.event_id}">Leave Waitlist</button>
+                    <span class="registered-pill" style="color: #F59E0B; background: rgba(245, 158, 11, 0.1); border-color: rgba(245, 158, 11, 0.2);">Waitlisted</span>
+                `;
+            } else {
                 if (isCompleted) {
                     actionHtml = `<span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Event Completed</span>`;
+                } else if (!ev.registration_open || ev.event_status === 'cancelled') {
+                    actionHtml = `<span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Closed</span>`;
+                } else if (ev.max_volunteers && ev.current_registrations >= ev.max_volunteers) {
+                    actionHtml = `<button class="btn-register action-btn" data-action="register" data-event-id="${ev.event_id}">Join Waitlist</button>`;
                 } else {
-                    actionHtml = `<button class="btn-register" data-event-id="${ev.event_id}">Register Now</button>`;
+                    actionHtml = `<button class="btn-register action-btn" data-action="register" data-event-id="${ev.event_id}">Register Now</button>`;
                 }
             }
 
-            // Visual dimming for completed events
             const dateBg = isCompleted ? 'background: #F1F5F9; color: #94A3B8;' : '';
             const monthColor = isCompleted ? 'color: #64748B;' : '';
 
-            // Note the onclick event to open the modal, and event.stopPropagation() on the actions container
             return `
-                <div class="event-ticket" style="${isCompleted ? 'opacity: 0.8;' : ''}" onclick="openEventDetails('${ev.event_id}')">
+                <div class="event-ticket" data-card-id="${ev.event_id}" style="${isCompleted ? 'opacity: 0.8;' : ''}">
                     <div class="ticket-date" style="${dateBg}">
                         <span class="month" style="${monthColor}">${month}</span>
                         <span class="day">${day}</span>
@@ -138,8 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <h4>${ev.title}</h4>
                         <div class="t-row"><i data-lucide="clock"></i> ${time}</div>
                         <div class="t-row"><i data-lucide="map-pin"></i> ${ev.location_name || 'Location TBD'}</div>
-                        
-                        <div class="ticket-actions" onclick="event.stopPropagation()">
+                        <div class="ticket-actions">
                             ${actionHtml}
                         </div>
                     </div>
@@ -148,54 +147,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
     }
 
-    // 5. Action Handlers (Register & Withdraw)
-    function bindActionButtons() {
-        // Handle Registrations
-        document.querySelectorAll('.btn-register').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                const btn = event.currentTarget;
-                const eventId = btn.dataset.eventId;
-                
-                btn.disabled = true;
-                btn.innerText = 'Processing...';
+    // 5. Centralized Event Delegation
+    document.querySelector('.events-container').addEventListener('click', async (e) => {
+        
+        const actionBtn = e.target.closest('.action-btn');
+        if (actionBtn) {
+            e.stopPropagation(); 
+            const eventId = actionBtn.dataset.eventId;
+            const action = actionBtn.dataset.action; 
+            
+            // Branch for the new Scanner action
+            if (action === 'scan') {
+                startScannerModal(eventId);
+                return;
+            }
+            
+            if (action === 'withdraw' && !confirm("Are you sure you want to withdraw from this event?")) return;
 
-                try {
-                    await ApiClient.request('/volunteer/apply', 'POST', { eventId });
-                    showToast('Successfully registered!', true);
-                    loadAllEvents(); // Refresh data to update all tabs
-                } catch (err) {
-                    showToast(err.message, false);
-                    btn.disabled = false;
-                    btn.innerText = 'Register Now';
-                }
-            });
-        });
+            actionBtn.disabled = true;
+            actionBtn.innerText = 'Processing...';
 
-        // Handle Withdrawals
-        document.querySelectorAll('.btn-cancel').forEach(button => {
-            button.addEventListener('click', async (event) => {
-                const btn = event.currentTarget;
-                const eventId = btn.dataset.eventId;
-                
-                if(!confirm("Are you sure you want to withdraw from this event?")) return;
+            try {
+                const response = await ApiClient.request(`/volunteer/events/${eventId}/${action}`, 'POST');
+                showToast(response.message || 'Success!', true);
+                loadAllEvents(); 
+            } catch (err) {
+                showToast(err.message, false);
+                actionBtn.disabled = false;
+                actionBtn.innerText = action === 'register' ? 'Register Now' : 'Withdraw';
+            }
+            return;
+        }
 
-                btn.disabled = true;
-                btn.innerText = 'Withdrawing...';
+        const ticketCard = e.target.closest('.event-ticket');
+        if (ticketCard) {
+            openEventDetails(ticketCard.dataset.cardId);
+        }
+    });
 
-                try {
-                    await ApiClient.request('/volunteer/withdraw', 'POST', { eventId });
-                    showToast('Registration withdrawn.', true);
-                    loadAllEvents(); // Refresh data to update all tabs
-                } catch (err) {
-                    showToast(err.message, false);
-                    btn.disabled = false;
-                    btn.innerText = 'Withdraw';
-                }
-            });
-        });
-    }
-
-    // 6. Dynamic Toast Message
+    // 6. Toast System
     function showToast(message, success = true) {
         let toast = document.querySelector('.notification-toast');
         if (!toast) {
@@ -214,80 +204,110 @@ document.addEventListener('DOMContentLoaded', async () => {
         toast.querySelector('.toast-message').innerText = message;
         toast.classList.add('show');
 
-        window.clearTimeout(toast.dismissTimeout);
-        toast.dismissTimeout = window.setTimeout(() => toast.classList.remove('show'), 3200);
+        clearTimeout(toast.dismissTimeout);
+        toast.dismissTimeout = setTimeout(() => toast.classList.remove('show'), 3200);
     }
 
-    // 7. Event Details Modal Logic
-    window.openEventDetails = function(eventId) {
+    // 7. Details Modal logic
+    function openEventDetails(eventId) {
         const ev = globalEventsData.find(e => e.event_id === eventId);
         if (!ev) return;
 
-        // Header Data
         document.getElementById('detail-title').innerText = ev.title;
         document.getElementById('detail-category').innerText = ev.category || 'Seva Activity';
         
-        // Show status badge inside modal if applicable
         const badge = document.getElementById('detail-status-badge');
-        if (ev.user_status === 'registered' || ev.user_status === 'present') {
+        const status = ev.user_registration_status;
+        if (['registered', 'present', 'waitlisted'].includes(status)) {
             badge.style.display = 'inline-flex';
-            badge.innerHTML = ev.user_status === 'present'
-                ? '<i data-lucide="award" style="width: 14px;"></i> Verified Attendance'
-                : '<i data-lucide="check-circle" style="width: 14px;"></i> Registered';
+            badge.innerText = status.charAt(0).toUpperCase() + status.slice(1);
         } else {
             badge.style.display = 'none';
         }
         
-        // Date & Time
         const evDate = new Date(ev.event_date).toLocaleDateString();
         const time = ev.start_time ? `${ev.start_time.substring(0,5)} - ${ev.end_time.substring(0,5)}` : 'TBA';
         document.getElementById('detail-datetime').innerText = `${evDate}\n${time}`;
-
-        // Contact
-        const contactName = ev.contact_person_name || 'Not provided';
-        const contactPhone = ev.contact_person_phone ? `\n${ev.contact_person_phone}` : '';
-        document.getElementById('detail-contact').innerText = `${contactName}${contactPhone}`;
-
-        // Separate Location Name and Full Address
+        document.getElementById('detail-capacity').innerText = ev.max_volunteers ? `${ev.current_registrations} / ${ev.max_volunteers}` : `${ev.current_registrations} (No Limit)`;
         document.getElementById('detail-location-name').innerText = ev.location_name || 'Location TBD';
-        
-        const addrElement = document.getElementById('detail-address');
-        if (ev.location_address && ev.location_address !== ev.location_name) {
-            addrElement.innerText = ev.location_address;
-            addrElement.style.display = 'block';
-        } else {
-            addrElement.style.display = 'none'; // Hide if address is same as name or empty
-        }
-        
-        // Google Maps link and embedded preview
-        const mapLink = document.getElementById('detail-map-link');
-        const mapEmbed = document.getElementById('detail-map-embed');
-        const mapIframe = document.getElementById('detail-map-iframe');
-
-        if (ev.google_maps_link) {
-            mapLink.href = ev.google_maps_link;
-            mapLink.style.display = 'inline-flex';
-
-            const embedUrl = ev.google_maps_link.includes('maps.app.goo.gl')
-                ? ev.google_maps_link
-                : ev.google_maps_link.replace('https://www.google.com/maps?q=', 'https://www.google.com/maps?q=');
-
-            mapIframe.src = embedUrl;
-            mapEmbed.style.display = 'block';
-        } else {
-            mapLink.style.display = 'none';
-            mapEmbed.style.display = 'none';
-        }
-
-        // Description
         document.getElementById('detail-desc').innerText = ev.description || 'No description provided.';
 
-        // Reveal Modal and re-render icons
         document.getElementById('eventDetailsModal').classList.add('active');
-        if (typeof lucide !== 'undefined') lucide.createIcons();
-    };
+        if (window.lucide) lucide.createIcons();
+    }
 
     window.closeDetailsModal = function() {
         document.getElementById('eventDetailsModal').classList.remove('active');
+    };
+
+    // ==========================================
+    // 8. CAMERA SCANNER ENGINE & HARDWARE CONTROL
+    // ==========================================
+    
+    async function startScannerModal(eventId) {
+        document.getElementById('qrScannerModal').classList.add('active');
+        document.getElementById('reader-placeholder').style.display = 'block';
+
+        // Ensure fresh instance
+        if (html5QrCode) {
+            await html5QrCode.clear();
+        }
+        html5QrCode = new Html5Qrcode("reader");
+        
+        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+        try {
+            // Request rear camera explicitly
+            await html5QrCode.start(
+                { facingMode: "environment" }, 
+                config, 
+                (decodedText) => handleSuccessfulScan(decodedText, eventId)
+            );
+            document.getElementById('reader-placeholder').style.display = 'none';
+        } catch (err) {
+            console.error("Camera startup failed:", err);
+            showToast("Camera access denied or unavailable. Please check permissions.", false);
+            closeScannerModal();
+        }
+    }
+
+    async function handleSuccessfulScan(decodedToken, eventId) {
+        if (!html5QrCode) return;
+
+        // Immediately pause camera to prevent duplicate rapid-fire API calls
+        await html5QrCode.stop();
+        html5QrCode = null; 
+
+        // Send token to backend check-in route
+        try {
+            const response = await ApiClient.request('/volunteer/events/check-in', 'POST', {
+                token: decodedToken 
+                // We pass eventId if the backend requires double verification, though JWTs usually encapsulate it.
+            });
+            
+            closeScannerModal();
+            showToast("Attendance verified successfully!", true);
+            loadAllEvents(); // Refresh data to show "Verified Attendance" badge
+
+        } catch (err) {
+            closeScannerModal();
+            // Backend will throw errors if Token is expired, invalid, or wrong event.
+            showToast(err.message || "Invalid or expired Check-in Code.", false);
+        }
+    }
+
+    window.closeScannerModal = async function() {
+        document.getElementById('qrScannerModal').classList.remove('active');
+        
+        // Strict hardware teardown
+        if (html5QrCode) {
+            try {
+                await html5QrCode.stop();
+                html5QrCode.clear();
+            } catch (err) {
+                console.error("Failed to stop camera:", err);
+            }
+            html5QrCode = null;
+        }
     };
 });

@@ -1,108 +1,87 @@
 // ==========================================
-// PUBLIC-MAIN.JS (Global Public Scripts)
+// PUBLIC-MAIN.JS (Optimized UI & Animations)
 // ==========================================
 
 document.addEventListener('DOMContentLoaded', () => {
     
     // 1. Initialize Icons
-    if (typeof lucide !== 'undefined') {
-        lucide.createIcons();
-    }
+    if (window.lucide) lucide.createIcons();
 
-    // 2. Dynamic Floating Navbar Logic
+    // 2. High-Performance Scroll Listener
     const navbar = document.getElementById('navbar');
-    
-    window.addEventListener('scroll', () => {
-        if (!navbar) return;
-        if (window.scrollY > 40) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
+    if (navbar) {
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    navbar.classList.toggle('scrolled', window.scrollY > 40);
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+    }
 
     // 3. Mobile Hamburger Menu Toggle
     const mobileBtn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.getElementById('sidebar');
-
     if (mobileBtn) {
         mobileBtn.addEventListener('click', () => {
             const iconElement = mobileBtn.querySelector('i');
+            const targetContainer = document.getElementById('navbar') || document.getElementById('sidebar');
+            const toggleClass = targetContainer.id === 'navbar' ? 'menu-active' : 'open';
 
-            // Prefer toggling the navbar 'menu-active' class (matches CSS rules)
-            const navbarEl = document.getElementById('navbar');
-            if (navbarEl) {
-                navbarEl.classList.toggle('menu-active');
-                const isOpen = navbarEl.classList.contains('menu-active');
-                if (iconElement) iconElement.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
-                if (typeof lucide !== 'undefined') lucide.createIcons(); // Re-render icon state
-                return;
-            }
-
-            // Fallback: toggle a sidebar element if present (older pages)
-            if (sidebar) {
-                sidebar.classList.toggle('open');
-                const isOpen = sidebar.classList.contains('open');
-                if (iconElement) iconElement.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
-                if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (targetContainer) {
+                targetContainer.classList.toggle(toggleClass);
+                const isOpen = targetContainer.classList.contains(toggleClass);
+                
+                if (iconElement) {
+                    iconElement.setAttribute('data-lucide', isOpen ? 'x' : 'menu');
+                    if (window.lucide) lucide.createIcons();
+                }
             }
         });
     }
 
     // 4. Scroll Reveal Animations
-    const observerOptions = {
-        threshold: 0.1, 
-        rootMargin: "0px 0px -50px 0px" 
-    };
-
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                observer.unobserve(entry.target); // Only animate once
+                obs.unobserve(entry.target); 
             }
         });
-    }, observerOptions);
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
 
-    document.querySelectorAll('.reveal').forEach((el) => {
-        observer.observe(el);
-    });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
     // 5. Smooth Number Counting Animation
-    const counters = document.querySelectorAll('.counter');
-    const counterObserver = new IntersectionObserver((entries, observer) => {
+    const counterObserver = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const target = entry.target;
-                const endValue = parseInt(target.getAttribute('data-target'));
+                const endValue = parseInt(target.getAttribute('data-target') || 0, 10);
                 const suffix = target.getAttribute('data-suffix') || '';
-                const duration = 2000; // Animation duration in ms (2 seconds)
                 let startTime = null;
 
                 const countUp = (currentTime) => {
                     if (!startTime) startTime = currentTime;
-                    const progress = Math.min((currentTime - startTime) / duration, 1);
+                    const progress = Math.min((currentTime - startTime) / 2000, 1); // 2000ms duration
                     
-                    // Cubic easing out for a smooth slow-down at the end
-                    const easeProgress = 1 - Math.pow(1 - progress, 3);
+                    const easeProgress = 1 - Math.pow(1 - progress, 3); // Cubic ease out
                     const currentVal = Math.floor(easeProgress * endValue);
                     
-                    // Format with commas and suffix
                     target.innerText = currentVal.toLocaleString() + suffix;
 
                     if (progress < 1) {
                         requestAnimationFrame(countUp);
-                    } else {
-                        target.innerText = endValue.toLocaleString() + suffix;
                     }
                 };
                 
                 requestAnimationFrame(countUp);
-                observer.unobserve(target); // Only animate once
+                obs.unobserve(target); 
             }
         });
-    }, { threshold: 0.5 }); // Trigger when 50% of the element is visible
+    }, { threshold: 0.5 });
 
-    counters.forEach(counter => counterObserver.observe(counter));
-
+    document.querySelectorAll('.counter').forEach(el => counterObserver.observe(el));
 });

@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="events.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -82,6 +83,32 @@
                     </button>
                 </div>
 
+                <!-- NEW: Search Matrix & Filters -->
+                <div style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
+                    <div style="flex: 1; min-width: 200px;">
+                        <input type="text" id="filter-search" class="form-input" style="width: 100%;" placeholder="Search events by title..." oninput="debounceLoadEvents()">
+                    </div>
+                    <select id="filter-category" class="form-input" onchange="loadEvents()">
+                        <option value="">All Categories</option>
+                        <option value="Food Drive">Food Drive</option>
+                        <option value="Cleanliness">Cleanliness</option>
+                        <option value="Teaching">Teaching</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <select id="filter-status" class="form-input" onchange="loadEvents()">
+                        <option value="">All Statuses</option>
+                        <option value="upcoming">Upcoming</option>
+                        <option value="ongoing">Ongoing</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                    <select id="filter-sort" class="form-input" onchange="loadEvents()">
+                        <option value="date">Sort by Date</option>
+                        <option value="created">Sort by Created</option>
+                        <option value="volunteers">Sort by Volunteers</option>
+                    </select>
+                </div>
+
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -89,7 +116,8 @@
                                 <th>Event Title</th>
                                 <th>Date & Time</th>
                                 <th>Location</th>
-                                <th>Volunteers</th> <th>Status</th>
+                                <th>Volunteers</th> 
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="events-table-body">
@@ -100,7 +128,8 @@
             </div>
         </main>
     </div>
-
+    
+    <!-- Create Event Modal -->
     <div class="modal-overlay" id="eventModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -138,34 +167,90 @@
                         <input type="time" id="ev-end" class="form-input" required>
                     </div>
 
+                    <!-- Priority & Visibility -->
+                    <div class="form-group">
+                        <label class="form-label">Priority</label>
+                        <select id="ev-priority" class="form-input">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Visibility</label>
+                        <select id="ev-visibility" class="form-input">
+                            <option value="public" selected>Public</option>
+                            <option value="private">Private</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label class="form-label">Location Name</label>
                         <input type="text" id="ev-location-name" class="form-input" required placeholder="e.g. Central Station">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Volunteers Needed</label>
-                        <input type="number" id="ev-max-volunteers" class="form-input" required placeholder="e.g. 15" min="1" value="10">
+                        <label class="form-label">Registration Deadline</label>
+                        <input type="datetime-local" id="ev-deadline" class="form-input">
+                    </div>
+
+                    <!-- Corrected Volunteer Metrics -->
+                    <div class="form-group">
+                        <label class="form-label">Target Volunteers Needed</label>
+                        <input type="number" id="ev-vol-needed" class="form-input" required placeholder="e.g. 10" min="1" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Capacity (Waitlist Cap)</label>
+                        <input type="number" id="ev-max-volunteers" class="form-input" placeholder="e.g. 15" min="1" value="15">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Min Volunteers (Go/No-Go)</label>
+                        <input type="number" id="ev-min-vol" class="form-input" min="1" value="1">
                     </div>
 
                     <div class="form-group full">
                         <label class="form-label">Full Location Address</label>
-                        <input type="text" id="ev-location-address" class="form-input" required placeholder="e.g. 123 Main St, Chembur, Mumbai">
+                        <input type="text" id="ev-location-address" class="form-input" required placeholder="e.g. 123 Main St, Mumbai">
                     </div>
 
+                    <!-- Missing Links & Appearance Data -->
                     <div class="form-group full">
-                        <label class="form-label">Google Maps Link (Optional)</label>
+                        <label class="form-label">Google Maps Link</label>
                         <input type="url" id="ev-maps-link" class="form-input" placeholder="https://maps.google.com/...">
                     </div>
-
                     <div class="form-group">
-                        <label class="form-label">Contact Person Name (Optional)</label>
-                        <input type="text" id="ev-contact-name" class="form-input" placeholder="e.g. Rahul Sharma">
+                        <label class="form-label">Banner Image URL</label>
+                        <input type="url" id="ev-banner" class="form-input" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Event Color (Theme)</label>
+                        <input type="color" id="ev-color" class="form-input" value="#3B82F6" style="height: 42px; padding: 4px;">
                     </div>
 
+                    <!-- Contact Information -->
                     <div class="form-group">
-                        <label class="form-label">Contact Phone (Optional)</label>
-                        <input type="tel" id="ev-contact-phone" class="form-input" placeholder="e.g. +91 9876543210">
+                        <label class="form-label">Contact Person</label>
+                        <input type="text" id="ev-contact-name" class="form-input" placeholder="Coordinator Name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Contact Phone</label>
+                        <input type="tel" id="ev-contact-phone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                    </div>
+                    
+                    <!-- Booleans & Toggles -->
+                    <div class="form-group full" style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="ev-reg-open" checked style="width: 16px; height: 16px;">
+                            <label class="form-label" style="margin: 0;">Registration Open Now</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="ev-waitlist" checked style="width: 16px; height: 16px;">
+                            <label class="form-label" style="margin: 0;">Enable Waitlist</label>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="ev-autoclose" checked style="width: 16px; height: 16px;">
+                            <label class="form-label" style="margin: 0;">Auto-close at Capacity</label>
+                        </div>
                     </div>
 
                     <div class="form-group full">
@@ -181,14 +266,25 @@
         </div>
     </div>
 
+    <!-- Event Details Modal -->
     <div class="modal-overlay" id="eventDetailsModal">
         <div class="modal-content details-modal">
             <div class="modal-header">
                 <div>
-                    <h2 id="detail-title">Loading...</h2>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <h2 id="detail-title">Loading...</h2>
+                        <span id="detail-status-badge"></span>
+                    </div>
                     <p id="detail-category" style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"></p>
                 </div>
-                <button class="icon-btn" onclick="closeDetailsModal()"><i data-lucide="x"></i></button>
+                <div style="display: flex; gap: 8px;">
+                    <!-- NEW: Check-in Kiosk Button -->
+                    <button class="primary-btn" id="btn-launch-qr" style="display: none; align-items: center; gap: 6px;">
+                        <i data-lucide="qr-code" style="width: 16px; height: 16px;"></i> Kiosk
+                    </button>
+                    <button class="btn-secondary" id="btn-delete-event" style="color: #EF4444; border-color: rgba(239, 68, 68, 0.3); display: none;">Delete</button>
+                    <button class="icon-btn" onclick="closeDetailsModal()"><i data-lucide="x"></i></button>
+                </div>
             </div>
             
             <div class="details-body" id="detail-body-content">
@@ -202,28 +298,25 @@
                         <span class="info-value" id="detail-location">--</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Contact Person</span>
-                        <span class="info-value" id="detail-contact">--</span>
-                    </div>
-                    <div class="info-item">
                         <span class="info-label">Capacity</span>
                         <span class="info-value" id="detail-capacity">--</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Waitlisted</span>
+                        <span class="info-value" id="detail-waitlist">--</span>
                     </div>
                 </div>
 
                 <div class="info-desc" style="margin-top: 16px;">
                     <span class="info-label">Description</span>
-                    <p class="info-value" id="detail-desc" style="margin-top: 4px;">--</p>
+                    <p class="info-value" id="detail-desc" style="margin-top: 4px; line-height: 1.5;">--</p>
                 </div>
 
                 <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">
 
                 <div class="volunteers-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h3 style="font-size: 16px; font-weight: 600;">Registered Volunteers</h3>
-                    </div>
-                    
-                    <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Registered Volunteers</h3>
+                    <div class="table-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 24px;">
                         <table class="data-table">
                             <thead style="position: sticky; top: 0; z-index: 10;">
                                 <tr>
@@ -238,11 +331,46 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Audit Timeline</h3>
+                    <div class="table-container" style="max-height: 200px; overflow-y: auto;">
+                        <table class="data-table">
+                            <tbody id="detail-timeline-body">
+                                <tr><td style="text-align: center;">Loading timeline...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- QR Check-in Kiosk Modal -->
+    <div class="modal-overlay" id="qrCheckInModal" style="z-index: 300;">
+        <div class="modal-content" style="max-width: 450px; text-align: center; background: #ffffff; border: none; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
+            <div class="modal-header" style="justify-content: center; position: relative; margin-bottom: 16px;">
+                <h2 id="qr-event-title" style="color: #0F172A;">Event Check-In</h2>
+                <button class="icon-btn" onclick="closeQRModal()" style="position: absolute; right: 0; color: #64748B;"><i data-lucide="x"></i></button>
+            </div>
+            
+            <div id="qr-status-message" style="display:none; padding: 16px; border-radius: 8px; margin-bottom: 16px; font-weight: 500;"></div>
+
+            <div id="qr-code-wrapper" style="padding: 24px; background: #F8FAFC; border-radius: 16px; display: inline-block; border: 1px solid #E2E8F0;">
+                <div id="qr-code-container">
+                    <!-- Canvas rendered here -->
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 24px; color: #0F172A; font-weight: 600;">Scan to Check-in</h3>
+            <p style="color: #64748B; font-size: 14px; margin-bottom: 24px;">Use the SevaLog Volunteer App</p>
+
+            <div class="qr-timer-container">
+                <div class="qr-timer-bar" id="qr-timer-bar"></div>
+            </div>
+            <p id="qr-timer-text" style="font-size: 12px; color: #64748B; margin-top: 8px; font-weight: 500;">Initializing...</p>
+        </div>
+    </div>
+    
     <script src="../../js/api.js"></script>
     <script src="../../js/auth.js"></script>
     <script src="main.js"></script>
