@@ -139,128 +139,98 @@
             
             <form id="createEventForm">
                 <div class="form-grid">
+                    <!-- 1. Basic Info -->
                     <div class="form-group full">
-                        <label class="form-label">Event Title</label>
-                        <input type="text" id="ev-title" class="form-input" required placeholder="e.g. Sunday Food Drive">
+                        <label class="form-label">Event Title <span style="color:red">*</span></label>
+                        <input type="text" id="ev-title" class="form-input" required maxlength="200" placeholder="e.g. Sunday Food Drive">
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Date</label>
-                        <input type="date" id="ev-date" class="form-input" required>
-                    </div>
-                    <div class="form-group">
                         <label class="form-label">Category</label>
-                        <select id="ev-category" class="form-input" required>
+                        <select id="ev-category" class="form-input">
                             <option value="Food Drive">Food Drive</option>
                             <option value="Cleanliness">Cleanliness</option>
                             <option value="Teaching">Teaching</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
-                    
+
+                    <!-- 2. Date & Time -->
                     <div class="form-group">
-                        <label class="form-label">Start Time</label>
-                        <input type="time" id="ev-start" class="form-input" required>
+                        <label class="form-label">Event Date <span style="color:red">*</span></label>
+                        <!-- min constraint set via JS to prevent past dates -->
+                        <input type="date" id="ev-date" class="form-input" required onfocus="this.min=new Date().toISOString().split('T')[0]">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">End Time</label>
-                        <input type="time" id="ev-end" class="form-input" required>
+                        <label class="form-label">Start Time <span style="color:red">*</span></label>
+                        <input type="time" id="ev-start" class="form-input" required onclick="this.showPicker()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time <span style="color:red">*</span></label>
+                        <input type="time" id="ev-end" class="form-input" required onclick="this.showPicker()">
                     </div>
 
-                    <!-- Priority & Visibility -->
+                    <!-- 3. Location -->
                     <div class="form-group">
-                        <label class="form-label">Priority</label>
-                        <select id="ev-priority" class="form-input">
-                            <option value="low">Low</option>
-                            <option value="medium" selected>Medium</option>
-                            <option value="high">High</option>
-                        </select>
+                        <label class="form-label">Location Name <span style="color:red">*</span></label>
+                        <input type="text" id="ev-location-name" class="form-input" required maxlength="150" placeholder="e.g. Central Station">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Visibility</label>
-                        <select id="ev-visibility" class="form-input">
-                            <option value="public" selected>Public</option>
-                            <option value="private">Private</option>
-                        </select>
+                        <label class="form-label">Google Maps Link</label>
+                        <input type="url" id="ev-maps-link" class="form-input" maxlength="255" placeholder="https://maps.google.com/...">
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">Full Location Address <span style="color:red">*</span></label>
+                        <input type="text" id="ev-location-address" class="form-input" required placeholder="e.g. 123 Main St, Mumbai">
                     </div>
 
+                    <!-- 4. Volunteers & Registration -->
                     <div class="form-group">
-                        <label class="form-label">Location Name</label>
-                        <input type="text" id="ev-location-name" class="form-input" required placeholder="e.g. Central Station">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Registration Deadline</label>
-                        <input type="datetime-local" id="ev-deadline" class="form-input">
-                    </div>
-
-                    <!-- Corrected Volunteer Metrics -->
-                    <div class="form-group">
-                        <label class="form-label">Target Volunteers Needed</label>
-                        <input type="number" id="ev-vol-needed" class="form-input" required placeholder="e.g. 10" min="1" value="10">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Max Capacity (Waitlist Cap)</label>
-                        <input type="number" id="ev-max-volunteers" class="form-input" placeholder="e.g. 15" min="1" value="15">
+                        <label class="form-label">Volunteers Needed <span style="color:red">*</span></label>
+                        <input type="number" id="ev-vol-needed" class="form-input" required min="1" placeholder="e.g. 10">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Min Volunteers (Go/No-Go)</label>
                         <input type="number" id="ev-min-vol" class="form-input" min="1" value="1">
                     </div>
-
-                    <div class="form-group full">
-                        <label class="form-label">Full Location Address</label>
-                        <input type="text" id="ev-location-address" class="form-input" required placeholder="e.g. 123 Main St, Mumbai">
-                    </div>
-
-                    <!-- Missing Links & Appearance Data -->
-                    <div class="form-group full">
-                        <label class="form-label">Google Maps Link</label>
-                        <input type="url" id="ev-maps-link" class="form-input" placeholder="https://maps.google.com/...">
+                    <div class="form-group">
+                        <label class="form-label">Max Volunteers (Capacity)</label>
+                        <input type="number" id="ev-max-volunteers" class="form-input" min="1" placeholder="Leave blank if no limit">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Banner Image URL</label>
-                        <input type="url" id="ev-banner" class="form-input" placeholder="https://example.com/image.jpg">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Event Color (Theme)</label>
-                        <input type="color" id="ev-color" class="form-input" value="#3B82F6" style="height: 42px; padding: 4px;">
+                        <label class="form-label">Registration Deadline</label>
+                        <input type="datetime-local" id="ev-deadline" class="form-input" onfocus="this.min=new Date().toISOString().slice(0, 16)">
                     </div>
 
-                    <!-- Contact Information -->
+                    <!-- 5. Contact & Description -->
                     <div class="form-group">
-                        <label class="form-label">Contact Person</label>
-                        <input type="text" id="ev-contact-name" class="form-input" placeholder="Coordinator Name">
+                        <label class="form-label">Contact Person Name</label>
+                        <input type="text" id="ev-contact-name" class="form-input" maxlength="100" placeholder="Coordinator Name">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Contact Phone</label>
-                        <input type="tel" id="ev-contact-phone" class="form-input" placeholder="+91 XXXXX XXXXX">
+                        <input type="tel" id="ev-contact-phone" class="form-input" maxlength="20" placeholder="+91 XXXXX XXXXX">
                     </div>
-                    
-                    <!-- Booleans & Toggles -->
-                    <div class="form-group full" style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 8px;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="ev-reg-open" checked style="width: 16px; height: 16px;">
-                            <label class="form-label" style="margin: 0;">Registration Open Now</label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="ev-waitlist" checked style="width: 16px; height: 16px;">
-                            <label class="form-label" style="margin: 0;">Enable Waitlist</label>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <input type="checkbox" id="ev-autoclose" checked style="width: 16px; height: 16px;">
-                            <label class="form-label" style="margin: 0;">Auto-close at Capacity</label>
-                        </div>
-                    </div>
-
                     <div class="form-group full">
                         <label class="form-label">Description</label>
                         <textarea id="ev-desc" class="form-input" rows="3" placeholder="What will volunteers be doing?"></textarea>
                     </div>
                 </div>
+
+                <div class="publish-toggle-container">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="ev-publish-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <div class="toggle-text">
+                        <span style="font-weight: 600; font-size: 14px;">Publish Immediately</span>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Volunteers will be able to see and register for this event right away.</p>
+                    </div>
+                </div>
+
                 <div class="form-actions">
                     <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="primary-btn">Save Event</button>
+                    <button type="submit" id="submit-event-btn" class="primary-btn">Create & Publish Event</button>
                 </div>
             </form>
         </div>
@@ -277,8 +247,13 @@
                     </div>
                     <p id="detail-category" style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"></p>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <!-- NEW: Check-in Kiosk Button -->
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <!-- NEW: Dynamic Lifecycle Action Buttons -->
+                    <div id="lifecycle-actions" style="display: flex; gap: 8px; margin-right: 12px; padding-right: 12px; border-right: 1px solid var(--border);">
+                        <!-- Buttons injected via JS -->
+                    </div>
+                    
+                    <!-- Existing Kiosk & Delete Buttons -->
                     <button class="primary-btn" id="btn-launch-qr" style="display: none; align-items: center; gap: 6px;">
                         <i data-lucide="qr-code" style="width: 16px; height: 16px;"></i> Kiosk
                     </button>

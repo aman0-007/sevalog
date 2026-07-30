@@ -61,9 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const password = getVal('login-password');
                 
                 const response = await ApiClient.request('/auth/login', 'POST', { email, password });
-                ApiClient.setSession(response.token, response.user);
+                ApiClient.setSession(response.data.token, response.data.user);
 
-                window.location.href = response.user.role === 'admin' ? 'admin.html' : 'volunteer/dashboard.html';
+                window.location.href = response.data.user.role === 'admin' ? 'admin/admin.html' : 'volunteer/dashboard.html';
             } catch (error) {
                 alert(error.message);
                 setButtonState(btn, false, origHtml);
@@ -82,6 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const origHtml = btn.innerHTML;
             
             try {
+                // Pre-flight check for the CHECK constraint
+                const college = getVal('college_name');
+                const prof = getVal('profession');
+                
+                if (!college && !prof) {
+                    throw new Error("Please provide either your College Name or Profession.");
+                }
+
                 setButtonState(btn, true);
 
                 // Step 1: Register Core Account
@@ -90,16 +98,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     lastName: getVal('last_name'),
                     email: getVal('email'),
                     password: getVal('password_hash'),
-                    phoneNumber: getVal('phone_number')
+                    phoneNumber: getVal('phone_number'),
+                    collegeName: college,
+                    profession: prof
                 };
                 
                 const authRes = await ApiClient.request('/auth/register', 'POST', authPayload);
-                ApiClient.setSession(authRes.token, authRes.user);
+                ApiClient.setSession(authRes.data.token, authRes.data.user);
 
                 // Step 2: Update Detailed Profile
                 const profilePayload = {
                     ...authPayload,
-                    professionOrCollege: getVal('profession_or_college'),
+                    collegeName: college,
+                    profession: prof,
                     city: getVal('city'),
                     residentialAddress: getVal('residential_address'),
                     dateOfBirth: getVal('date_of_birth'),
@@ -112,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     emergencyContactRelation: getVal('emergency_contact_relation'),
                     emergencyContactNumber: getVal('emergency_contact_number'),
                     medicalConditions: getVal('medical_conditions'),
-                    languages: getChecked('languages_spoken'),
+                    languagesSpoken: getChecked('languages_spoken'),
                     skills: getChecked('skills'),
                     interestedActivities: getChecked('interested_activities'),
                 };
@@ -147,11 +158,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const password = getVal('password');
                 const response = await ApiClient.request('/auth/login', 'POST', { email, password });
                 
-                if (response.user.role !== 'admin') {
+                const user = response.data.user;
+                const token = response.data.token;
+
+                if (user.role !== 'admin') {
                     throw new Error("Access Denied: Not an Admin.");
                 }
 
-                ApiClient.setSession(response.token, response.user);
+                ApiClient.setSession(token, user);
                 window.location.href = 'admin.html';
 
             } catch (error) {

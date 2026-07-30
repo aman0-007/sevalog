@@ -103,3 +103,79 @@
     border-radius: 4px;
     /* The transition is controlled by JS to prevent resetting glitches */
 }
+
+/* --- PUBLISH TOGGLE --- */
+.publish-toggle-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(59, 130, 246, 0.05); /* Slight blue tint */
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-md);
+    margin-top: 16px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: var(--border);
+    transition: .3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+input:checked + .toggle-slider {
+    background-color: var(--accent); /* SevaLog Blue */
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(16px);
+}
+
+/* --- DRAFT BUTTON STATE --- */
+.primary-btn.btn-draft {
+    background-color: #64748B; /* Muted Slate color */
+    color: #FFFFFF;
+    box-shadow: none;
+}
+
+.primary-btn.btn-draft:hover {
+    background-color: #475569; /* Darker Slate on hover */
+}
+
+/* Ensure it works well in dark mode too */
+[data-theme="dark"] .primary-btn.btn-draft {
+    background-color: #475569;
+    color: #F8FAFC;
+}
+[data-theme="dark"] .primary-btn.btn-draft:hover {
+    background-color: #334155;
+}

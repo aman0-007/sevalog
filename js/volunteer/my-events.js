@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         myRegsGrid.innerHTML = '<div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Fetching your schedule...</div>';
 
         try {
-            const response = await ApiClient.request('/volunteer/events/all', 'GET');
+            const response = await ApiClient.request('/volunteer/events/all?limit=50', 'GET');
             globalEventsData = response.data || [];
             
             const upcoming = [];
@@ -52,13 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const isCancelled = ev.event_status === 'cancelled';
                 const isActiveReg = ['registered', 'waitlisted', 'present', 'absent'].includes(ev.user_registration_status);
                 
-                if (isActiveReg) myRegistrations.push(ev);
-
                 if (isCancelled || isCompleted) {
-                    past.push(ev);
+                    past.push(ev); // Locks past events exclusively to the history tab
                 } else {
-                    // Any event that reaches here is public, not a draft, and not in the past
                     upcoming.push(ev);
+                    if (isActiveReg) {
+                        myRegistrations.push(ev); // Only active future/ongoing events go here
+                    }
                 }
             });
 
@@ -100,7 +100,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (status === 'absent') {
                 actionHtml = `<span style="font-size: 13px; font-weight: 700; color: #EF4444;">Marked Absent</span>`;
             } else if (status === 'registered') {
-                // If registered and not completed, show the check-in camera button alongside withdraw
                 actionHtml = `
                     <div style="display: flex; gap: 8px;">
                         ${!isCompleted ? `<button class="btn-checkin action-btn" data-action="scan" data-event-id="${ev.event_id}"><i data-lucide="qr-code"></i> Check-in</button>` : ''}
@@ -119,7 +118,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } else if (!ev.registration_open || ev.event_status === 'cancelled') {
                     actionHtml = `<span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Closed</span>`;
                 } else if (ev.max_volunteers && ev.current_registrations >= ev.max_volunteers) {
-                    actionHtml = `<button class="btn-register action-btn" data-action="register" data-event-id="${ev.event_id}">Join Waitlist</button>`;
+                    // NEW: Distinct styling for Waitlist action button
+                    actionHtml = `<button class="btn-register action-btn" data-action="register" data-event-id="${ev.event_id}" style="background: #F59E0B; border-color: #F59E0B; color: #FFFFFF;">Join Waitlist</button>`;
                 } else {
                     actionHtml = `<button class="btn-register action-btn" data-action="register" data-event-id="${ev.event_id}">Register Now</button>`;
                 }
@@ -225,12 +225,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             badge.style.display = 'none';
         }
         
-        const evDate = new Date(ev.event_date).toLocaleDateString();
+        // Format dates cleanly
+        const evDate = new Date(ev.event_date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         const time = ev.start_time ? `${ev.start_time.substring(0,5)} - ${ev.end_time.substring(0,5)}` : 'TBA';
+        
         document.getElementById('detail-datetime').innerText = `${evDate}\n${time}`;
         document.getElementById('detail-capacity').innerText = ev.max_volunteers ? `${ev.current_registrations} / ${ev.max_volunteers}` : `${ev.current_registrations} (No Limit)`;
+        
+        // INJECT NEW DATA FIELDS
         document.getElementById('detail-location-name').innerText = ev.location_name || 'Location TBD';
-        document.getElementById('detail-desc').innerText = ev.description || 'No description provided.';
+        document.getElementById('detail-desc').innerText = ev.description || 'No specific instructions provided for this event.';
+        
+        // Handle Address & Optional Google Maps Link
+        let addressHtml = ev.location_address || '';
+        if (ev.google_maps_link) {
+            addressHtml += `<br><a href="${ev.google_maps_link}" target="_blank" style="color: var(--accent-primary); display: inline-block; margin-top: 6px; font-weight: 600; text-decoration: none;">View on Google Maps &rarr;</a>`;
+        }
+        document.getElementById('detail-address').innerHTML = addressHtml || '--';
 
         document.getElementById('eventDetailsModal').classList.add('active');
         if (window.lucide) lucide.createIcons();
@@ -246,11 +257,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     async function startScannerModal(eventId) {
         document.getElementById('qrScannerModal').classList.add('active');
-        document.getElementById('reader-placeholder').style.display = 'block';
+        const placeholder = document.getElementById('reader-placeholder');
+        placeholder.style.display = 'block';
+        placeholder.innerText = 'Requesting camera...';
+
+        // 1. Strict HTTPS Check (Browser Security Requirement)
+        if (!window.isSecureContext) {
+            placeholder.innerHTML = `<span style="color: #EF4444; text-align: center; display: block;">Camera Blocked.<br>Browsers require HTTPS for camera access.</span>`;
+            console.error("Camera access blocked: Environment is not a secure context (HTTPS/localhost).");
+            setTimeout(closeScannerModal, 4000);
+            return;
+        }
 
         // Ensure fresh instance
         if (html5QrCode) {
-            await html5QrCode.clear();
+            try { await html5QrCode.clear(); } catch(e) {}
         }
         html5QrCode = new Html5Qrcode("reader");
         
@@ -263,10 +284,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 config, 
                 (decodedText) => handleSuccessfulScan(decodedText, eventId)
             );
-            document.getElementById('reader-placeholder').style.display = 'none';
+            placeholder.style.display = 'none';
         } catch (err) {
             console.error("Camera startup failed:", err);
-            showToast("Camera access denied or unavailable. Please check permissions.", false);
+            
+            // Detailed error handling
+            let errorMsg = "Camera access unavailable.";
+            if (err.name === 'NotAllowedError') errorMsg = "Camera permission denied in browser settings.";
+            else if (err.name === 'NotFoundError') errorMsg = "No camera hardware detected.";
+            
+            showToast(errorMsg, false);
             closeScannerModal();
         }
     }
