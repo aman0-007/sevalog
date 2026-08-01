@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 1. Check Auth
     const token = typeof ApiClient !== 'undefined' ? ApiClient.getToken() : null;
     if (!token) {
-        window.location.href = '../login.html'; 
+        window.location.href = '../login.html';
         return;
     }
 
@@ -20,13 +20,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.addEventListener('click', () => {
             tabBtns.forEach(b => b.classList.remove('active'));
             tabContents.forEach(c => c.classList.remove('active'));
-            
+
             btn.classList.add('active');
             const targetId = btn.dataset.target;
             document.getElementById(targetId).classList.add('active');
 
             // Hide the Profile Save button if we are on the Security tab
-            if(targetId === 'tab-security') {
+            if (targetId === 'tab-security') {
                 saveBar.classList.remove('active');
             } else {
                 saveBar.classList.add('active');
@@ -42,11 +42,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Simple text inputs
             const fields = [
-                'first_name', 'last_name', 'email', 'phone_number', 
+                'first_name', 'last_name', 'email', 'phone_number',
                 'date_of_birth', 'gender', 'blood_group', 'residential_address',
                 'city', 'state', 'pincode', 'emergency_contact_name',
                 'emergency_contact_relation', 'emergency_contact_number',
-                'medical_conditions', 'education_level', 'profession_or_college'
+                'medical_conditions', 'education_level', 'college_name', 'profession' // <-- Fixed here
             ];
 
             fields.forEach(field => {
@@ -81,10 +81,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. Handle Profile Update
     document.getElementById('profile-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const btn = document.getElementById('save-profile-btn');
         const msg = document.getElementById('profile-msg');
-        
+
+        const collegeName = document.getElementById('college_name').value.trim();
+        const profession = document.getElementById('profession').value.trim();
+
+        // Frontend validation for DB constraint (chk_college_or_profession)
+        if (!collegeName && !profession) {
+            msg.innerText = "Please provide either your College Name or Profession.";
+            msg.style.color = "#EF4444";
+            return;
+        }
+
         btn.innerHTML = `<i data-lucide="loader-2" class="spin" style="width:16px;"></i> Saving...`;
         btn.disabled = true;
         lucide.createIcons();
@@ -111,7 +121,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             emergencyContactNumber: document.getElementById('emergency_contact_number').value,
             medicalConditions: document.getElementById('medical_conditions').value,
             educationLevel: document.getElementById('education_level').value,
-            professionOrCollege: document.getElementById('profession_or_college').value,
+            collegeName: collegeName || null,
+            profession: profession || null,
             skills: getArray('skills'),
             languagesSpoken: getArray('languages_spoken'),
             interestedActivities: getArray('interested_activities')
@@ -119,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             const response = await ApiClient.request('/volunteer/profile', 'PUT', payload);
-            
+
             // Update local storage name if it changed
             const session = JSON.parse(localStorage.getItem('samithi_user') || '{}');
             session.firstName = payload.firstName;
@@ -130,13 +141,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('user-name-top').innerText = `${payload.firstName} ${payload.lastName}`;
 
             btn.innerHTML = `<i data-lucide="check"></i> Saved`;
-            btn.style.background = "#10B981"; 
+            btn.style.background = "#10B981";
             msg.innerText = "Profile updated successfully.";
             msg.style.color = "#10B981";
-            
+
             setTimeout(() => {
                 btn.innerText = "Save Profile";
-                btn.style.background = ""; 
+                btn.style.background = "";
                 btn.disabled = false;
                 msg.innerText = "";
             }, 3000);
@@ -152,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 5. Handle Password Change
     document.getElementById('password-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
+
         const currentPassword = document.getElementById('current_password').value;
         const newPassword = document.getElementById('new_password').value;
         const confirmPassword = document.getElementById('confirm_password').value;
@@ -170,7 +181,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         try {
             await ApiClient.request('/auth/change-password', 'PUT', { currentPassword, newPassword });
-            
+
             document.getElementById('password-form').reset();
             msg.innerText = "Password changed securely.";
             msg.style.color = "#10B981";
