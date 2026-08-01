@@ -24,20 +24,38 @@ const STATUS_UI_MAP = {
     'archived': { bg: 'rgba(71, 85, 105, 0.1)', text: '#475569', label: 'ARCHIVED' }
 };
 
-
+// --- Performance Formatters & Lookups ---
 function getEventBadges(event) {
     let badgesHTML = '';
     
-    // Check if backend provided a dynamic_status, otherwise fallback to DB status
     const primaryStatus = (event.dynamic_status || event.status || '').toLowerCase();
     
-    const ui = STATUS_UI_MAP[primaryStatus] || STATUS_UI_MAP['draft'];
+    // Time Boundary Math
+    const safeStartTime = event.start_time || '00:00:00';
+    const evDateStr = event.event_date ? event.event_date.split('T')[0] : new Date().toISOString().split('T')[0];
+    const startDateTime = new Date(`${evDateStr}T${safeStartTime}`);
+    const minsToStart = (startDateTime - new Date()) / 60000;
+    
+    const isWithin30Mins = (minsToStart <= 30 && minsToStart > 0);
+    const isStarted = minsToStart <= 0;
+    const isOngoing = primaryStatus === 'ongoing';
+
+    // 1. Primary Status Badge
+    let ui = STATUS_UI_MAP[primaryStatus] || STATUS_UI_MAP['draft'];
+    
+    // Override: If it's upcoming but within the 30-minute window, switch to "STARTING SOON"
+    if (isWithin30Mins && primaryStatus === 'upcoming') {
+        ui = { bg: 'rgba(245, 158, 11, 0.1)', text: '#F59E0B', label: 'STARTING SOON' };
+    }
+    
     badgesHTML += `<span class="status-badge" style="background: ${ui.bg}; color: ${ui.text}; margin-right: 6px;">${ui.label}</span>`;
     
-    // 2. Determine Registration Badge (ONLY show if event is not draft/cancelled/completed/archived)
-    if (['upcoming', 'ongoing', 'published'].includes(primaryStatus)) {
+    // 2. Registration Badge
+    // HIDE REGISTRATION DATA if within 30 mins, already started, completed, or cancelled
+    const hideRegBadge = isWithin30Mins || isStarted || isOngoing || ['completed', 'cancelled', 'archived', 'draft'].includes(primaryStatus);
+    
+    if (!hideRegBadge) {
         const isRegOpen = event.registration_open === true;
-        
         const regUi = isRegOpen 
             ? { bg: 'rgba(16, 185, 129, 0.1)', text: '#10B981', label: 'REG OPEN' }
             : { bg: 'rgba(239, 68, 68, 0.1)', text: '#EF4444', label: 'REG CLOSED' };
@@ -50,6 +68,7 @@ function getEventBadges(event) {
 
 // --- Modal Controls ---
 function openModal() { document.getElementById('eventModal').classList.add('active'); }
+
 function closeModal() { 
     document.getElementById('eventModal').classList.remove('active'); 
     document.getElementById('createEventForm').reset(); 
@@ -89,16 +108,49 @@ async function loadEvents() {
             return;
         }
 
-        // Fast string buffer accumulation using Array.map.join
         tbody.innerHTML = events.map(ev => {
             const currentRegs = ev.volunteers_registered || 0; 
             const maxVols = ev.max_volunteers || ev.volunteers_needed || 0;
             const isFull = currentRegs >= maxVols;
 
             let badgeHtml = getEventBadges(ev);
+            
+            // Inline Kiosk Quick Actions
+            const safeStartTime = ev.start_time || '00:00:00';
+            const safeEndTime = ev.end_time || '23:59:59';
+
+            // Safely convert UTC to local YYYY-MM-DD
+            const dateObj = new Date(ev.event_date);
+            const evDateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+            const eventStart = new Date(`${evDateStr}T${safeStartTime}`);
+            const eventEnd = new Date(`${evDateStr}T${safeEndTime}`);
+            const now = new Date();
+            
+            // Boundary rules matching the backend
+            const checkinOpenTime = new Date(eventStart.getTime() - (30 * 60 * 1000));
+            const checkoutCloseTime = new Date(eventEnd.getTime() + (2 * 60 * 60 * 1000));
+            
+            const canCheckIn = now >= checkinOpenTime && now <= eventEnd;
+            const canCheckOut = now >= eventStart && now <= checkoutCloseTime;
+            
+            const primaryStatus = (ev.dynamic_status || ev.status || '').toLowerCase();
+
+            let quickActions = '';
+            
+            if (['upcoming', 'ongoing', 'published'].includes(primaryStatus)) {
+                if (canCheckIn || canCheckOut) {
+                    quickActions += `
+                        <button onclick="event.stopPropagation(); openQRModal('${ev.event_id}', '${ev.title.replace(/'/g, "\\'")}')" 
+                                title="Launch Attendance Kiosk"
+                                style="background: transparent; color: var(--primary, #3B82F6); border: 1px solid var(--primary, #3B82F6); padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                            <i data-lucide="qr-code" style="width: 14px; height: 14px;"></i> Kiosk
+                        </button>
+                    `;
+                }
+            }
 
             return `
-            <tr onclick="openDetailsModal('${ev.event_id}')">
+            <tr onclick="openDetailsModal('${ev.event_id}')" style="cursor: pointer;">
                 <td style="font-weight: 600;">${ev.title}</td>
                 <td>
                     <div>${dateFormatter.format(new Date(ev.event_date))}</div>
@@ -114,7 +166,12 @@ async function loadEvents() {
                         ${currentRegs} / ${maxVols}
                     </div>
                 </td>
-                <td>${badgeHtml}</td>
+                <td>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div>${badgeHtml}</div>
+                        <div style="display: flex; gap: 6px;">${quickActions}</div>
+                    </div>
+                </td>
             </tr>`;
         }).join('');
 
@@ -125,134 +182,257 @@ async function loadEvents() {
     }
 }
 
-// --- Core API: Deep-Fetch Details Modal ---
+// --- Core API: Deep-Fetch Details Modal (Orchestrator) ---
 async function openDetailsModal(eventId) {
     currentActiveEventId = eventId;
-    
-    // DOM Caching for scoped updates
     const modal = document.getElementById('eventDetailsModal');
-    const tbodyVols = document.getElementById('detail-volunteers-body');
-    const tbodyTimeline = document.getElementById('detail-timeline-body');
-    const delBtn = document.getElementById('btn-delete-event');
-    const qrBtn = document.getElementById('btn-launch-qr');
     
+    // Set Loading States
     document.getElementById('detail-title').innerText = "Fetching Event Data...";
+    document.getElementById('detail-volunteers-body').innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Fetching secure roster...</td></tr>`;
+    const timelineContainer = document.getElementById('detail-timeline-container');
+    if(timelineContainer) timelineContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted);">Fetching audit logs...</div>`;
     
-    document.getElementById('detail-status-badge').innerHTML = "";
-    tbodyVols.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Fetching secure roster...</td></tr>`;
-    tbodyTimeline.innerHTML = `<tr><td style="text-align: center; color: var(--text-muted);">Fetching audit logs...</td></tr>`;
-    delBtn.style.display = 'none'; 
-    
+    document.getElementById('btn-delete-event').style.display = 'none'; 
     modal.classList.add('active');
 
     try {
         const response = await ApiClient.request(`/admin/events/${eventId}`, 'GET');
         const evData = response.data || response; 
+        const dynamicStatus = evData.dynamic_status || evData.status;
 
-        // Populate Core Stats
-        document.getElementById('detail-title').innerText = evData.title;
-        
-        document.getElementById('detail-status-badge').innerHTML = getEventBadges(evData);
-
-        document.getElementById('detail-category').innerText = `Category: ${evData.category || 'N/A'}`;
-        document.getElementById('detail-datetime').innerText = `${dateFormatter.format(new Date(evData.event_date))} | ${formatTime(evData.start_time)} - ${formatTime(evData.end_time)}`;
-        document.getElementById('detail-location').innerText = evData.location_name;
-        document.getElementById('detail-desc').innerText = evData.description || 'No description provided.';
-        
-        // Roster Fast-Filter logic
-        const roster = evData.roster || [];
-        const activeCount = roster.filter(v => v.status !== 'withdrawn' && v.status !== 'waitlisted').length;
-        const waitlistCount = roster.filter(v => v.status === 'waitlisted').length;
-        
-        document.getElementById('detail-capacity').innerText = `${activeCount} / ${evData.max_volunteers} Registered`;
-        document.getElementById('detail-waitlist').innerText = waitlistCount;
-
-        // Render Roster (NEW: Interactive Status Dropdowns)
-        if (roster.length === 0) {
-            tbodyVols.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No volunteers registered yet.</td></tr>`;
-        } else {
-            const statusOptions = ['registered', 'present', 'absent', 'waitlisted', 'withdrawn', 'excused', 'late'];
-            
-            tbodyVols.innerHTML = roster.map(vol => {
-                const color = vol.status === 'withdrawn' ? '#EF4444' : (vol.status === 'present' ? '#10B981' : (vol.status === 'waitlisted' ? '#F59E0B' : 'var(--text-main)'));
-                
-                // Interactive select element for manual admin overrides
-                const selectHtml = `
-                    <select class="form-input" style="padding: 4px 8px; height: auto; font-size: 12px; font-weight: 600; color: ${color}; border: 1px solid ${color}40; background: ${color}10; border-radius: 4px; cursor: pointer;" onchange="updateVolunteerStatus('${vol.attendance_id}', this.value, '${eventId}')">
-                        ${statusOptions.map(opt => `<option value="${opt}" ${vol.status === opt ? 'selected' : ''}>${opt.toUpperCase()}</option>`).join('')}
-                    </select>
-                `;
-
-                return `
-                <tr>
-                    <td style="font-weight: 500;">${vol.first_name} ${vol.last_name}</td>
-                    <td>
-                        <div style="font-size: 13px;">${vol.email}</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">${vol.phone_number || 'No Phone'}</div>
-                    </td>
-                    <td>${selectHtml}</td>
-                    <td>${parseFloat(vol.hours_logged || 0).toFixed(2)} hrs</td>
-                </tr>`;
-            }).join('');
-        }
-
-        // Render Timeline Logs
-        const timeline = evData.timeline || [];
-        if (timeline.length === 0) {
-            tbodyTimeline.innerHTML = `<tr><td style="text-align: center; color: var(--text-muted);">No audit data found.</td></tr>`;
-        } else {
-            tbodyTimeline.innerHTML = timeline.map(log => `
-                <tr>
-                    <td>
-                        <div style="font-size: 13px; font-weight: 500;">${log.action}</div>
-                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                            ${new Date(log.timestamp).toLocaleString()} &bull; Triggered by: ${log.first_name ? `${log.first_name} ${log.last_name}` : 'System Auto'}
-                        </div>
-                    </td>
-                </tr>`).join('');
-        }
-
-        // 1. Setup Lifecycle Control Buttons based on decoupled states (Timeline vs. Registration)
-        const lifecycleContainer = document.getElementById('lifecycle-actions');
-        lifecycleContainer.innerHTML = ''; 
-        
-        if (evData.status === 'draft') {
-            lifecycleContainer.innerHTML = `<button class="primary-btn" onclick="changeEventLifecycleStatus('${eventId}', 'registration_open', '${evData.title.replace(/'/g, "\\'")}')">Publish & Open Reg</button>`;
-        } 
-        else if (evData.registration_open) {
-            lifecycleContainer.innerHTML = `<button class="btn-secondary" style="color: #F59E0B; border-color: rgba(245, 158, 11, 0.3);" onclick="changeEventLifecycleStatus('${eventId}', 'registration_closed', '${evData.title.replace(/'/g, "\\'")}')">Close Registration</button>`;
-        }
-        else if (!evData.registration_open && ['upcoming', 'ongoing'].includes(evData.dynamic_status)) {
-            // Allow admins to re-open registration if the event hasn't finished yet
-            lifecycleContainer.innerHTML = `<button class="btn-secondary" style="color: #10B981; border-color: rgba(16, 185, 129, 0.3);" onclick="changeEventLifecycleStatus('${eventId}', 'registration_open', '${evData.title.replace(/'/g, "\\'")}')">Re-open Registration</button>`;
-        }
-
-        // Archive button explicitly relies on the timeline being over
-        if (['completed', 'cancelled'].includes(evData.dynamic_status) && evData.status !== 'archived') {
-            lifecycleContainer.innerHTML += `<button class="btn-secondary" onclick="changeEventLifecycleStatus('${eventId}', 'archived', '${evData.title.replace(/'/g, "\\'")}')"><i data-lucide="archive" style="width: 14px; height: 14px; margin-right: 4px;"></i> Archive</button>`;
-        }
-
-        // 2. Setup Delete Button (Disabled if already cancelled/archived)
-        if (evData.dynamic_status !== 'cancelled' && evData.status !== 'archived') {
-            delBtn.style.display = 'block';
-            delBtn.onclick = () => confirmDeleteEvent(eventId, evData.title);
-        } else {
-            delBtn.style.display = 'none';
-        }
-
-        // 3. Setup QR Kiosk Button (Relies on timeline, NOT registration state)
-        if (['upcoming', 'ongoing'].includes(evData.dynamic_status)) {
-            qrBtn.style.display = 'flex';
-            qrBtn.onclick = () => openQRModal(eventId, evData.title);
-        } else {
-            qrBtn.style.display = 'none';
-        }
+        // Delegate rendering to helper functions
+        renderCoreStats(evData);
+        renderRoster(evData.roster || [], dynamicStatus);
+        renderTimeline(evData.timeline || []);
+        renderLifecycleButtons(eventId, evData, dynamicStatus);
 
         if (window.lucide) lucide.createIcons();
 
     } catch (error) {
         document.getElementById('detail-title').innerText = "Network Error";
-        tbodyVols.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #EF4444;">Failed to load secure context: ${error.message}</td></tr>`;
+        document.getElementById('detail-volunteers-body').innerHTML = `<tr><td colspan="4" style="text-align: center; color: #EF4444;">Failed to load secure context: ${error.message}</td></tr>`;
+    }
+}
+
+// --- Helper 1: Render Core UI & Hidden Data ---
+function renderCoreStats(evData) {
+    document.getElementById('detail-title').innerText = evData.title || 'Untitled Event';
+    document.getElementById('detail-status-badge').innerHTML = getEventBadges(evData);
+    document.getElementById('detail-datetime').innerText = `${dateFormatter.format(new Date(evData.event_date))} | ${formatTime(evData.start_time)} - ${formatTime(evData.end_time)}`;
+    document.getElementById('detail-location').innerText = evData.location_name || 'No location set';
+    document.getElementById('detail-desc').innerText = evData.description || 'No description provided.';
+
+    // Progress Bar & Capacity
+    const roster = evData.roster || [];
+    const registeredCount = roster.filter(v => ['registered', 'present'].includes(v.attendance_status || v.status)).length;
+    const waitlistCount = roster.filter(v => (v.attendance_status || v.status) === 'waitlisted').length;
+    const maxVolunteers = evData.max_volunteers || 'No Limit';
+    
+    document.getElementById('detail-capacity-text').innerText = `${registeredCount} / ${maxVolunteers} Reg.`;
+    
+    // Waitlist UI
+    const waitlistDiv = document.getElementById('detail-waitlist');
+    if (waitlistCount > 0 && waitlistDiv) {
+        waitlistDiv.innerHTML = `<i data-lucide="alert-circle" style="width: 12px; height: 12px;"></i> ${waitlistCount} on Waitlist`;
+        waitlistDiv.style.display = 'flex';
+    } else if (waitlistDiv) {
+        waitlistDiv.style.display = 'none';
+    }
+    
+    // Progress Bar Coloring
+    const progressBar = document.getElementById('detail-capacity-bar');
+    if (evData.max_volunteers && progressBar) {
+        const pct = Math.min((registeredCount / evData.max_volunteers) * 100, 100);
+        progressBar.style.width = `${pct}%`;
+        if (pct >= 100) progressBar.style.backgroundColor = '#EF4444'; // Red
+        else if (pct >= 80) progressBar.style.backgroundColor = '#F59E0B'; // Yellow
+        else progressBar.style.backgroundColor = '#10B981'; // Green
+    } else if (progressBar) {
+        progressBar.style.width = '100%';
+        progressBar.style.backgroundColor = '#3B82F6'; // Blue
+    }
+
+    // Contacts
+    document.getElementById('detail-creator').innerHTML = `Created by: <span style="color: var(--text-main); font-weight: 500;">${evData.creator_first || 'System'} ${evData.creator_last || ''}</span>`;
+    const pocDiv = document.getElementById('detail-poc');
+    if (evData.contact_person_name && pocDiv) {
+        pocDiv.innerHTML = `PoC: <span style="color: var(--text-main);">${evData.contact_person_name}</span> ${evData.contact_person_phone ? `<br/>📞 ${evData.contact_person_phone}` : ''}`;
+        pocDiv.style.display = 'block';
+    } else if (pocDiv) pocDiv.style.display = 'none';
+
+    // Google Maps Link (Fixes missing http:// bug)
+    const mapsLink = document.getElementById('detail-maps-link');
+    if (evData.google_maps_link && mapsLink) {
+        let rawUrl = evData.google_maps_link.trim();
+        // If it doesn't start with http:// or https://, add it
+        if (!/^https?:\/\//i.test(rawUrl)) {
+            rawUrl = 'https://' + rawUrl;
+        }
+        mapsLink.href = rawUrl;
+        mapsLink.style.display = 'inline-flex';
+    } else if (mapsLink) {
+        mapsLink.style.display = 'none';
+    }
+
+    // Registration Deadline
+    const deadlineDiv = document.getElementById('detail-deadline');
+    if (evData.registration_deadline && deadlineDiv) {
+        deadlineDiv.innerText = `Ends: ${new Date(evData.registration_deadline).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}`;
+        deadlineDiv.style.display = 'block';
+    } else if (deadlineDiv) {
+        deadlineDiv.style.display = 'none';
+    }
+}
+
+// --- Helper 2: Render Interactive Roster ---
+function renderRoster(roster, dynamicStatus) {
+    const tbodyVols = document.getElementById('detail-volunteers-body');
+    const theadVols = document.getElementById('detail-volunteers-head');
+    if (!tbodyVols || !theadVols) return;
+    
+    const isPastOrOngoing = ['ongoing', 'completed', 'archived'].includes(dynamicStatus);
+    
+    if (isPastOrOngoing) {
+        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Check-In / Out</th><th>Status</th><th>Hours</th></tr>`;
+    } else {
+        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Contact Info</th><th>Status</th><th>Hours</th></tr>`;
+    }
+
+    if (roster.length === 0) {
+        tbodyVols.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No volunteers registered yet.</td></tr>`;
+    } else {
+        tbodyVols.innerHTML = roster.map(vol => {
+            const status = (vol.attendance_status || vol.status || 'UNKNOWN').toLowerCase();
+            const color = status === 'withdrawn' ? '#EF4444' : (status === 'present' ? '#10B981' : (status === 'waitlisted' ? '#F59E0B' : 'var(--text-main)'));
+            const initials = (vol.first_name?.[0] || '') + (vol.last_name?.[0] || '');
+            
+            let middleColumn = '';
+            if (isPastOrOngoing) {
+                const inTime = vol.check_in_time ? new Date(vol.check_in_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--';
+                const outTime = vol.check_out_time ? new Date(vol.check_out_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--';
+                middleColumn = `<div style="font-size: 13px;">In: <b>${inTime}</b></div><div style="font-size: 13px; color: var(--text-muted);">Out: <b>${outTime}</b></div>`;
+            } else {
+                middleColumn = `<div style="font-size: 13px;">${vol.email || '--'}</div><div style="font-size: 12px; color: var(--text-muted);">${vol.phone_number || '--'}</div>`;
+            }
+
+            return `
+            <tr>
+                <td>
+                    <div class="roster-user">
+                        <div class="avatar-sm">${initials.toUpperCase()}</div>
+                        <span style="font-weight: 500;">${vol.first_name || ''} ${vol.last_name || ''}</span>
+                    </div>
+                </td>
+                <td>${middleColumn}</td>
+                <td>
+                    <span style="font-size: 12px; font-weight: 600; color: ${color}; padding: 4px 8px; background: ${color}10; border-radius: 4px;">
+                        ${status.toUpperCase()}
+                    </span>
+                </td>
+                <td>${parseFloat(vol.hours_logged || 0).toFixed(2)} hrs</td>
+            </tr>`;
+        }).join('');
+    }
+}
+
+// --- Helper 3: Render Vertical Timeline ---
+function renderTimeline(timeline) {
+    const timelineContainer = document.getElementById('detail-timeline-container');
+    if (!timelineContainer) return;
+    
+    if (timeline.length === 0) {
+        timelineContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted); margin-top: 10px;">No audit data found.</div>`;
+    } else {
+        timelineContainer.innerHTML = timeline.map(log => `
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <strong>${log.action}</strong>
+                </div>
+                <div class="timeline-meta">
+                    ${new Date(log.timestamp).toLocaleString()} &bull; By: ${log.first_name ? `${log.first_name} ${log.last_name}` : 'System Auto'}
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+// --- Helper 4: Action Buttons & Lifecycle ---
+function renderLifecycleButtons(eventId, evData, dynamicStatus) {
+    const lifecycleContainer = document.getElementById('lifecycle-actions');
+    const delBtn = document.getElementById('btn-delete-event');
+    
+    const oldQrBtn = document.getElementById('btn-launch-qr');
+    if (oldQrBtn) oldQrBtn.style.display = 'none';
+    
+    if (lifecycleContainer) lifecycleContainer.innerHTML = ''; 
+    if (delBtn) delBtn.style.display = 'none';
+
+    const safeTitle = evData.title.replace(/'/g, "\\'");
+    
+    // --- UPDATED: Time Boundary Math matching the backend ---
+    const safeStartTime = evData.start_time || '00:00:00';
+    const safeEndTime = evData.end_time || '23:59:59';
+    const dateObj = new Date(evData.event_date);
+    const evDateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+    
+    const eventStart = new Date(`${evDateStr}T${safeStartTime}`);
+    const eventEnd = new Date(`${evDateStr}T${safeEndTime}`);
+    const now = new Date();
+    
+    // Calculate precise window boundaries
+    const checkinOpenTime = new Date(eventStart.getTime() - (30 * 60 * 1000));
+    const checkoutCloseTime = new Date(eventEnd.getTime() + (2 * 60 * 60 * 1000));
+    
+    const canCheckIn = now >= checkinOpenTime && now <= eventEnd;
+    const canCheckOut = now >= eventStart && now <= checkoutCloseTime;
+    const isMoreThan30MinsAway = now < checkinOpenTime;
+
+    if (evData.status === 'draft') {
+        lifecycleContainer.innerHTML = `<button class="primary-btn" onclick="changeEventLifecycleStatus('${eventId}', 'published', '${safeTitle}')">Publish Event</button>`;
+        if (delBtn) {
+            delBtn.style.display = 'block';
+            delBtn.onclick = () => confirmDeleteEvent(eventId, evData.title);
+        }
+    } else if (['upcoming', 'ongoing'].includes(dynamicStatus)) {
+        
+        let buttonsHTML = `<div style="display: flex; gap: 8px; align-items: center;">`;
+        
+        // Show Kiosks dynamically based on new windows
+        if (canCheckIn || canCheckOut) {
+            buttonsHTML += `
+                <button onclick="openQRModal('${eventId}', '${safeTitle}')" 
+                        style="background: #0F172A; color: #FFFFFF; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;">
+                    <i data-lucide="qr-code" style="width: 14px; height: 14px;"></i> Open Kiosk
+                </button>
+            `;
+        }
+
+        // ONLY show cancel button if event is strictly more than 30 mins away
+        if (isMoreThan30MinsAway) {
+            buttonsHTML += `
+                <button style="background: transparent; color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" 
+                        onclick="confirmCancelEvent('${eventId}', '${safeTitle}')">
+                    <i data-lucide="x-circle" style="width: 14px; height: 14px;"></i> Cancel Event
+                </button>
+            `;
+        }
+        
+        buttonsHTML += `</div>`;
+        lifecycleContainer.innerHTML = buttonsHTML;
+        
+    } else if (dynamicStatus === 'completed' && evData.status !== 'archived') {
+        lifecycleContainer.innerHTML = `
+            <button style="background: transparent; color: #475569; border: 1px solid #CBD5E1; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;" 
+                    onclick="changeEventLifecycleStatus('${eventId}', 'archived', '${safeTitle}')">
+                <i data-lucide="archive" style="width: 14px; height: 14px;"></i> Archive
+            </button>`;
+    } else if (['cancelled', 'archived'].includes(dynamicStatus)) {
+        if (delBtn) {
+            delBtn.style.display = 'block';
+            delBtn.onclick = () => confirmDeleteEvent(eventId, evData.title);
+        }
     }
 }
 
@@ -287,6 +467,22 @@ async function confirmDeleteEvent(eventId, eventTitle) {
         loadEvents(); 
     } catch (error) {
         alert(`Deletion Failed: ${error.message}`);
+    }
+}
+
+async function confirmCancelEvent(eventId, eventTitle) {
+    if(!confirm(`WARNING: Are you sure you want to CANCEL "${eventTitle}"?\n\nThis will withdraw all registered volunteers and permanently mark the event as cancelled.`)) return;
+    
+    try {
+        // Use the dedicated cancel endpoint
+        await ApiClient.request(`/admin/events/${eventId}/cancel`, 'POST');
+        
+        // Refresh the modal data to show the new CANCELLED badge and updated timeline
+        openDetailsModal(eventId);
+        // Refresh the background table
+        loadEvents(); 
+    } catch (error) {
+        alert(`Cancellation Failed: ${error.message}`);
     }
 }
 
@@ -411,13 +607,17 @@ document.getElementById('ev-publish-toggle').addEventListener('change', function
         submitBtn.classList.add('btn-draft');    // Changes to muted gray
     }
 });
+
 // ==========================================
 // DYNAMIC QR CHECK-IN KIOSK
 // ==========================================
 let qrRefreshTimeout = null;
 let qrCountdownInterval = null;
+let currentKioskType = 'checkin'; 
+let currentKioskEventId = null; 
 
 async function openQRModal(eventId, eventTitle) {
+    currentKioskEventId = eventId;
     document.getElementById('qr-event-title').innerText = eventTitle;
     document.getElementById('qrCheckInModal').classList.add('active');
     
@@ -425,7 +625,42 @@ async function openQRModal(eventId, eventTitle) {
     document.getElementById('qr-code-wrapper').style.display = 'none';
     document.getElementById('qr-status-message').style.display = 'none';
     
-    await fetchAndRenderQR(eventId);
+    // Default to check-in when modal opens
+    await switchKioskTab('checkin');
+}
+
+async function switchKioskTab(type) {
+    currentKioskType = type;
+    
+    // Update Tab UI Styles
+    const btnIn = document.getElementById('kiosk-tab-checkin');
+    const btnOut = document.getElementById('kiosk-tab-checkout');
+    
+    if (type === 'checkin') {
+        btnIn.style.background = 'white';
+        btnIn.style.color = '#10B981';
+        btnIn.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+        
+        btnOut.style.background = 'transparent';
+        btnOut.style.color = '#64748B';
+        btnOut.style.boxShadow = 'none';
+    } else {
+        btnOut.style.background = 'white';
+        btnOut.style.color = '#3B82F6';
+        btnOut.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+        
+        btnIn.style.background = 'transparent';
+        btnIn.style.color = '#64748B';
+        btnIn.style.boxShadow = 'none';
+    }
+
+    // Clear old data while switching
+    document.getElementById('qr-code-container').innerHTML = "";
+    document.getElementById('qr-code-wrapper').style.display = 'none';
+    document.getElementById('qr-status-message').style.display = 'none';
+    
+    // Fetch the new QR code for this specific tab
+    await fetchAndRenderQR(currentKioskEventId);
 }
 
 async function fetchAndRenderQR(eventId) {
@@ -436,38 +671,39 @@ async function fetchAndRenderQR(eventId) {
     const qrContainer = document.getElementById('qr-code-container');
 
     try {
-        const response = await ApiClient.request(`/admin/events/${eventId}/qr-token`, 'GET');
+        const response = await ApiClient.request(`/admin/events/${eventId}/qr-token?type=${currentKioskType}`, 'GET');
         
-        // Hide error message if successful
         statusDiv.style.display = 'none';
         qrWrapper.style.display = 'inline-block';
         
         const { token, refreshIntervalMs } = response.data;
-
-        // Clear old canvas and render new
         qrContainer.innerHTML = "";
+        
+        // Visual cue: Tint the QR wrapper based on type
+        qrWrapper.style.borderColor = currentKioskType === 'checkin' ? "#10B981" : "#3B82F6";
+        const qrColor = currentKioskType === 'checkin' ? "#064E3B" : "#1E3A8A";
+
         new QRCode(qrContainer, {
             text: token,
             width: 256,
             height: 256,
-            colorDark: "#000000",
-            colorLight: "#F8FAFC", // Matches the wrapper background
+            colorDark: qrColor,
+            colorLight: "#F8FAFC", 
             correctLevel: QRCode.CorrectLevel.H
         });
 
         startQRTimers(eventId, refreshIntervalMs);
 
     } catch (error) {
-        // Handle 403 (Too early, too late) gracefully on screen
         qrWrapper.style.display = 'none';
         statusDiv.style.display = 'block';
         statusDiv.style.background = 'rgba(239, 68, 68, 0.1)';
         statusDiv.style.color = '#EF4444';
-        statusDiv.innerText = error.message || "Failed to generate check-in token.";
         
-        // Reset timers UI
+        statusDiv.innerText = error.message || `Failed to generate ${currentKioskType} token.`;
+        
         document.getElementById('qr-timer-bar').style.width = '0%';
-        document.getElementById('qr-timer-text').innerText = 'Check-in inactive';
+        document.getElementById('qr-timer-text').innerText = 'Kiosk inactive';
     }
 }
 
@@ -477,11 +713,10 @@ function startQRTimers(eventId, refreshIntervalMs) {
     
     let secondsLeft = Math.floor(refreshIntervalMs / 1000);
 
-    // CSS Reflow Trick to snap bar back to 100% instantly
     timerBar.style.transition = 'none';
     timerBar.style.width = '100%';
     void timerBar.offsetWidth; 
-    timerBar.style.transition = 'width 1s linear'; // Re-apply smooth shrinking
+    timerBar.style.transition = 'width 1s linear'; 
 
     qrCountdownInterval = setInterval(() => {
         secondsLeft--;
@@ -493,7 +728,6 @@ function startQRTimers(eventId, refreshIntervalMs) {
         if (secondsLeft <= 0) clearInterval(qrCountdownInterval);
     }, 1000);
 
-    // Fetch the next token slightly before this one expires
     qrRefreshTimeout = setTimeout(() => {
         fetchAndRenderQR(eventId);
     }, refreshIntervalMs);
@@ -508,9 +742,10 @@ function clearQRTimers() {
 
 function closeQRModal() {
     document.getElementById('qrCheckInModal').classList.remove('active');
-    clearQRTimers(); // CRITICAL: Stop background polling
+    clearQRTimers(); 
     document.getElementById('qr-code-container').innerHTML = "";
     document.getElementById('qr-status-message').style.display = 'none';
+    currentKioskEventId = null;
 }
 
 // --- Initialization Lifecycle ---

@@ -179,3 +179,84 @@ input:checked + .toggle-slider:before {
 [data-theme="dark"] .primary-btn.btn-draft:hover {
     background-color: #334155;
 }
+
+/* --- Capacity Progress Bar --- */
+.capacity-tracker {
+    margin-top: 8px;
+    width: 100%;
+}
+.progress-bg {
+    width: 100%;
+    height: 8px;
+    background-color: var(--border); /* or #e2e8f0 */
+    border-radius: 4px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+/* --- Vertical Audit Timeline --- */
+.vertical-timeline {
+    position: relative;
+    padding-left: 24px;
+    margin-top: 16px;
+}
+.vertical-timeline::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--border); /* or #e2e8f0 */
+}
+.timeline-item {
+    position: relative;
+    margin-bottom: 20px;
+}
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+.timeline-dot {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--surface);
+    border: 3px solid var(--primary); /* or #3B82F6 */
+    z-index: 1;
+}
+.timeline-content {
+    font-size: 13px;
+    color: var(--text-main);
+}
+.timeline-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* --- Roster Avatars --- */
+.roster-user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.avatar-sm {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--primary-light, #EFF6FF);
+    color: var(--primary, #3B82F6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+}

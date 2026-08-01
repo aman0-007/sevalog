@@ -86,7 +86,6 @@
 /* Buttons & Badges */
 .ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 
-.btn-cancel { color: #EF4444; font-size: 13px; font-weight: 700; text-decoration: none; padding: 6px 12px; border-radius: 8px; background: rgba(239, 68, 68, 0.1); transition: 0.2s; }
 .btn-cancel:hover { background: #EF4444; color: white; }
 
 .registered-pill,
@@ -132,7 +131,7 @@
     color: white;
 }
 
-/* --- REGISTRATION & WITHDRAW BUTTONS --- */
+.btn-register,
 .btn-cancel {
     display: inline-flex;
     align-items: center;
@@ -148,6 +147,20 @@
     transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 
+.btn-register {
+    background: var(--accent-primary);
+    color: white;
+}
+
+.btn-register:hover {
+    background: #2563eb;
+}
+
+.btn-register:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .registered-pill {
     min-width: auto;
     background: rgba(16, 185, 129, 0.1);
@@ -158,11 +171,6 @@
 .btn-cancel {
     color: #EF4444;
     background: rgba(239, 68, 68, 0.1);
-}
-
-.btn-cancel:hover { 
-    background: #EF4444; 
-    color: white; 
 }
 
 .btn-cancel:disabled { 
@@ -293,21 +301,25 @@
 }
 
 /* --- QR SCANNER MODAL OVERRIDES --- */
-/* The html5-qrcode library injects messy inline styles and links. We override them here for a clean UI. */
 #reader {
     width: 100%;
-}
-#reader video {
-    object-fit: cover;
+    overflow: hidden; /* Prevents the zoomed video from spilling out */
     border-radius: 16px;
-    transform: scale(1.02); /* Removes slight clipping gaps */
+}
+
+#reader video {
+    width: 100% !important;
+    object-fit: cover !important;
+    /* Apply a gentle 20% digital zoom to hide ultra-wide distortion */
+    transform: scale(1.2); 
+    transform-origin: center center;
 }
 #reader__dashboard_section_csr span {
-    display: none !important; /* Hides the "Powered by" text */
+    display: none !important;
 }
 #reader__dashboard_section_swaplink {
-    display: none !important; /* Hide camera swap if not needed, we force rear camera */
+    display: none !important;
 }
 #reader__scan_region img {
-    display: none !important; /* Hides the ugly default QR overlay graphic */
+    display: none !important;
 }
