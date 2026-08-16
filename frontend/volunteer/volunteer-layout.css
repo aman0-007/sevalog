@@ -2,6 +2,16 @@
    VOLUNTEER-LAYOUT.CSS (Shared App Shell)
    ========================================= */
 
+/* 1. Remove the blue flash when tapping links/buttons on mobile */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 2. Disable the "Pull-to-Refresh" browser behavior */
+html, body {
+    overscroll-behavior-y: contain;
+}
+
 :root {
     --sidebar-width: 260px;
     --topbar-height: 70px;

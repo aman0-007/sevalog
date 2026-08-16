@@ -218,19 +218,75 @@
 }
 
 @media (max-width: 768px) {
-    /* Stack the new Impact Hero panel on mobile */
-    .impact-content {
-        flex-direction: column;
-        gap: 32px;
-        text-align: center;
-    }
-    
-    .big-stats-container {
-        justify-content: center;
+    /* 1. Tighter viewport padding */
+    .main-viewport {
+        padding: 12px;
     }
 
-    .main-viewport {
-        padding: 20px;
+    /* 2. Compact the Hero Panel padding */
+    .impact-hero-panel {
+        padding: 20px 16px;
+        margin-bottom: 24px;
+        border-radius: 20px;
+    }
+
+    /* 3. KEEP IT IN A SINGLE ROW */
+    .impact-content {
+        flex-direction: row; /* Forces horizontal layout */
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* 4. Scale text down so it doesn't overflow horizontally */
+    .rank-badge {
+        padding: 4px 10px;
+        font-size: 10px;
+        margin-bottom: 8px;
+    }
+
+    .impact-info h2 {
+        font-size: 13px;
+        margin-bottom: 12px;
+        white-space: nowrap; /* Prevents text breaking into multiple lines */
+    }
+
+    /* 5. Compact the stats numbers side-by-side */
+    .big-stats-container {
+        gap: 12px;
+    }
+
+    .stat-value {
+        font-size: 26px; /* Scaled down perfectly for mobile single-row */
+    }
+
+    .stat-label {
+        font-size: 10px;
+    }
+
+    .stat-divider {
+        height: 30px;
+    }
+
+    /* 6. Scale down the circular progress ring on the right */
+    .progress-ring-container {
+        width: 100px;
+        height: 100px;
+        flex-shrink: 0;
+    }
+
+    .progress-ring {
+        width: 100px;
+        height: 100px;
+    }
+
+    /* Adjust the SVG circle radius dynamically if needed, or scale container */
+    .progress-text span {
+        font-size: 16px !important;
+    }
+    
+    .progress-text small {
+        font-size: 8px !important;
     }
 }
 

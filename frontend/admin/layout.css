@@ -2,6 +2,16 @@
    LAYOUT.CSS (Core, Themes, Sidebar, Header)
    ========================================= */
 
+/* 1. Remove the blue flash when tapping links/buttons on mobile */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 2. Disable the "Pull-to-Refresh" browser behavior */
+html, body {
+    overscroll-behavior-y: contain;
+}
+
 /* --- 1. CSS VARIABLES (Themes) --- */
 :root {
     --bg-color: #F8FAFC;      

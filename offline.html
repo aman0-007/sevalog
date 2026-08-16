@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Offline | SevaLog</title>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #F8FAFC; color: #0F172A; text-align: center; padding: 20px; }
+        h1 { font-size: 24px; margin-bottom: 8px; }
+        p { color: #64748B; margin-bottom: 24px; }
+        button { background: #3B82F6; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+    </style>
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="../../manifest.json">
+
+    <!-- iOS Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SevaLog">
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png">
+
+    <!-- Theme Color for Browser Chrome -->
+    <meta name="theme-color" content="#3B82F6">
+</head>
+<body>
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 16px;"><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a15.16 15.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A15.528 15.528 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
+    <h1>You're Offline</h1>
+    <p>It looks like you've lost internet connection. Check your network and try again.</p>
+    <button onclick="window.location.reload()">Try Again</button>
+    <script src="../../js/pwa.js"></script>
+</body>
+</html>

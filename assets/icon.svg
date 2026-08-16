@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- Full bleed background for PWA Maskable support -->
+    <rect width="512" height="512" fill="#3B82F6" />
+    
+    <!-- White Heart (Seva) -->
+    <path d="M 256 410 
+             C 256 410 90 300 90 180 
+             C 90 100 150 70 208 70 
+             C 240 70 256 100 256 100 
+             C 256 100 272 70 304 70 
+             C 362 70 422 100 422 180 
+             C 422 300 256 410 256 410 Z" 
+          fill="#FFFFFF" />
+          
+    <!-- Blue Checkmark (Log/Verification) -->
+    <path d="M 195 195 L 240 240 L 325 145" 
+          fill="none" 
+          stroke="#3B82F6" 
+          stroke-width="36" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" />
+</svg>

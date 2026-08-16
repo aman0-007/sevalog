@@ -11,6 +11,18 @@
     <link rel="stylesheet" href="../public-layout.css">
     <link rel="stylesheet" href="volunteer-layout.css">
     <link rel="stylesheet" href="dashboard.css">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="../../manifest.json">
+
+    <!-- iOS Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="SevaLog">
+    <link rel="apple-touch-icon" href="/assets/icons/icon-192x192.png">
+
+    <!-- Theme Color for Browser Chrome -->
+    <meta name="theme-color" content="#3B82F6">
 </head>
 <body>
 
@@ -77,7 +89,7 @@
 
                     <div class="impact-progress">
                         <div class="progress-ring-container">
-                            <svg class="progress-ring" width="140" height="140">
+                            <svg class="progress-ring" width="140" height="140" viewBox="0 0 140 140">
                                 <circle class="ring-track" stroke-width="8" fill="transparent" r="62" cx="70" cy="70"/>
                                 <circle class="ring-fill" id="milestone-ring" stroke-width="8" fill="transparent" r="62" cx="70" cy="70"/>
                             </svg>
@@ -205,5 +217,7 @@
 
     <script src="../public-main.js"></script>
     <script src="../../js/volunteer/dashboard.js"></script>
+    <script src="../../js/volunteer/dashboard.js"></script>
+    <script src="../../js/pwa.js"></script>
 </body>
 </html>
