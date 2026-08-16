@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Tasks | SevaLog</title>
+    <link rel="stylesheet" href="layout.css">
+    <link rel="stylesheet" href="tasks.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
+</head>
+<body class="preload">
+
+    <div class="dashboard-layout">
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i data-lucide="heart" class="brand-icon"></i>
+                <h2 class="nav-text">SevaLog</h2>
+                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()"><i data-lucide="x"></i></button>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="admin.html" class="nav-item" title="Dashboard">
+                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="events.html" class="nav-item" title="Events Management">
+                    <i data-lucide="calendar"></i> <span class="nav-text">Events</span>
+                </a>
+                <a href="volunteers.html" class="nav-item" title="Volunteers">
+                    <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
+                </a>
+                <a href="admin-tasks.html" class="nav-item active" title="Tasks">
+                    <i data-lucide="check-square"></i> <span class="nav-text">Tasks</span>
+                </a>
+            </nav>
+        </aside>
+
+        <main class="main-content" id="main-content">
+            <!-- TOP HEADER -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="icon-btn" onclick="toggleSidebar()"><i data-lucide="menu"></i></button>
+                    <div class="search-bar">
+                        <i data-lucide="search"></i>
+                        <input type="text" id="task-search-input" placeholder="Search tasks by title...">
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
+                        <i data-lucide="moon" id="theme-icon-moon"></i>
+                        <i data-lucide="sun" id="theme-icon-sun" style="display: none;"></i>
+                    </button>
+                    <div class="admin-profile">
+                        <div class="avatar" id="top-user-initial">A</div>
+                        <div class="admin-info">
+                            <span class="admin-name" id="top-user-name">Admin User</span>
+                            <span class="admin-role">Super Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper">
+                <!-- FIX 6: Added flex-wrap and gap to prevent buttons from hiding off screen -->
+                <div class="page-header" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px;">
+                    <div>
+                        <h1>Task Board</h1>
+                        <p>Manage assignments, track progress, and review volunteer tasks.</p>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+                        <select id="filter-task-status" class="form-input" style="width: auto; min-width: 140px;">
+                            <!-- FIX 7: Changed text to "All" -->
+                            <option value="">All</option>
+                            <option value="assigned">Assigned</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="pending_verification">Review Pending</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <button class="primary-btn" onclick="openCreateTaskModal()" style="white-space: nowrap;">
+                            <i data-lucide="plus"></i> New Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KANBAN BOARD -->
+                <div class="kanban-board" id="kanban-board">
+                    <!-- Columns injected via JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- CREATE TASK MODAL -->
+    <div class="modal-overlay" id="createTaskModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Task</h2>
+                <button class="icon-btn" onclick="closeCreateTaskModal()"><i data-lucide="x"></i></button>
+            </div>
+            <form id="createTaskForm">
+                <div class="form-group">
+                    <label class="form-label">Task Title <span style="color:red">*</span></label>
+                    <input type="text" id="task-title" class="form-input" required placeholder="e.g. Purchase food supplies">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Assign To (Volunteer/Admin) <span style="color:red">*</span></label>
+                    <select id="task-assignee" class="form-input" required>
+                        <option value="">Loading users...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Link to Event (Optional)</label>
+                    <select id="task-event" class="form-input">
+                        <option value="">No Event Linked</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Deadline</label>
+                    <input type="datetime-local" id="task-deadline" class="form-input">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label">Description (URLs will be auto-linked)</label>
+                    <textarea id="task-desc" class="form-input" rows="4" placeholder="Task instructions..."></textarea>
+                </div>
+                
+                <div class="publish-toggle-container" style="margin-top: 16px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.2); padding: 16px; border-radius: var(--radius-md); display: flex; gap: 12px; align-items: flex-start;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="task-public-toggle" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <div class="toggle-text">
+                        <span style="font-weight: 600; font-size: 14px;">Publicly Visible</span>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Other volunteers can see this task exists.</p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" onclick="closeCreateTaskModal()">Cancel</button>
+                    <button type="submit" id="submit-task-btn" class="primary-btn">Assign Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TASK DETAILS MODAL -->
+    <div class="modal-overlay" id="taskDetailsModal">
+        <div class="modal-content details-modal" style="max-width: 650px;">
+            <div class="modal-header" style="align-items: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px;">
+                <div>
+                    <div id="detail-task-status"></div>
+                    <h2 id="detail-task-title" style="margin-top: 8px;">Loading...</h2>
+                    <p id="detail-task-event" style="font-size: 13px; color: var(--primary); margin-top: 4px; font-weight: 500;"></p>
+                </div>
+                <button class="icon-btn" onclick="closeTaskDetailsModal()"><i data-lucide="x"></i></button>
+            </div>
+
+            <div class="info-grid" style="margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; background: var(--bg-color); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
+                <div class="info-item">
+                    <span class="info-label" style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Assigned To</span>
+                    <div class="info-value" id="detail-task-assignee" style="font-weight: 500; margin-top: 4px;">--</div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label" style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Deadline</span>
+                    <div class="info-value" id="detail-task-deadline" style="font-weight: 600; margin-top: 4px;">--</div>
+                </div>
+            </div>
+
+            <div class="info-desc" style="margin-bottom: 24px;">
+                <span class="info-label" style="font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">Description</span>
+                <div class="info-value" id="detail-task-desc" style="margin-top: 8px; line-height: 1.6; background: var(--bg-color); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">--</div>
+            </div>
+            
+            <div id="remarks-container" style="margin-bottom: 24px;"></div>
+            <div id="task-action-area" style="background: rgba(59,130,246,0.05); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(59,130,246,0.2); margin-bottom: 24px; display: none;"></div>
+
+            <!-- FIX 2: Removed Activity Timeline entirely from here -->
+        </div>
+    </div>
+
+    <!-- Corrected Scripts Path -->
+    <script src="../../js/api.js"></script>
+    <script src="../../js/auth.js"></script>
+    <script src="main.js"></script>
+    <script src="../../js/admin/tasks.js"></script>
+</body>
+</html>

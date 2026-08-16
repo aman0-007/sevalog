@@ -1,0 +1,212 @@
+/* =========================================
+   VOLUNTEER TASKS.CSS (Mobile-First UI)
+   ========================================= */
+
+.tasks-container {
+    background: #FFFFFF;
+    border-radius: 24px;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    min-height: 60vh;
+}
+
+/* --- TABS --- */
+.tab-header {
+    display: flex;
+    border-bottom: 1px solid var(--border-light);
+    background: var(--bg-surface);
+    padding: 0 24px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-btn {
+    padding: 20px 32px;
+    background: transparent;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--text-main); }
+.tab-btn.active { color: var(--accent-primary); }
+.tab-btn::after {
+    content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px;
+    background: var(--accent-primary);
+    transform: scaleX(0); transition: transform 0.3s ease;
+}
+.tab-btn.active::after { transform: scaleX(1); }
+
+.tab-content { display: none; padding: 32px; animation: fadeIn 0.4s ease; }
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- TASK GRID & CARDS --- */
+.task-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.task-card {
+    background: #FFFFFF;
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    border-color: var(--accent-glow);
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.card-event {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.card-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px dashed var(--border-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* --- BADGES & HELPERS --- */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.deadline-text { font-size: 12px; font-weight: 600; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+.deadline-warning { color: #F59E0B; }
+.deadline-danger { color: #EF4444; }
+
+.empty-msg { text-align: center; color: var(--text-muted); font-size: 14px; padding: 40px; }
+.auto-link { color: var(--accent-primary); text-decoration: underline; text-underline-offset: 2px; }
+
+/* --- MODAL UI --- */
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border-light);
+    background: #F8FAFC;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.interaction-box {
+    background: rgba(37, 99, 235, 0.04);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    margin-bottom: 16px;
+    resize: vertical;
+}
+.form-input:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+.btn-start { background: #3B82F6; color: white; padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+.btn-start:hover { background: #2563EB; }
+
+.btn-submit { background: #10B981; color: white; padding: 10px 20px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; width: 100%; transition: 0.2s; }
+.btn-submit:hover { background: #059669; }
+
+/* Toast overrides */
+.notification-toast {
+    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #0F172A; color: white; padding: 16px 24px; border-radius: 12px;
+    display: flex; align-items: center; gap: 12px; opacity: 0; pointer-events: none;
+    transition: 0.3s ease; z-index: 9999; font-weight: 500; font-size: 14px;
+}
+.notification-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 768px) {
+    .tab-content { padding: 20px 16px; }
+}
+
+/* --- TASK GROUP HEADERS --- */
+.task-group {
+    margin-bottom: 24px;
+}
+
+.group-title {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-light);
+}
+
+/* --- MODAL OVERLAY FIX --- */
+.modal-overlay {
+    position: fixed !important; 
+    inset: 0; 
+    background: rgba(15, 23, 42, 0.75) !important;
+    backdrop-filter: blur(4px); 
+    z-index: 99999 !important; /* Force to absolute top */
+    display: flex !important; 
+    align-items: center; 
+    justify-content: center;
+    opacity: 0; 
+    visibility: hidden; /* Safer than pointer-events */
+    transition: opacity 0.3s ease, visibility 0.3s ease; 
+    padding: 20px;
+}
+
+.modal-overlay.active { 
+    opacity: 1; 
+    visibility: visible; 
+}
+
+.modal-content {
+    background-color: #FFFFFF !important;
+}
