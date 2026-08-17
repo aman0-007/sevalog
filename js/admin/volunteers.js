@@ -45,7 +45,7 @@ function renderTable(dataToRender) {
                 <div style="font-size: 13px;">${vol.email}</div>
                 <div style="font-size: 12px; color: var(--text-muted);">${vol.phone_number || '--'}</div>
             </td>
-            <td><span class="role-badge ${vol.role === 'admin' ? 'role-admin' : 'role-volunteer'}">${vol.role.toUpperCase()}</span></td>
+            <td><span class="role-badge ${vol.role === 'admin' ? 'role-admin' : 'role-volunteer'}">${vol.role}</span></td>
             
             <td>
                 <div style="font-size: 13px;">${vol.city || 'Mumbai'}</div>
