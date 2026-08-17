@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Volunteers | SevaLog</title>
     <link rel="stylesheet" href="layout.css">
     <link rel="stylesheet" href="volunteers.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -26,6 +28,7 @@
     <!-- Theme Color for Browser Chrome -->
     <meta name="theme-color" content="#3B82F6">
 </head>
+
 <body class="preload">
 
     <div class="dashboard-layout">
@@ -33,7 +36,8 @@
             <div class="sidebar-header">
                 <i data-lucide="heart" class="brand-icon"></i>
                 <h2 class="nav-text">SevaLog</h2>
-                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()"><i data-lucide="x"></i></button>
+                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()"><i
+                        data-lucide="x"></i></button>
             </div>
             <nav class="sidebar-nav">
                 <a href="admin.html" class="nav-item" title="Dashboard">
@@ -53,7 +57,7 @@
                 </a>
             </nav>
         </aside>
-        
+
         <script>
             if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
                 document.getElementById('sidebar').classList.add('collapsed');
@@ -104,7 +108,10 @@
                             </tr>
                         </thead>
                         <tbody id="volunteers-table-body">
-                            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading volunteers...</td></tr>
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading
+                                    volunteers...</td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -125,7 +132,7 @@
                 </div>
                 <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
             </div>
-            
+
             <div id="modal-body-content" style="display: none;">
                 <!-- High Level Impact Stats -->
                 <div class="stats-banner">
@@ -147,18 +154,25 @@
                     <!-- Core Info -->
                     <div class="profile-card">
                         <h4>Contact & Demographics</h4>
-                        <div class="info-row"><span class="lbl">Email</span><span class="val" id="modal-email"></span></div>
-                        <div class="info-row"><span class="lbl">Phone</span><span class="val" id="modal-phone"></span></div>
-                        <div class="info-row"><span class="lbl">DOB / Gender</span><span class="val" id="modal-demographics"></span></div>
-                        <div class="info-row"><span class="lbl">Blood Group</span><span class="val font-red font-bold" id="modal-blood"></span></div>
+                        <div class="info-row"><span class="lbl">Email</span><span class="val" id="modal-email"></span>
+                        </div>
+                        <div class="info-row"><span class="lbl">Phone</span><span class="val" id="modal-phone"></span>
+                        </div>
+                        <div class="info-row"><span class="lbl">DOB / Gender</span><span class="val"
+                                id="modal-demographics"></span></div>
+                        <div class="info-row"><span class="lbl">Blood Group</span><span class="val font-red font-bold"
+                                id="modal-blood"></span></div>
                     </div>
 
                     <!-- Background Info -->
                     <div class="profile-card">
                         <h4>Background</h4>
-                        <div class="info-row"><span class="lbl">Education</span><span class="val" id="modal-edu"></span></div>
-                        <div class="info-row"><span class="lbl">Profession</span><span class="val" id="modal-profession"></span></div>
-                        <div class="info-row"><span class="lbl">Address</span><span class="val" id="modal-address"></span></div>
+                        <div class="info-row"><span class="lbl">Education</span><span class="val" id="modal-edu"></span>
+                        </div>
+                        <div class="info-row"><span class="lbl">Profession</span><span class="val"
+                                id="modal-profession"></span></div>
+                        <div class="info-row"><span class="lbl">Address</span><span class="val"
+                                id="modal-address"></span></div>
                     </div>
 
                     <!-- Medical & Emergency -->
@@ -201,9 +215,7 @@
     <script src="../../js/auth.js"></script>
     <script src="main.js"></script>
     <script src="../../js/admin/volunteers.js"></script>
+    <script src="../../js/pwa.js"></script>
 </body>
-        <script src="../../js/api.js"></script>
-        <script src="../../js/auth.js"></script>
-        <script src="../../js/pwa.js"></script>
-    </body>
+
 </html>
