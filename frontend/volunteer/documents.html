@@ -55,68 +55,20 @@
         </header>
 
         <main class="main-viewport">
-            
             <div class="doc-controls reveal">
                 <div>
-                    <h2 style="font-size: 24px; margin-bottom: 8px;">Official Service Record</h2>
-                    <p style="color: var(--text-muted); font-size: 15px;">Your digitally verified community service certificate.</p>
+                    <h2 style="font-size: 24px; margin-bottom: 8px;">Official Service Records</h2>
+                    <p style="color: var(--text-muted); font-size: 15px;">Your digitally verified community service certificates.</p>
                 </div>
-                <button class="btn btn-primary" onclick="alert('PDF Download Initialized!')">
-                    <i data-lucide="download"></i> Download as PDF
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i data-lucide="printer"></i> Print / Save as PDF
                 </button>
             </div>
 
-            <div class="certificate-wrapper reveal" style="transition-delay: 0.1s;">
-                <!-- Helpful hint for mobile users -->
-                <div class="mobile-swipe-hint">
-                    <i data-lucide="chevrons-right"></i> Swipe to view full certificate
-                </div>
-
-                <div class="certificate-frame">
-                    <div class="certificate-inner">
-                        
-                        <div class="cert-header">
-                            <i data-lucide="award" style="color: #0F172A; width: 36px; height: 36px;"></i>
-                            <span class="cert-org">SevaLog Initiative</span>
-                        </div>
-
-                        <h1 class="cert-title">Certificate of Appreciation</h1>
-                        
-                        <p class="cert-text">This is proudly presented to</p>
-                        
-                        <h2 class="cert-name" id="cert-name">Loading Name...</h2>
-                        
-                        <p class="cert-text">in recognition of their outstanding dedication and selfless service to the community. They have successfully contributed</p>
-                        
-                        <div class="cert-hours">
-                            <span id="cert-hours">0</span>
-                            <small>Verified Service Hours</small>
-                        </div>
-
-                        <!-- Perfectly aligned bottom row -->
-                        <div class="cert-bottom-row">
-                            <div class="signature-block">
-                                <div class="signature-line"></div>
-                                <p>Platform Administrator</p>
-                            </div>
-                            
-                            <div class="gold-seal">
-                                <div class="seal-inner">Verified</div>
-                                <div class="ribbon ribbon-left"></div>
-                                <div class="ribbon ribbon-right"></div>
-                            </div>
-
-                            <div class="signature-block">
-                                <div class="date-text" id="cert-date">Date</div>
-                                <div class="signature-line"></div>
-                                <p>Date of Issuance</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
+            <!-- This is where JS will inject ALL earned certificates -->
+            <div id="certificates-container" style="display: flex; flex-direction: column; gap: 40px;">
+                <div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading your verified certificates...</div>
             </div>
-
         </main>
     </div>
 

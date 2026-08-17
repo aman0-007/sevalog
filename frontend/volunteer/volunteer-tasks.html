@@ -116,7 +116,7 @@
             <!-- Modal Body -->
             <div class="modal-body" style="padding: 24px; max-height: 65vh; overflow-y: auto;">
                 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; padding: 16px; background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-light);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px; padding: 16px; background: var(--bg-surface); border-radius: 12px; border: 1px solid var(--border-light);">
                     <div>
                         <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Deadline</span>
                         <span id="modal-task-deadline" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 4px; display: block;">--</span>
@@ -124,6 +124,13 @@
                     <div>
                         <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Assigned To</span>
                         <span id="modal-task-assignee" style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-top: 4px; display: block;">--</span>
+                    </div>
+                    <div>
+                        <span style="display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Reward</span>
+                        <span style="font-size: 14px; font-weight: 800; color: #10B981; margin-top: 4px; display: flex; align-items: center; gap: 4px;">
+                            <i data-lucide="award" style="width: 16px;"></i> 
+                            <span id="modal-task-reward">--</span> Hrs
+                        </span>
                     </div>
                 </div>
 

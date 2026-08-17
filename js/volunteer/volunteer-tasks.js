@@ -129,8 +129,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 card.style.opacity = '0.6';
             }
 
+            const hours = task.hours_awarded ? parseFloat(task.hours_awarded) : 0;
+            const hoursHtml = hours > 0 
+                ? `<span style="font-size: 12px; font-weight: 800; color: #10B981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px;"><i data-lucide="award" style="width:12px; display:inline; margin-right:2px;"></i>${hours} Hrs</span>` 
+                : '';
+
             card.innerHTML = `
-                <div class="card-title">${task.title}</div>
+                <div style="display:flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="card-title">${task.title}</div>
+                    ${hoursHtml}
+                </div>
                 ${task.event_title ? `<div class="card-event"><i data-lucide="map-pin" style="width:12px;"></i> ${task.event_title}</div>` : ''}
                 <div class="card-footer">
                     <span class="status-badge" style="background: ${style.bg}; color: ${style.color};">${style.label}</span>

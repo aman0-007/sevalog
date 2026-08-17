@@ -65,8 +65,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const arrayFields = ['skills', 'languages_spoken', 'interested_activities'];
             arrayFields.forEach(field => {
                 const el = document.getElementById(field);
-                if (el && Array.isArray(data[field])) {
-                    el.value = data[field].join(', ');
+                if (el) {
+                    const arr = Array.isArray(data[field]) ? data[field] : [];
+                    el.value = arr.join(', ');
                 }
             });
 

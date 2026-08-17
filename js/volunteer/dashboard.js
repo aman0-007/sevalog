@@ -28,16 +28,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     async function loadDashboardStats() {
         try {
-            // Fetch from your Node.js backend cache table
             const response = await ApiClient.request('/volunteer/dashboard', 'GET');
-            const stats = response.data;
+            
+            // Your API groups this inside "impact"
+            const stats = response.data.impact; 
 
-            // Update UI with real database numbers
             const totalHours = parseFloat(stats.total_hours_logged || 0);
             document.getElementById('stat-hours').innerText = totalHours;
             document.getElementById('stat-count').innerText = stats.total_activities_attended || 0;
+            
+            // Use the real rank from the DB!
+            document.getElementById('stat-rank').innerText = stats.current_rank || 'Rookie';
 
-            updateMilestoneRing(totalHours);
+            // If next_rank_hours is null, they hit the max rank
+            const nextTarget = stats.next_rank_hours ? parseFloat(stats.next_rank_hours) : totalHours;
+            updateMilestoneRing(totalHours, nextTarget);
         } catch (error) {
             console.error("Failed to load dashboard stats:", error);
         }
@@ -53,11 +58,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = '<div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading events...</div>';
 
         try {
-            const response = await ApiClient.request('/volunteer/events/all', 'GET');
+            const response = await ApiClient.request('/volunteer/events', 'GET');
             const data = response.data || [];
             globalEventsData = data;
 
-            const upcomingEvents = data.filter(ev => ev.event_status === 'upcoming' || ev.event_status === 'live');
+            const upcomingEvents = data.filter(ev => ev.dynamic_status === 'upcoming' || ev.dynamic_status === 'ongoing');
 
             if (upcomingEvents.length === 0) {
                 container.innerHTML = '<p class="empty-msg">There are no upcoming events yet.</p>';
@@ -71,8 +76,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const time = ev.start_time ? ev.start_time.substring(0,5) : 'TBA';
 
                 let actionHtml = '';
-                if (ev.user_status === 'registered' || ev.user_status === 'present') {
-                    actionHtml = '<span class="registered-pill">Registered</span>';
+                const userStatus = ev.user_registration_status;
+                if (['registered', 'present', 'waitlisted'].includes(userStatus)) {
+                    const statusText = userStatus.charAt(0).toUpperCase() + userStatus.slice(1);
+                    actionHtml = `<span class="registered-pill">${statusText}</span>`;
+                } else if (ev.registration_open === false) {
+                    actionHtml = `<span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Closed</span>`;
                 } else {
                     actionHtml = `<button class="btn-register" data-event-id="${ev.event_id}">Register</button>`;
                 }
@@ -89,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="t-row"><i data-lucide="map-pin"></i> ${ev.location_name || 'Location TBD'}</div>
                             <div class="ticket-actions" onclick="event.stopPropagation()">
                                 ${actionHtml}
-                                <span style="font-size: 13px; font-weight: 700; color: var(--accent-primary);">Seva Activity</span>
+                                <span style="font-size: 13px; font-weight: 700; color: var(--accent-primary);">${ev.category || 'Seva Activity'}</span>
                             </div>
                         </div>
                     </div>
@@ -138,16 +147,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function registerForEvent(eventId) {
         try {
-            // Hit the Node.js apply endpoint
-            await ApiClient.request('/volunteer/apply', 'POST', { eventId });
+            await ApiClient.request(`/volunteer/events/${eventId}/register`, 'POST');
             showRegistrationToast('Successfully registered!', true);
             return true;
         } catch (err) {
-            // The backend database trigger throws a specific error if already applied
-            if (err.message && err.message.toLowerCase().includes('already applied')) {
+            if (err.message && err.message.toLowerCase().includes('already registered')) {
                 return 'ALREADY_REGISTERED';
             }
-            
             showRegistrationToast(err.message || 'Registration failed. Try again.', false);
             return false;
         }
@@ -181,20 +187,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3200);
     }
 
-    function updateMilestoneRing(currentHours) {
-        let nextMilestone = 20;
-        let rank = "Rookie";
-
-        if (currentHours >= 20) { nextMilestone = 50; rank = "Bronze Volunteer"; }
-        if (currentHours >= 50) { nextMilestone = 100; rank = "Silver Volunteer"; }
-        if (currentHours >= 100) { nextMilestone = 250; rank = "Gold Leader"; }
-
-        document.getElementById('stat-rank').innerText = rank;
-        
+    function updateMilestoneRing(currentHours, nextMilestone) {
         let hoursLeft = nextMilestone - currentHours;
         if (hoursLeft < 0) hoursLeft = 0; 
         
-        document.getElementById('hours-left').innerText = hoursLeft;
+        // Show "MAX" if they reached the highest tier
+        document.getElementById('hours-left').innerText = (hoursLeft === 0 && nextMilestone === currentHours) ? 'MAX' : hoursLeft;
 
         const circle = document.getElementById('milestone-ring');
         if (!circle) return;
@@ -205,7 +203,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         circle.style.strokeDasharray = `${circumference} ${circumference}`;
         circle.style.strokeDashoffset = circumference;
 
-        const percentFill = currentHours / nextMilestone;
+        // Prevent division by zero
+        const percentFill = nextMilestone > 0 ? (currentHours / nextMilestone) : 1;
         const safePercent = Math.min(percentFill, 1); 
         const offset = circumference - (safePercent * circumference);
 
@@ -222,9 +221,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('detail-category').innerText = ev.category || 'Seva Activity';
 
         const badge = document.getElementById('detail-status-badge');
-        if (ev.user_status === 'registered' || ev.user_status === 'present') {
+        if (ev.user_registration_status === 'registered' || ev.user_registration_status === 'present') {
             badge.style.display = 'inline-flex';
-            badge.innerHTML = ev.user_status === 'present'
+            badge.innerHTML = ev.user_registration_status === 'present'
                 ? '<i data-lucide="award" style="width: 14px;"></i> Verified Attendance'
                 : '<i data-lucide="check-circle" style="width: 14px;"></i> Registered';
         } else {
@@ -272,25 +271,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('eventDetailsModal').classList.remove('active');
     };
 
-    function loadCommunityFeed() {
-        const feed = document.getElementById('community-feed');
-        if (!feed) return;
+    async function loadCommunityFeed() {
+        const feedContainer = document.getElementById('community-feed');
+        if (!feedContainer) return;
 
-        const activities = [
-            { name: "Rahul D.", action: "completed 4h at Beach Cleanup", time: "2h ago" },
-            { name: "Sneha K.", action: "earned the 'Green Warrior' badge", time: "5h ago" },
-            { name: "Global Hub", action: "reached 50,000 community hours!", time: "1d ago" }
-        ];
+        try {
+            const response = await ApiClient.request('/volunteer/feed?limit=5', 'GET');
+            const activities = response.data || [];
+            
+            if (activities.length === 0) {
+                feedContainer.innerHTML = '<p class="empty-msg">No recent community activity.</p>';
+                return;
+            }
 
-        feed.innerHTML = activities.map(act => `
-            <div class="feed-item">
-                <div class="feed-dot"></div>
-                <div class="feed-content">
-                    <strong>${act.name}</strong> ${act.action}
-                    <div class="feed-time">${act.time}</div>
-                </div>
-            </div>
-        `).join('');
+            feedContainer.innerHTML = activities.map((act, index) => {
+                // Parse date for UI
+                const date = new Date(act.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div class="feed-item">
+                        <div class="feed-dot" ${index === 0 ? 'style="animation: livePulse 2s infinite; background: #10B981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);"' : ''}></div>
+                        <div class="feed-content">
+                            <strong>${act.first_name} ${act.last_name_initial}.</strong> ${act.action}
+                            ${act.event_title ? `<br><span style="color: var(--accent-primary); font-size: 13px;">${act.event_title}</span>` : ''}
+                            <div class="feed-time">${date}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error('Error loading community feed:', err);
+            feedContainer.innerHTML = '<p class="empty-msg">Unable to load feed right now.</p>';
+        }
     }
 
     if (typeof lucide !== 'undefined') lucide.createIcons();

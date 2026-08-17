@@ -299,13 +299,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ev.user_registration_status === 'present') {
             attendanceStats.style.display = 'flex';
             
-            // FIX: Parse the full timestamp into a readable AM/PM time
+            const timeFormatOptions = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+            
             document.getElementById('detail-checkin').innerText = ev.check_in_time 
-                ? new Date(ev.check_in_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+                ? new Date(ev.check_in_time).toLocaleString('en-IN', timeFormatOptions) 
                 : '--';
                 
             document.getElementById('detail-checkout').innerText = ev.check_out_time 
-                ? new Date(ev.check_out_time).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true }) 
+                ? new Date(ev.check_out_time).toLocaleString('en-IN', timeFormatOptions) 
                 : '--';
                 
             // Format hours to max 2 decimal places to keep the UI clean
@@ -324,12 +325,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         const mapEmbed = document.getElementById('detail-map-embed');
         const mapIframe = document.getElementById('detail-map-iframe');
 
-        if (ev.location_address || ev.location_name) {
+        if (ev.location_address || ev.location_name || ev.google_maps_link) {
             mapEmbed.style.display = 'block';
             
-            // Standard fallback query to generate a map iframe
-            const mapQuery = encodeURIComponent(`${ev.location_name || ''} ${ev.location_address || ''}`);
-            mapIframe.src = `https://maps.google.com/maps?q=${mapQuery}&output=embed`;
+            if (ev.google_maps_link && ev.google_maps_link.includes('embed')) {
+                // If the admin pasted a proper embed link, use it directly
+                mapIframe.src = ev.google_maps_link;
+            } else {
+                // Otherwise, reliably generate an embed iframe using the text address
+                const mapQuery = encodeURIComponent(`${ev.location_name || ''} ${ev.location_address || ''}`);
+                mapIframe.src = `https://maps.google.com/maps?q=${mapQuery}&output=embed`;
+            }
         } else {
             mapEmbed.style.display = 'none';
         }
