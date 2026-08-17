@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (!userData) return window.location.href = '../../index.html';
     currentUser = JSON.parse(userData);
 
+    // GLOBALLY define the ID safely
+    const currentUserId = String(currentUser.user_id || currentUser.userId || currentUser.id || 'anonymous');
+
     // Setup Top Header
     document.getElementById('top-user-name').innerText = `${currentUser.firstName} ${currentUser.lastName}`;
     document.getElementById('top-user-initial').innerText = currentUser.firstName.charAt(0).toUpperCase();
@@ -75,7 +78,10 @@ async function loadDropdownData() {
         const volRes = await ApiClient.request('/admin/volunteers?limit=1000', 'GET');
         const assigneeSelect = document.getElementById('task-assignee');
         assigneeSelect.innerHTML = '<option value="">Select a user...</option>';
-        volRes.data.forEach(user => {
+        
+        // FIX 1: Safely handle pagination wrapper
+        const vols = volRes.data.data || volRes.data || [];
+        vols.forEach(user => {
             assigneeSelect.innerHTML += `<option value="${user.user_id}">${user.first_name} ${user.last_name} (${user.role})</option>`;
         });
 
@@ -83,7 +89,10 @@ async function loadDropdownData() {
         const evRes = await ApiClient.request('/admin/events?limit=100', 'GET');
         const eventSelect = document.getElementById('task-event');
         eventSelect.innerHTML = '<option value="">No Event Linked</option>';
-        evRes.data.forEach(ev => {
+        
+        // FIX 1: Safely handle pagination wrapper
+        const evs = evRes.data.data || evRes.data || [];
+        evs.forEach(ev => {
             eventSelect.innerHTML += `<option value="${ev.event_id}">${ev.title} (${new Date(ev.event_date).toLocaleDateString()})</option>`;
         });
     } catch (e) {
@@ -98,7 +107,8 @@ async function fetchTasks() {
 
     try {
         const response = await ApiClient.request(url, 'GET');
-        allTasks = response.data;
+        // FIX 1: Safely handle pagination wrapper
+        allTasks = response.data.data || response.data || [];
         renderKanban();
     } catch (error) {
         document.getElementById('kanban-board').innerHTML = `<p style="color:red; padding: 20px;">Failed to load tasks: ${error.message}</p>`;
@@ -114,14 +124,10 @@ function debounceRender() {
 function renderKanban() {
     const board = document.getElementById('kanban-board');
     const searchTerm = document.getElementById('task-search-input').value.toLowerCase();
-    
-    // FIX 3: Get the current status filter
     const statusFilter = document.getElementById('filter-task-status').value;
     
-    // Filter by search
     const filteredTasks = allTasks.filter(t => t.title.toLowerCase().includes(searchTerm) || (t.assignee_first && t.assignee_first.toLowerCase().includes(searchTerm)));
 
-    // FIX 3: If a status is selected, only keep that specific column. Otherwise, show all.
     const visibleColumns = statusFilter 
         ? COLUMNS.filter(col => col.id === statusFilter)
         : COLUMNS;
@@ -130,14 +136,22 @@ function renderKanban() {
         const colTasks = filteredTasks.filter(t => t.status === col.id);
         
         const tasksHtml = colTasks.map(task => {
-            // Check if cancelled to apply visual styling
             const isCancelled = task.status === 'cancelled';
             const cardOpacity = isCancelled ? '0.6' : '1';
             const titleStyle = isCancelled ? 'text-decoration: line-through; color: var(--text-muted);' : '';
 
+            // The hour badge we created earlier!
+            const hours = task.hours_awarded ? parseFloat(task.hours_awarded) : 0;
+            const hoursHtml = hours > 0 
+                ? `<span style="font-size: 11px; font-weight: 800; color: #10B981; background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 6px;"><i data-lucide="award" style="width:10px; display:inline; margin-right:2px;"></i>${hours}</span>` 
+                : '';
+
             return `
             <div class="task-card" data-id="${task.task_id}" style="opacity: ${cardOpacity};">
-                <div class="task-card-title" style="${titleStyle}">${task.title}</div>
+                <div style="display:flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                    <div class="task-card-title" style="${titleStyle}">${task.title}</div>
+                    ${hoursHtml}
+                </div>
                 ${task.event_title ? `<div style="font-size:11px; color:var(--primary); margin-bottom: 8px; font-weight:500;">📍 ${task.event_title}</div>` : ''}
                 <div class="task-meta">
                     <div class="task-assignee">
@@ -188,12 +202,10 @@ function closeTaskDetailsModal() {
     document.getElementById('taskDetailsModal').classList.remove('active'); 
 }
 
-
 async function openTaskDetailsModal(taskId) {
     const modal = document.getElementById('taskDetailsModal');
     modal.classList.add('active');
     
-    // Loading State
     document.getElementById('detail-task-title').innerText = "Loading...";
     document.getElementById('task-action-area').style.display = 'none';
 
@@ -210,20 +222,26 @@ async function openTaskDetailsModal(taskId) {
         document.getElementById('detail-task-deadline').innerHTML = formatDeadline(task.deadline);
         document.getElementById('detail-task-desc').innerHTML = linkify(task.description);
 
+        // Map the reward hours to the 3rd column if it exists in HTML
+        const rewardEl = document.getElementById('modal-task-reward');
+        if (rewardEl) rewardEl.innerText = task.hours_awarded ? parseFloat(task.hours_awarded) : 0;
+
         // Remarks display
         let remarksHtml = '';
         if (task.volunteer_remarks) remarksHtml += `<div style="background:var(--bg-color); padding:12px; border-radius:8px; margin-bottom:8px; border-left: 3px solid #3B82F6;"><span style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Assignee Notes:</span><p style="font-size:13px; margin-top:4px;">${task.volunteer_remarks}</p></div>`;
         if (task.admin_remarks) remarksHtml += `<div style="background:rgba(245,158,11,0.05); padding:12px; border-radius:8px; border-left: 3px solid #F59E0B;"><span style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Admin Review Remarks:</span><p style="font-size:13px; margin-top:4px;">${task.admin_remarks}</p></div>`;
         document.getElementById('remarks-container').innerHTML = remarksHtml;
 
-        // FIX 2: Timeline JS generation removed entirely
-
         // ==========================================
         // DYNAMIC ROLE-BASED UI GENERATION
         // ==========================================
         const actionArea = document.getElementById('task-action-area');
-        const isCreator = task.created_by === currentUser.userId;
-        const isAssignee = task.assigned_to === currentUser.userId;
+        
+        // Define IDs securely
+        const currentUserId = String(currentUser.user_id || currentUser.userId || currentUser.id || 'anonymous');
+        const isCreator = String(task.created_by) === currentUserId;
+        const isAssignee = String(task.assigned_to) === currentUserId;
+        
         const isFrozen = ['completed', 'cancelled'].includes(task.status);
         
         let actionHtml = '';
@@ -248,6 +266,19 @@ async function openTaskDetailsModal(taskId) {
                 actionHtml += `
                     <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px; color: #F59E0B;">Admin Controls (Creator)</h3>
                     <textarea id="my-admin-remarks" class="form-input" rows="2" placeholder="Add official review remarks..." style="width: 100%;"></textarea>
+                `;
+
+                // FIX 2: Inject "Hours to Award" input if they are about to complete the task
+                if (task.status !== 'completed' && task.status !== 'cancelled') {
+                    actionHtml += `
+                        <div style="margin-top: 12px; margin-bottom: 12px;">
+                            <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Hours to Award (if completing)</label>
+                            <input type="number" id="task-award-hours" class="form-input" placeholder="e.g. 2.5" step="0.5" min="0" style="width: 100%;">
+                        </div>
+                    `;
+                }
+
+                actionHtml += `
                     <div class="action-row">
                         ${task.status === 'pending_verification' ? `<button class="btn-success" onclick="handleTaskAction('${task.task_id}', 'status', 'completed')"><i data-lucide="check-circle" style="width:14px; height:14px; display:inline; margin-bottom:-2px;"></i> Approve & Complete</button>` : ''}
                         ${task.status !== 'pending_verification' ? `<button class="primary-btn" onclick="handleTaskAction('${task.task_id}', 'status', 'completed')">Force Complete</button>` : ''}
@@ -310,14 +341,29 @@ window.handleTaskAction = async function(taskId, actionType, newStatus) {
         if (actionType === 'progress') {
             const remarks = document.getElementById('my-volunteer-remarks')?.value;
             await ApiClient.request(`/admin/tasks/${taskId}/progress`, 'PATCH', { status: newStatus, volunteer_remarks: remarks });
-        } else if (actionType === 'status') {
-            const remarks = document.getElementById('my-admin-remarks')?.value;
-            await ApiClient.request(`/admin/tasks/${taskId}/status`, 'PATCH', { status: newStatus, admin_remarks: remarks });
+        } 
+        else if (actionType === 'status') {
+            const payload = { 
+                status: newStatus,
+                admin_remarks: document.getElementById('my-admin-remarks')?.value || null
+            };
+
+            // FIX 3: Parse and enforce the hours input if completing
+            if (newStatus === 'completed') {
+                const hoursInput = document.getElementById('task-award-hours')?.value;
+                if (!hoursInput || isNaN(parseFloat(hoursInput)) || parseFloat(hoursInput) < 0) {
+                    alert("Validation Error: Please enter a valid number of hours to award before completing this task.");
+                    return; // Stop execution
+                }
+                payload.hours_awarded = parseFloat(hoursInput);
+            }
+
+            await ApiClient.request(`/admin/tasks/${taskId}/status`, 'PATCH', payload);
         }
         
         // Refresh UI smoothly
-        await openTaskDetailsModal(taskId); // Re-fetch current modal
-        fetchTasks(); // Refresh board behind it
+        await openTaskDetailsModal(taskId); 
+        fetchTasks(); 
     } catch (e) {
         alert("Action failed: " + e.message);
     }
