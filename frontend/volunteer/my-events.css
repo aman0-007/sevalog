@@ -303,23 +303,28 @@
 /* --- QR SCANNER MODAL OVERRIDES --- */
 #reader {
     width: 100%;
-    overflow: hidden; /* Prevents the zoomed video from spilling out */
     border-radius: 16px;
+    overflow: hidden; /* Clips the corners of the video feed perfectly */
+    border: none;
+}
+
+#reader__dashboard_section_csr span,
+#reader__dashboard_section_swaplink,
+#reader__scan_region img,
+#reader__dashboard_section_csr div {
+    display: none !important;
+}
+
+#reader__dashboard_section_csr button {
+    display: none !important; /* Hides the default "Request Camera" button */
 }
 
 #reader video {
     width: 100% !important;
+    height: 100% !important;
     object-fit: cover !important;
-    /* Apply a gentle 20% digital zoom to hide ultra-wide distortion */
+    /* This adds a gentle 20% zoom so you don't have to hold the phone too close */
     transform: scale(1.2); 
     transform-origin: center center;
-}
-#reader__dashboard_section_csr span {
-    display: none !important;
-}
-#reader__dashboard_section_swaplink {
-    display: none !important;
-}
-#reader__scan_region img {
-    display: none !important;
+    border-radius: 16px;
 }

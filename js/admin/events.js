@@ -348,7 +348,7 @@ function renderLifecycleButtons(eventId, evData, dynamicStatus) {
             delBtn.style.display = 'block';
             delBtn.onclick = () => confirmDeleteEvent(eventId, evData.title);
         }
-    } else if (['upcoming', 'ongoing'].includes(dynamicStatus)) {
+    } else if (['upcoming', 'ongoing', 'published'].includes(dynamicStatus)) {
         let buttonsHTML = `<div style="display: flex; gap: 8px; align-items: center;">`;
         
         // Complete Event manually
@@ -524,7 +524,31 @@ window.openQRModal = async function(eventId, eventTitle) {
     document.getElementById('qr-code-wrapper').style.display = 'none';
     document.getElementById('qr-status-message').style.display = 'none';
     
-    await switchKioskTab('checkin');
+    // FIX BUG 7 & 12: Safely parse date & smartly default the tab
+    try {
+        const response = await ApiClient.request(`/admin/events/${eventId}`, 'GET');
+        const ev = response.data;
+        
+        const safeStartTime = ev.start_time || '00:00:00';
+        const dateObj = new Date(ev.event_date);
+        const yyyy = dateObj.getFullYear();
+        const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const dd = String(dateObj.getDate()).padStart(2, '0');
+        
+        // Construct standard ISO string assuming local time
+        const eventEnd = new Date(`${yyyy}-${mm}-${dd}T${ev.end_time}`);
+        const now = new Date();
+        
+        // If the event has already started, default to Check-out tab
+        if (now >= eventEnd) {
+            await switchKioskTab('checkout');
+        } else {
+            await switchKioskTab('checkin');
+        }
+    } catch (error) {
+        console.error("Failed to fetch event data for Kiosk:", error);
+        await switchKioskTab('checkin'); // fallback
+    }
 }
 
 window.switchKioskTab = async function(type) {

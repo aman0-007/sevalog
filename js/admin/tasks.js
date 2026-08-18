@@ -69,6 +69,16 @@ function formatDeadline(dateString) {
     return formatted;
 }
 
+// --- HELPER: Escape HTML to prevent XSS ---
+function escapeHTML(str) {
+    if (!str) return '';
+    return str.replace(/[&<>'"]/g, 
+        tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag] || tag)
+    );
+}
+
 // ==========================================
 // DATA FETCHING & RENDERING
 // ==========================================
@@ -228,8 +238,8 @@ async function openTaskDetailsModal(taskId) {
 
         // Remarks display
         let remarksHtml = '';
-        if (task.volunteer_remarks) remarksHtml += `<div style="background:var(--bg-color); padding:12px; border-radius:8px; margin-bottom:8px; border-left: 3px solid #3B82F6;"><span style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Assignee Notes:</span><p style="font-size:13px; margin-top:4px;">${task.volunteer_remarks}</p></div>`;
-        if (task.admin_remarks) remarksHtml += `<div style="background:rgba(245,158,11,0.05); padding:12px; border-radius:8px; border-left: 3px solid #F59E0B;"><span style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Admin Review Remarks:</span><p style="font-size:13px; margin-top:4px;">${task.admin_remarks}</p></div>`;
+        if (task.volunteer_remarks) remarksHtml += `<div style="background:var(--bg-color); padding:12px; border-radius:8px; margin-bottom:8px; border-left: 3px solid #3B82F6;"><span style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Assignee Notes:</span><p style="font-size:13px; margin-top:4px;">${escapeHTML(task.volunteer_remarks)}</p></div>`;
+        if (task.admin_remarks) remarksHtml += `<div style="background:rgba(245,158,11,0.05); padding:12px; border-radius:8px; border-left: 3px solid #F59E0B;"><span style="font-size:11px; font-weight:600; color:var(--text-muted); text-transform:uppercase;">Admin Review Remarks:</span><p style="font-size:13px; margin-top:4px;">${escapeHTML(task.admin_remarks)}</p></div>`;
         document.getElementById('remarks-container').innerHTML = remarksHtml;
 
         // ==========================================

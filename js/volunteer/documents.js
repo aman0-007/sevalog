@@ -37,27 +37,36 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Generate HTML for each certificate
             container.innerHTML = certificates.map(cert => {
-                // Formatting data safely
                 const issueDate = new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
                 const certTitle = cert.type === 'master' ? 'Master Volunteer Certificate' : 'Certificate of Appreciation';
                 const eventContextHtml = cert.event_title 
                     ? `<p class="cert-text">for their active participation and successful completion of the <strong style="color: #0F172A;">${cert.event_title}</strong> initiative.</p>`
                     : `<p class="cert-text">in recognition of their outstanding overall dedication and selfless service to the community.</p>`;
 
-                const hoursStr = parseFloat(cert.hours_credited).toFixed(2).replace(/\.00$/, ''); // Cleans up "4.00" to "4"
+                const hoursStr = parseFloat(cert.hours_credited).toString();
 
                 return `
-                <div class="certificate-wrapper reveal" style="margin-bottom: 20px;">
+                <div class="certificate-wrapper reveal" style="margin-bottom: 30px;">
+                    
+                    <!-- NEW: Per-Certificate Action Bar -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 0 4px;">
+                        <span style="font-size: 14px; font-weight: 600; color: var(--text-main);">${certTitle}</span>
+                        <button class="btn btn-primary" onclick="downloadCertificate(this, '${cert.certificate_id}')" style="font-size: 13px; padding: 6px 12px; border-radius: 8px;">
+                            <i data-lucide="download" style="width: 16px; height: 16px;"></i> Download PNG
+                        </button>
+                    </div>
+
                     <div class="mobile-swipe-hint">
                         <i data-lucide="chevrons-right"></i> Swipe to view full certificate
                     </div>
 
-                    <div class="certificate-frame">
+                    <!-- Target ID added for HTML2Canvas -->
+                    <div class="certificate-frame" id="cert-frame-${cert.certificate_id}">
                         <div class="certificate-inner">
                             
                             <div class="cert-header">
                                 <i data-lucide="award" style="color: #0F172A; width: 36px; height: 36px;"></i>
-                                <span class="cert-org">SevaLog Initiative</span>
+                                <span class="cert-org">Seva Hub Initiative</span>
                             </div>
 
                             <h1 class="cert-title">${certTitle}</h1>
@@ -92,7 +101,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </div>
                             </div>
                             
-                            <!-- Hidden UUID for verifiable tracking -->
                             <div style="position: absolute; bottom: 20px; right: 60px; font-size: 9px; color: #94A3B8; font-family: monospace;">
                                 ID: ${cert.certificate_id}
                             </div>
@@ -111,3 +119,50 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     loadCertificates();
 });
+
+// ==========================================
+// 3. HTML5 Canvas Download Generator
+// ==========================================
+window.downloadCertificate = async function(btnElement, certId) {
+    // 1. UI Loading State
+    const originalText = btnElement.innerHTML;
+    btnElement.innerHTML = `<i data-lucide="loader-2" class="spin" style="width: 16px; height: 16px;"></i> Generating...`;
+    btnElement.disabled = true;
+    if (window.lucide) lucide.createIcons();
+
+    try {
+        // Optional: Ping your backend download API endpoint here if you want to log the download event
+        // await ApiClient.request(`/volunteer/certificates/${certId}/download`, 'GET');
+
+        // 2. Select the specific certificate frame
+        const certFrame = document.getElementById(`cert-frame-${certId}`);
+        
+        // 3. Convert HTML to High-Res Canvas
+        const canvas = await html2canvas(certFrame, {
+            scale: 3, // Multiplies resolution for crisp, printable text
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false
+        });
+
+        // 4. Convert Canvas to PNG image data
+        const imgData = canvas.toDataURL('image/png');
+        
+        // 5. Trigger fake click to download the image
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = `SevaLog_Certificate_${certId.substring(0,6)}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    } catch (error) {
+        console.error("Certificate generation failed:", error);
+        alert("Failed to generate certificate image. Please try again.");
+    } finally {
+        // 6. Restore Button UI
+        btnElement.innerHTML = originalText;
+        btnElement.disabled = false;
+        if (window.lucide) lucide.createIcons();
+    }
+};

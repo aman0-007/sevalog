@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // State 4: Both done.
                 actionHtml = `<span class="verified-badge" style="display: flex; justify-content: center; align-items: center; gap: 4px; color: #10B981; font-weight: 600; padding: 6px 12px; background: rgba(16, 185, 129, 0.1); border-radius: 20px; width: 100%;">
                                 <i data-lucide="check-circle" style="width: 16px;"></i> Attendance Completed
-                              </span>`;
+                            </span>`;
             } else if (status === 'present' && !hasCheckedOut) {
                 // State 3: Checked In, waiting to Check Out
                 actionHtml = `
@@ -353,9 +353,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ==========================================
     
     let currentScanType = 'check-in'; 
+    let isProcessingScan = false;
+    let isStartingCamera = false; // NEW: Strict lock to prevent double-spawning cameras
 
     async function startScannerModal(eventId, scanType = 'check-in') {
+        if (isStartingCamera) return; 
+        isStartingCamera = true;
+        
         currentScanType = scanType;
+        isProcessingScan = false; 
         
         const modalTitle = document.querySelector('#qrScannerModal h2');
         if (modalTitle) {
@@ -365,36 +371,79 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('qrScannerModal').classList.add('active');
         const placeholder = document.getElementById('reader-placeholder');
         placeholder.style.display = 'block';
-        placeholder.innerText = 'Requesting camera...';
+        placeholder.innerHTML = 'Requesting camera...';
 
         if (!window.isSecureContext) {
-            placeholder.innerHTML = `<span style="color: #EF4444; text-align: center; display: block;">Camera Blocked.<br>Browsers require HTTPS for camera access.</span>`;
-            setTimeout(closeScannerModal, 4000);
-            return;
+            placeholder.innerHTML = `<span style="color: #EF4444; text-align: center; display: block; font-weight: 600;">Camera Blocked</span><span style="font-size: 12px; color: #94A3B8; display: block; margin-top: 8px;">Browsers strictly require HTTPS to access the camera.</span>`;
+            isStartingCamera = false;
+            return; 
         }
 
         if (html5QrCode) {
-            try { await html5QrCode.clear(); } catch(e) {}
+            try { 
+                if (html5QrCode.isScanning) await html5QrCode.stop(); 
+                html5QrCode.clear(); 
+            } catch(e) {}
         }
+        
+        const readerDiv = document.getElementById('reader');
+        if (readerDiv) {
+            readerDiv.innerHTML = ''; 
+            readerDiv.removeAttribute('style'); 
+            readerDiv.style.width = '100%';
+            readerDiv.style.borderRadius = '16px';
+            readerDiv.style.overflow = 'hidden';
+        }
+        
         html5QrCode = new Html5Qrcode("reader");
         
+        const screenWidth = window.innerWidth;
+        const boxSize = screenWidth < 400 ? 200 : 280;
+
         const config = { 
-            fps: 30, // Increased to 30 for much faster capturing on shaky hands
-            qrbox: { width: 250, height: 250 }, // Slightly larger sweet spot
+            fps: 30,
+            qrbox: { width: boxSize, height: boxSize },
+            aspectRatio: 1.0,
+            formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ]
         };
+
+        // ========================================================
+        // NEW: SMART HARDWARE LENS DETECTOR
+        // ========================================================
+        let cameraTarget = { facingMode: "environment" }; // Fallback
+
+        try {
+            const devices = await Html5Qrcode.getCameras();
+            if (devices && devices.length > 0) {
+                // Filter to find only the rear-facing cameras
+                const backCams = devices.filter(c => c.label.toLowerCase().includes('back') || c.label.toLowerCase().includes('rear') || c.label.toLowerCase().includes('environment'));
+                
+                if (backCams.length > 1) {
+                    // Multi-lens phone detected!
+                    // Camera 0 is usually the Ultra-Wide. Camera 1 is usually the Main/Standard lens.
+                    // We select index 1 to grab the middle camera.
+                    cameraTarget = backCams[1].id; 
+                } else if (backCams.length === 1) {
+                    // Only one back camera exists
+                    cameraTarget = backCams[0].id;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not query specific lenses, falling back to default.", e);
+        }
+        // ========================================================
 
         try {
             await html5QrCode.start(
-                { facingMode: "environment" }, 
+                cameraTarget, // <-- WE PASS THE SMART TARGET HERE
                 config, 
                 async (decodedText) => {
-                    if (!html5QrCode) return;
+                    if (isProcessingScan) return; 
+                    isProcessingScan = true; 
 
-                    // Stop camera immediately upon reading code
                     try {
-                        await html5QrCode.stop();
+                        if (html5QrCode && html5QrCode.isScanning) await html5QrCode.pause();
                     } catch (e) {}
-                    html5QrCode = null; 
 
                     const endpoint = currentScanType === 'check-in' 
                         ? '/volunteer/events/check-in' 
@@ -405,52 +454,52 @@ document.addEventListener('DOMContentLoaded', async () => {
                             token: decodedText 
                         });
                         
-                        closeScannerModal();
-                        const successMsg = currentScanType === 'check-in' 
-                            ? "Attendance verified successfully!" 
-                            : "Check-out successful! Hours logged.";
-                        showToast(successMsg, true);
+                        showToast(response.message || (currentScanType === 'check-in' ? "Attendance verified successfully!" : "Check-out successful!"), true);
                         
+                        await closeScannerModal();
                         loadAllEvents(); 
 
                     } catch (err) {
-                        closeScannerModal();
                         showToast(err.message || `Invalid or expired ${currentScanType} Code.`, false);
+                        
+                        try {
+                            if (html5QrCode) await html5QrCode.resume();
+                        } catch (e) {}
+                        
+                        setTimeout(() => { isProcessingScan = false; }, 2000);
                     }
                 },
-                (errorMessage) => {
-                    // Scanning error frame (safe to ignore as it runs continuously per frame)
-                }
+                (errorMessage) => {}
             );
             placeholder.style.display = 'none';
         } catch (err) {
             console.error("Camera startup failed:", err);
             let errorMsg = "Camera access unavailable.";
-            if (err.name === 'NotAllowedError') {
-                errorMsg = "Camera permission denied. Please allow camera access in browser settings.";
-            } else if (err.name === 'NotFoundError') {
-                errorMsg = "No camera hardware detected.";
-            } else if (err.name === 'NotSupportedError' || !window.isSecureContext) {
-                errorMsg = "Camera blocked by browser. Mobile devices require HTTPS to use the camera.";
-            } else if (err.name === 'OverconstrainedError') {
-                errorMsg = "Camera configuration not supported by this phone.";
-            }
-            showToast(errorMsg, false);
-            closeScannerModal();
+            if (err.name === 'NotAllowedError') errorMsg = "Camera permission denied. Please allow camera access in your browser settings.";
+            else if (err.name === 'NotFoundError') errorMsg = "No camera hardware detected on this device.";
+            
+            placeholder.innerHTML = `<span style="color: #EF4444; text-align: center; display: block;">${errorMsg}</span>`;
+        } finally {
+            isStartingCamera = false;
         }
     }
 
     window.closeScannerModal = async function() {
         document.getElementById('qrScannerModal').classList.remove('active');
+        isProcessingScan = false;
         
         if (html5QrCode) {
             try {
-                await html5QrCode.stop();
+                if (html5QrCode.isScanning) {
+                    await html5QrCode.stop();
+                }
                 html5QrCode.clear();
-            } catch (err) {
-                console.error("Failed to stop camera:", err);
-            }
+            } catch (err) {}
             html5QrCode = null;
         }
+        
+        // Final wipe on close
+        const readerDiv = document.getElementById('reader');
+        if (readerDiv) readerDiv.innerHTML = ''; 
     };
 });

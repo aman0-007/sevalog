@@ -70,6 +70,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `<span class="deadline-text"><i data-lucide="calendar" style="width:14px;"></i> ${formatted}</span>`;
     }
 
+    // --- HELPER: Escape HTML to prevent XSS ---
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
     // 6. Fetch & Categorize Data
     async function loadTasks() {
         try {
@@ -234,7 +244,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     remarksHtml += `
                         <div style="background: var(--bg-surface); padding: 16px; border-radius: 12px; border: 1px solid var(--border-light); margin-bottom: 12px;">
                             <span style="font-size: 11px; font-weight: 800; color: var(--accent-primary); text-transform: uppercase; letter-spacing: 0.05em;">Your Submitted Notes</span>
-                            <p style="font-size: 14px; margin-top: 8px; color: var(--text-main);">${task.volunteer_remarks}</p>
+                            
+                            <p style="font-size: 14px; margin-top: 8px; color: var(--text-main);">${escapeHTML(task.volunteer_remarks)}</p>
                         </div>
                     `;
                 }
@@ -242,7 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     remarksHtml += `
                         <div style="background: rgba(245, 158, 11, 0.05); padding: 16px; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2);">
                             <span style="font-size: 11px; font-weight: 800; color: #D97706; text-transform: uppercase; letter-spacing: 0.05em;">Admin Feedback</span>
-                            <p style="font-size: 14px; margin-top: 8px; color: var(--text-main);">${task.admin_remarks}</p>
+                            <p style="font-size: 14px; margin-top: 8px; color: var(--text-main);">${escapeHTML(task.admin_remarks)}</p>
                         </div>
                     `;
                 }
