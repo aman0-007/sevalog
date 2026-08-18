@@ -35,9 +35,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Safely grab total hours (Handle different API return structures)
             const currentHours = parseFloat((dashboardData.impact && dashboardData.impact.total_hours_logged) ? dashboardData.impact.total_hours_logged : 0);
 
-            // Separate Master vs Event certificates
+            // Separate Master vs Standard (Events + Tasks) certificates
             const masterCert = globalCertificates.find(c => c.type === 'master');
-            const eventCerts = globalCertificates.filter(c => c.type === 'event');
+            const standardCerts = globalCertificates.filter(c => c.type === 'event' || c.type === 'task');
 
             let html = '';
 
@@ -75,9 +75,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // --- 2. THE EVENT CERTIFICATES LIST ---
             html += `<h3 style="font-size: 18px; color: var(--text-main); margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">Event Certificates</h3>`;
             
-            if (eventCerts.length > 0) {
+            if (standardCerts.length > 0) {
                 html += `<div class="cert-card-grid">`;
-                html += eventCerts.map(cert => renderCertCard(cert, false)).join('');
+                html += standardCerts.map(cert => renderCertCard(cert, false)).join('');
                 html += `</div>`;
             } else {
                 html += `
@@ -99,7 +99,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderCertCard(cert, isMaster) {
         const date = new Date(cert.issued_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         const title = isMaster ? 'Master Volunteer Diploma' : (cert.event_title || 'Certificate of Appreciation');
-        const badgeText = isMaster ? 'MILESTONE ACHEIVED' : 'VERIFIED EVENT';
+        let badgeText = 'VERIFIED EVENT';
+        if (isMaster) badgeText = 'MILESTONE ACHIEVED';
+        else if (cert.type === 'task') badgeText = 'VERIFIED TASK';
+
         const icon = isMaster ? 'crown' : 'award';
         const cssClass = isMaster ? 'cert-card cert-card-master' : 'cert-card';
         
@@ -127,10 +130,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const certTitle = isMaster ? 'Master Volunteer Diploma' : 'Certificate of Appreciation';
         const themeClass = isMaster ? 'master-theme' : '';
         
-        const eventContextHtml = isMaster 
-            ? `in recognition of their outstanding overall dedication and achieving the milestone of <strong>${cert.hours_credited} hours</strong> of selfless service to the community.`
-            : `for their active participation, dedication, and successful completion of the <strong style="color: #0F172A;">${cert.event_title}</strong> initiative.`;
-
+        let eventContextHtml = '';
+        if (isMaster) {
+            eventContextHtml = `in recognition of their outstanding overall dedication and achieving the milestone of <strong>${cert.hours_credited} hours</strong> of selfless service to the community.`;
+        } else if (cert.type === 'task') {
+            eventContextHtml = `for their exceptional individual contribution and successful completion of the <strong style="color: #0F172A;">${cert.event_title}</strong> assignment.`;
+        } else {
+            eventContextHtml = `for their active participation, dedication, and successful completion of the <strong style="color: #0F172A;">${cert.event_title}</strong> initiative.`;
+        }
+        
         const fullCertHtml = `
         <div class="certificate-frame ${themeClass}" id="cert-frame-${cert.certificate_id}">
             <div class="certificate-inner">
