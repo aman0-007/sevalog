@@ -161,17 +161,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.appendChild(fragment);
     }
 
-    // 8. Open Task Details Modal (FIXED ID MATCHING)
-    document.querySelector('.tasks-container').addEventListener('click', (e) => {
+    // 8. Open Task Details Modal (FIXED ID MATCHING & STALE DATA)
+    document.querySelector('.tasks-container').addEventListener('click', async (e) => {
         const card = e.target.closest('.task-card');
         if (!card) return;
         
         const clickedId = String(card.dataset.taskId);
-        // FIX: Force both to String so "5" matches 5.
-        const task = globalTasks.find(t => String(t.task_id) === clickedId);
         
-        if (task) {
-            openActionModal(task);
+        try {
+            // FIX: Fetch absolute latest data from the server so remarks and status are never stale
+            const response = await ApiClient.request(`/volunteer/tasks/${clickedId}`, 'GET');
+            if (response.data) {
+                openActionModal(response.data);
+            }
+        } catch (err) {
+            showToast("Failed to load task details: " + err.message, false);
         }
     });
 
