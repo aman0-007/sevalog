@@ -2,6 +2,7 @@
    DOCUMENTS.CSS (Digital Diploma UI)
    ========================================= */
 
+/* --- 1. PAGE CONTROLS --- */
 .doc-controls {
     display: flex;
     justify-content: space-between;
@@ -14,162 +15,25 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-/* --- THE CERTIFICATE PREVIEW (Scrollable on Mobile) --- */
-.certificate-wrapper {
-    background: #F8FAFC; 
-    padding: 40px;
-    border-radius: 24px;
-    border: 1px solid var(--border-light);
-    overflow-x: auto; /* Allows horizontal swipe on mobile */
-    -webkit-overflow-scrolling: touch;
-    position: relative;
-    text-align: center;
-}
-
-.mobile-swipe-hint {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: 16px;
-}
-
-/* Frame locks aspect ratio and dimensions */
-.certificate-frame {
-    background: #FFFFFF; 
-    width: 850px; /* Fixed width ensures signatures never overlap */
-    min-width: 850px;
-    height: 600px; 
-    padding: 20px;
-    box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15);
-    margin: 0 auto; /* Centers it on desktop */
-}
-
-/* The ornate double border */
-.certificate-inner {
-    border: 2px solid #0F172A; /* Deep Navy Border */
-    outline: 1px solid #0F172A;
-    outline-offset: -8px;
-    height: 100%;
-    width: 100%;
-    padding: 40px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.cert-header { 
-    margin-bottom: 24px; 
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    gap: 12px; 
-}
-
-.cert-org {
-    font-weight: 800; 
-    font-size: 16px; 
-    color: #0F172A; 
-    letter-spacing: 0.2em; 
-    text-transform: uppercase;
-}
-
-.cert-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 46px;
-    color: #0F172A;
-    margin-bottom: 24px;
-    font-weight: 700;
-}
-
-.cert-text { 
-    font-size: 15px; 
-    color: #475569; 
-    max-width: 550px; 
-    line-height: 1.6; 
-}
-
-.cert-name {
-    font-family: 'Playfair Display', serif;
-    font-size: 42px;
-    color: var(--accent-primary);
-    margin: 16px 0;
-    font-style: italic;
-    font-weight: 600;
-}
-
-.cert-hours { margin-top: 24px; }
-.cert-hours span { font-size: 36px; font-weight: 800; color: #10B981; line-height: 1; }
-.cert-hours small { display: block; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #64748B; margin-top: 4px; }
-
-/* Perfect Flex Layout for Signatures & Seal */
-.cert-bottom-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    width: 100%;
-    margin-top: auto; /* Pushes the row to the very bottom */
-}
-
-/* Signatures */
-.signature-block { display: flex; flex-direction: column; align-items: center; width: 200px; }
-.signature-line { width: 100%; height: 1px; background: #0F172A; margin-bottom: 8px; }
-.signature-block p { font-size: 12px; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; }
-.date-text { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; color: #0F172A; margin-bottom: 4px; }
-
-/* The CSS Gold Seal */
-.gold-seal {
-    position: relative;
-    width: 90px;
-    height: 90px;
-    margin-bottom: -10px; /* Aligns visually with the signature lines */
-}
-
-.seal-inner {
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, #F59E0B 0%, #B45309 100%);
-    border-radius: 50%;
-    border: 2px dashed rgba(255, 255, 255, 0.8);
-    box-shadow: 0 8px 16px rgba(180, 83, 9, 0.3), inset 0 0 12px rgba(0,0,0,0.1);
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
-    position: relative; z-index: 2;
-}
-
-.ribbon { position: absolute; width: 24px; height: 40px; background: #92400E; bottom: -16px; z-index: 1; }
-.ribbon-left { left: 15px; transform: rotate(20deg); }
-.ribbon-right { right: 15px; transform: rotate(-20deg); }
-
-/* Mobile Responsiveness */
-@media (max-width: 900px) {
-    .doc-controls { flex-direction: column; gap: 20px; text-align: center; padding: 20px; }
-    .doc-controls .btn { width: 100%; justify-content: center; }
-    
-    .certificate-wrapper { padding: 20px; border-radius: 16px; }
-    .mobile-swipe-hint { display: flex; } /* Shows the hint only on small screens */
-}
-
-/* --- MASTER CERTIFICATE STYLES --- */
+/* --- 2. LOCKED MASTER BANNER --- */
 .locked-certificate {
     background: #F8FAFC;
     border: 2px dashed #CBD5E1;
-    border-radius: 24px;
-    padding: 60px 20px;
+    border-radius: 16px;
+    padding: 20px 24px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row; 
     align-items: center;
-    text-align: center;
-    margin-bottom: 40px;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+    width: 100%;
 }
 
 .locked-progress-container {
-    margin-top: 24px;
     width: 100%;
-    max-width: 300px;
+    min-width: 200px;
+    max-width: 280px; 
 }
 
 .locked-progress-bg {
@@ -178,7 +42,6 @@
     background: #E2E8F0;
     border-radius: 10px;
     overflow: hidden;
-    margin-bottom: 8px;
 }
 
 .locked-progress-fill {
@@ -188,14 +51,162 @@
     transition: width 1s ease;
 }
 
-/* Golden overrides for the unlocked Master Certificate */
-.master-theme .certificate-inner {
-    border-color: #B45309;
-    outline-color: #B45309;
+@media (max-width: 768px) {
+    .doc-controls { flex-direction: column; gap: 20px; text-align: center; padding: 20px; }
+    
+    .locked-certificate {
+        flex-direction: column; 
+        align-items: stretch;   
+        padding: 16px;          
+        gap: 16px;              
+    }
+    .locked-progress-container {
+        max-width: 100%;        
+    }
 }
-.master-theme .cert-header i {
-    color: #D97706 !important;
+
+
+/* --- 3. CERTIFICATE LIST CARDS --- */
+.cert-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
 }
-.master-theme .cert-title {
-    color: #92400E;
+
+.cert-card {
+    background: white;
+    border: 1px solid var(--border-light);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
+
+.cert-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+}
+
+.cert-card-master {
+    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+    border: 1px solid #FCD34D;
+}
+
+
+/* --- 4. MODAL POPUP --- */
+.modal-overlay { 
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(4px); 
+    z-index: 1000; display: flex; align-items: center; justify-content: center; 
+    opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; 
+}
+
+.modal-overlay.active { 
+    opacity: 1; 
+    pointer-events: auto; 
+}
+
+.modal-content-cert {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateY(20px);
+    transition: 0.3s ease;
+}
+
+.modal-overlay.active .modal-content-cert { 
+    transform: translateY(0); 
+}
+
+/* Custom Scrollbar for Modal content on Windows */
+#modal-certificate-render-area::-webkit-scrollbar { height: 8px; }
+#modal-certificate-render-area::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+#modal-certificate-render-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+#modal-certificate-render-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+
+/* --- 5. PREMIUM CERTIFICATE DESIGN --- */
+.certificate-frame {
+    width: 850px;
+    min-width: 850px;
+    height: 600px;
+    background: #FFFFFF;
+    padding: 30px;
+    margin: 0 auto;
+}
+
+/* Outer Navy Border */
+.certificate-inner {
+    width: 100%;
+    height: 100%;
+    border: 3px solid #0F172A; 
+    padding: 8px; 
+    background: #FFFFFF;
+}
+
+/* Inner Gold Border & Ivory Background */
+.certificate-core {
+    width: 100%;
+    height: 100%;
+    border: 1px solid #D4AF37; 
+    background: #FAFAFA; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 60px;
+    position: relative;
+    text-align: center;
+}
+
+/* Typography Hierarchy */
+.cert-header { margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cert-org { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 0.3em; color: #64748B; text-transform: uppercase; }
+
+.cert-title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 700; color: #0F172A; margin: 12px 0 20px 0; text-transform: uppercase; letter-spacing: 0.05em; }
+.cert-subtitle { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 15px; color: #64748B; letter-spacing: 0.05em; }
+
+.cert-name { font-family: 'Playfair Display', serif; font-size: 48px; color: #D4AF37; margin: 20px 0; font-style: italic; font-weight: 600; line-height: 1.2; border-bottom: 1px solid #E2E8F0; padding-bottom: 8px; min-width: 400px; }
+
+.cert-text { font-size: 15px; color: #334155; max-width: 650px; line-height: 1.7; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0 auto; }
+
+/* Footer Layout (QR, Signature, Seal) */
+.cert-footer { display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: auto; }
+
+/* QR Code Block */
+.cert-qr-block { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.cert-qr-box { width: 78px; height: 78px; background: white; padding: 4px; border: 1px solid #CBD5E1; border-radius: 4px; display: flex; align-items: center; justify-content: center; }
+.cert-qr-label { font-size: 10px; font-weight: 800; color: #0F172A; letter-spacing: 0.1em; }
+.cert-id-text { font-size: 9px; font-family: monospace; color: #94A3B8; margin-top: 2px; text-align: left; }
+
+/* Signature Block */
+.cert-sig-block { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
+.cert-date { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; color: #0F172A; margin-bottom: 6px; }
+.cert-sig-line { width: 220px; height: 1px; background: #0F172A; margin-bottom: 8px; }
+.cert-sig-label { font-size: 12px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.1em; }
+
+/* Premium Gold Seal */
+.premium-seal { width: 110px; height: 110px; position: relative; margin-bottom: 5px; }
+.premium-seal-inner {
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, #FDE68A 0%, #D4AF37 60%, #B45309 100%);
+    border-radius: 50%;
+    border: 2px dashed rgba(255, 255, 255, 0.9);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    box-shadow: 0 8px 16px rgba(180, 83, 9, 0.25);
+    color: #78350F;
+    position: relative; z-index: 2;
+}
+.seal-hrs { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 800; line-height: 1; }
+.seal-txt { font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; line-height: 1.2; }
+.seal-ribbon { position: absolute; width: 24px; height: 45px; background: #92400E; bottom: -15px; z-index: 1; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+.seal-ribbon.left { left: 20px; transform: rotate(25deg); }
+.seal-ribbon.right { right: 20px; transform: rotate(-25deg); }
+
+/* Theme Overrides for Master Certificate */
+.master-theme .certificate-inner { border-color: #B45309; }
+.master-theme .cert-title { color: #92400E; }
+.master-theme .cert-name { color: #B45309; border-bottom-color: #FDE68A; }

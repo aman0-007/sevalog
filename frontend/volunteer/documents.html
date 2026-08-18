@@ -55,20 +55,35 @@
         </header>
 
         <main class="main-viewport">
-            <div class="doc-controls reveal">
-                <div>
-                    <h2 style="font-size: 24px; margin-bottom: 8px;">Official Service Records</h2>
-                    <p style="color: var(--text-muted); font-size: 15px;">Your digitally verified community service certificates.</p>
-                </div>
-            </div>
-
-            <!-- This is where JS will inject ALL earned certificates -->
             <div id="certificates-container" style="display: flex; flex-direction: column; gap: 40px;">
                 <div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading your verified certificates...</div>
             </div>
         </main>
     </div>
 
+    <!-- UPDATED CERTIFICATE MODAL -->
+    <div class="modal-overlay" id="certificateModal">
+        <div class="modal-content-cert">
+            
+            <!-- Modal Controls -->
+            <div style="width: 100%; max-width: 850px; display: flex; justify-content: flex-end; gap: 12px; margin-bottom: 16px;">
+                <button id="modal-download-btn" style="background: white; color: #0F172A; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <i data-lucide="download" style="width: 16px;"></i> Download PDF
+                </button>
+                <button onclick="closeCertificateModal()" style="background: white; color: #0F172A; border: none; width: 38px; height: 38px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                    <i data-lucide="x" style="width: 18px;"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable container for the certificate -->
+            <div id="modal-certificate-render-area" style="overflow-x: auto; width: 100%; max-width: 850px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); background: white;">
+                <!-- The JS will inject the certificate here -->
+            </div>
+
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../../js/api.js"></script>
     <script src="../../js/auth.js"></script>
