@@ -272,8 +272,8 @@ async function openTaskDetailsModal(taskId) {
                 if (task.status !== 'completed' && task.status !== 'cancelled') {
                     actionHtml += `
                         <div style="margin-top: 12px; margin-bottom: 12px;">
-                            <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Hours to Award (if completing)</label>
-                            <input type="number" id="task-award-hours" class="form-input" placeholder="e.g. 2.5" step="0.5" min="0" style="width: 100%;">
+                            <label style="font-size: 12px; font-weight: 600; color: var(--text-main); display: block; margin-bottom: 4px;">Hours to Award (Confirm)</label>
+                            <input type="number" id="task-award-hours" class="form-input" value="${parseFloat(task.hours_awarded || 0)}" step="0.5" min="0" style="width: 100%;">
                         </div>
                     `;
                 }
@@ -318,7 +318,8 @@ document.getElementById('createTaskForm').addEventListener('submit', async (e) =
         event_id: document.getElementById('task-event').value || null,
         deadline: document.getElementById('task-deadline').value || null,
         description: document.getElementById('task-desc').value,
-        is_public: document.getElementById('task-public-toggle').checked
+        is_public: document.getElementById('task-public-toggle').checked,
+        hours_awarded: parseFloat(document.getElementById('task-est-hours').value) || 0
     };
 
     try {

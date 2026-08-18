@@ -189,6 +189,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         document.getElementById('modal-task-assignee').innerHTML = `<span style="color: ${isAssignedToMe ? 'var(--accent-primary)' : 'var(--text-main)'}">${assigneeText}</span>`;
         
+        const rewardEl = document.getElementById('modal-task-reward');
+        if (rewardEl) {
+            rewardEl.innerText = task.hours_awarded ? parseFloat(task.hours_awarded) : 0;
+        }
+        
         document.getElementById('modal-task-desc').innerHTML = linkify(task.description);
 
         // Render Interactive Area

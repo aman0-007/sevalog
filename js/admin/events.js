@@ -197,9 +197,10 @@ function renderCoreStats(evData) {
     document.getElementById('detail-location').innerText = evData.location_name || 'No location set';
     document.getElementById('detail-desc').innerText = evData.description || 'No description provided.';
 
-    // FIX 2: Use Backend Gamification Metrics securely
-    const registeredCount = evData.current_registered_count || 0;
-    const waitlistCount = (evData.roster || []).filter(v => (v.attendance_status || v.status) === 'waitlisted').length;
+    // FIX 2: Calculate capacity dynamically from the secure roster
+    const roster = evData.roster || [];
+    const registeredCount = roster.filter(v => ['registered', 'present'].includes(v.attendance_status || v.status)).length;
+    const waitlistCount = roster.filter(v => (v.attendance_status || v.status) === 'waitlisted').length;
     const maxVolunteers = evData.max_volunteers || 'No Limit';
     
     document.getElementById('detail-capacity-text').innerText = `${registeredCount} / ${maxVolunteers} Reg.`;
