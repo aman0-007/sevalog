@@ -36,13 +36,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const totalHours = parseFloat(stats.total_hours_logged || 0);
             document.getElementById('stat-hours').innerText = totalHours;
             document.getElementById('stat-count').innerText = stats.total_activities_attended || 0;
-            
-            // Use the real rank from the DB!
-            document.getElementById('stat-rank').innerText = stats.current_rank || 'Rookie';
+            document.getElementById('stat-rank').innerText = stats.current_rank;
 
-            // If next_rank_hours is null, they hit the max rank
-            const nextTarget = stats.next_rank_hours ? parseFloat(stats.next_rank_hours) : totalHours;
-            updateMilestoneRing(totalHours, nextTarget);
+            const hasNextRank = stats.next_rank_hours !== null && stats.next_rank_hours !== undefined;
+            const nextTarget = hasNextRank ? parseFloat(stats.next_rank_hours) : totalHours;
+            updateMilestoneRing(totalHours, nextTarget, !hasNextRank);
         } catch (error) {
             console.error("Failed to load dashboard stats:", error);
         }
@@ -187,12 +185,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         }, 3200);
     }
 
-    function updateMilestoneRing(currentHours, nextMilestone) {
+    function updateMilestoneRing(currentHours, nextMilestone, isMaxRank) {
         let hoursLeft = nextMilestone - currentHours;
         if (hoursLeft < 0) hoursLeft = 0; 
         
-        // Show "MAX" if they reached the highest tier
-        document.getElementById('hours-left').innerText = (hoursLeft === 0 && nextMilestone === currentHours) ? 'MAX' : hoursLeft;
+        document.getElementById('hours-left').innerText = isMaxRank ? 'MAX' : hoursLeft;
 
         const circle = document.getElementById('milestone-ring');
         if (!circle) return;
@@ -204,8 +201,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         circle.style.strokeDashoffset = circumference;
 
         // Prevent division by zero
-        const percentFill = nextMilestone > 0 ? (currentHours / nextMilestone) : 1;
-        const safePercent = Math.min(percentFill, 1); 
+        const percentFill = isMaxRank ? 1 : (currentHours / nextMilestone);
+        const safePercent = Math.min(Math.max(percentFill, 0), 1); 
         const offset = circumference - (safePercent * circumference);
 
         setTimeout(() => {
