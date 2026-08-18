@@ -130,14 +130,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         const certTitle = isMaster ? 'Master Volunteer Diploma' : 'Certificate of Appreciation';
         const themeClass = isMaster ? 'master-theme' : '';
         
-        let eventContextHtml = '';
-        if (isMaster) {
-            eventContextHtml = `in recognition of their outstanding overall dedication and achieving the milestone of <strong>${cert.hours_credited} hours</strong> of selfless service to the community.`;
-        } else if (cert.type === 'task') {
-            eventContextHtml = `for their exceptional individual contribution and successful completion of the <strong style="color: #0F172A;">${cert.event_title}</strong> assignment.`;
-        } else {
-            eventContextHtml = `for their active participation, dedication, and successful completion of the <strong style="color: #0F172A;">${cert.event_title}</strong> initiative.`;
-        }
+        // FIX: Grab the dynamic description directly from the database!
+        // Added a fallback just in case you have old certificates generated before the DB update.
+        const dynamicDescriptionHtml = cert.description || `<p class="cert-text">for their active participation and successful completion of the <strong style="color: #0F172A;">${cert.event_title || 'Seva Initiative'}</strong>.</p>`;
         
         const fullCertHtml = `
         <div class="certificate-frame ${themeClass}" id="cert-frame-${cert.certificate_id}">
@@ -154,7 +149,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     
                     <h2 class="cert-name">${fullName}</h2>
                     
-                    <p class="cert-text">${eventContextHtml}</p>
+                    <!-- INJECTED DYNAMIC DB TEMPLATE HERE -->
+                    ${dynamicDescriptionHtml}
                     
                     <div class="cert-footer">
                         <!-- Left: QR Code Verification -->
