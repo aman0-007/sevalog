@@ -206,3 +206,25 @@ body {
 .delay-2 { animation-delay: 0.15s; }
 .delay-3 { animation-delay: 0.25s; }
 .delay-4 { animation-delay: 0.35s; }
+
+/* =========================================
+   GLOBAL MOBILE HEADER FIX (Applies to ALL pages)
+   ========================================= */
+@media (max-width: 900px) {
+    /* 1. Fix the Header squishing issue caused by iOS Safe Areas */
+    .top-bar {
+        height: auto !important; 
+        min-height: var(--topbar-height);
+        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        padding-bottom: 12px !important;
+    }
+    
+    /* 2. Truncate long titles so they don't push the profile menu off-screen */
+    .page-title h3 {
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px; 
+    }
+}

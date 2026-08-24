@@ -35,9 +35,48 @@
 .input-readonly { background: var(--bg-surface) !important; color: var(--text-muted) !important; cursor: not-allowed; font-weight: 600; border-color: transparent !important; }
 .input-readonly:focus { box-shadow: none !important; }
 
+/* Hide the scrollbar for the horizontal nav on mobile (Chrome/Safari/iOS) */
+.settings-nav::-webkit-scrollbar {
+    display: none;
+}
+
 @media (max-width: 900px) {
     .settings-layout { grid-template-columns: 1fr; }
-    .settings-nav { flex-direction: row; overflow-x: auto; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); }
+    
+    .settings-nav { 
+        flex-direction: row; 
+        overflow-x: auto; 
+        -webkit-overflow-scrolling: touch; /* Enables silky smooth iOS swiping */
+        scrollbar-width: none; /* Hides scrollbar on Firefox */
+        padding-bottom: 16px; 
+        border-bottom: 1px solid var(--border-light); 
+    }
+    
     .s-nav-btn { white-space: nowrap; }
     .form-row { grid-template-columns: 1fr; }
+}
+
+/* --- ADD THIS NEW BLOCK FOR MOBILE HEADER FIXES --- */
+@media (max-width: 768px) {
+    /* 1. Fix the Header squishing issue caused by iOS Safe Areas */
+    .top-bar {
+        height: auto !important; 
+        min-height: var(--topbar-height);
+        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        padding-bottom: 12px !important;
+    }
+    
+    /* 2. Truncate long titles so they don't push the profile menu off-screen */
+    .page-title h3 {
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px; 
+    }
+    
+    /* 3. Adjust the panel padding for smaller screens */
+    .settings-panel {
+        padding: 24px 20px;
+    }
 }

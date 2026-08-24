@@ -1,5 +1,5 @@
 /* =========================================
-   MY-EVENTS.CSS (Ticket UI & Tabs)
+   MY-EVENTS.CSS (Clean & Optimized)
    ========================================= */
 
 .events-container {
@@ -11,7 +11,7 @@
     min-height: 60vh;
 }
 
-/* --- THE TABS --- */
+/* --- THE TABS (Smooth Swipe enabled) --- */
 .tab-header {
     display: flex;
     border-bottom: 1px solid var(--border-light);
@@ -19,12 +19,9 @@
     padding: 0 24px;
     overflow-x: auto; 
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Hides scrollbar on Firefox */
+    scrollbar-width: none; 
 }
-
-.tab-header::-webkit-scrollbar {
-    display: none; 
-}
+.tab-header::-webkit-scrollbar { display: none; }
 
 .tab-btn {
     padding: 20px 24px; 
@@ -42,8 +39,6 @@
 
 .tab-btn:hover { color: var(--text-main); }
 .tab-btn.active { color: var(--accent-primary); }
-
-/* The sliding underline effect */
 .tab-btn::after {
     content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px;
     background: var(--accent-primary);
@@ -51,7 +46,6 @@
 }
 .tab-btn.active::after { transform: scaleX(1); }
 
-/* --- TAB CONTENT --- */
 .tab-content { display: none; padding: 40px 32px; animation: fadeIn 0.4s ease; }
 .tab-content.active { display: block; }
 
@@ -62,307 +56,67 @@
 
 /* --- THE EVENT TICKETS --- */
 .ticket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 24px; }
-
-.event-ticket {
-    display: flex;
-    background: white;
-    border: 1px solid var(--border-light);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-    transition: transform 0.2s, box-shadow 0.2s;
-    position: relative;
-}
+.event-ticket { display: flex; background: white; border: 1px solid var(--border-light); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; position: relative; cursor: pointer; }
 .event-ticket:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
 
-/* Left Date Box */
-.ticket-date {
-    background: var(--bg-surface);
-    padding: 24px 20px;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-right: 2px dashed var(--border-light); /* Perforated ticket look */
-    min-width: 100px;
-}
+.ticket-date { background: var(--bg-surface); padding: 24px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 2px dashed var(--border-light); min-width: 100px; }
 .ticket-date .month { font-size: 13px; font-weight: 800; color: var(--accent-primary); text-transform: uppercase; }
 .ticket-date .day { font-size: 32px; font-weight: 800; color: var(--text-main); line-height: 1.1; }
 
-/* Right Details Box */
 .ticket-details { padding: 24px; flex: 1; display: flex; flex-direction: column; }
 .ticket-details h4 { font-size: 18px; margin-bottom: 12px; color: var(--text-main); }
 .t-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
 .t-row i { width: 16px; color: var(--accent-primary); }
 
+.ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+
 /* Buttons & Badges */
-.ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.btn-register, .btn-cancel, .btn-checkin { display: inline-flex; align-items: center; justify-content: center; min-width: 130px; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; gap: 6px; }
+.btn-register { background: var(--accent-primary); color: white; }
+.btn-register:hover { background: #2563eb; }
+.btn-register:disabled { opacity: 0.55; cursor: not-allowed; }
 
+.btn-cancel { color: #EF4444; background: rgba(239, 68, 68, 0.1); }
 .btn-cancel:hover { background: #EF4444; color: white; }
+.btn-cancel:disabled { opacity: 0.6; cursor: not-allowed; }
 
-.registered-pill,
-.verified-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(16, 185, 129, 0.1); color: #10B981; border-radius: 20px; font-size: 12px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2); }
+.btn-checkin { background: var(--accent-primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+.btn-checkin:hover { background: var(--accent-hover); transform: translateY(-2px); }
 
+.registered-pill, .verified-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(16, 185, 129, 0.1); color: #10B981; border-radius: 20px; font-size: 12px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2); }
 
-.notification-toast {
-    position: fixed;
-    left: 50%;
-    bottom: 30px;
-    transform: translateX(-50%) translateY(20px);
-    background: rgba(15, 23, 42, 0.95);
-    color: white;
-    padding: 18px 22px;
-    border-radius: 16px;
-    box-shadow: 0 22px 60px rgba(15, 23, 42, 0.25);
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    z-index: 9999;
-}
-
-.notification-toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-.notification-toast .toast-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #10B981;
-    display: grid;
-    place-items: center;
-}
-
-.notification-toast .toast-icon svg {
-    width: 18px;
-    height: 18px;
-    color: white;
-}
-
-.btn-register,
-.btn-cancel {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 130px;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    border: none;
-    text-decoration: none;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s, transform 0.2s;
-}
-
-.btn-register {
-    background: var(--accent-primary);
-    color: white;
-}
-
-.btn-register:hover {
-    background: #2563eb;
-}
-
-.btn-register:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
-.registered-pill {
-    min-width: auto;
-    background: rgba(16, 185, 129, 0.1);
-    color: #10B981;
-    border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.btn-cancel {
-    color: #EF4444;
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.btn-cancel:disabled { 
-    opacity: 0.6; 
-    cursor: not-allowed; 
-}
-
-/* --- CLICKABLE CARDS & MODAL --- */
-.event-ticket {
-    cursor: pointer; /* Makes the whole card look clickable */
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    padding: 24px;
-    border-bottom: 1px solid var(--border-light);
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(16, 185, 129, 0.05));
-}
-
-.modal-title-block {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 0;
-}
-
-.modal-title-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.modal-title-row h2 {
-    margin: 0;
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--text-main);
-    line-height: 1.2;
-}
-
-.modal-header p {
-    margin: 0;
-    color: var(--accent-primary);
-    font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.details-modal-close {
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--border-light);
-    border-radius: 12px;
-    background: white;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.details-modal-close:hover {
-    background: var(--bg-surface);
-    color: var(--accent-primary);
-    border-color: var(--accent-glow);
-}
-
-.modal-overlay { 
-    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); 
-    z-index: 999; display: flex; align-items: center; justify-content: center; 
-    opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; 
-}
+/* --- MODAL UI --- */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; }
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
-
-.modal-content { 
-    background: #FFFFFF; width: 100%; max-width: 600px; 
-    border-radius: 20px; padding: 24px; transform: translateY(20px); 
-    transition: 0.3s ease; border: 1px solid var(--border-light); 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-}
+.modal-content { background: #FFFFFF; width: 100%; max-width: 600px; border-radius: 20px; padding: 24px; transform: translateY(20px); transition: 0.3s ease; border: 1px solid var(--border-light); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
 .modal-overlay.active .modal-content { transform: translateY(0); }
 
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 24px; border-bottom: 1px solid var(--border-light); background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(16, 185, 129, 0.05)); }
+.modal-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.modal-title-row h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--text-main); line-height: 1.2; }
+.modal-header p { margin: 0; color: var(--accent-primary); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 6px; }
+
+.details-modal-close { width: 44px; height: 44px; border: 1px solid var(--border-light); border-radius: 12px; background: white; color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s ease; flex-shrink: 0; }
+.details-modal-close:hover { background: var(--bg-surface); color: var(--accent-primary); border-color: var(--accent-glow); }
+
+/* --- QR SCANNER --- */
+#reader { width: 100%; border-radius: 16px; overflow: hidden; border: none; }
+#reader__dashboard_section_csr span, #reader__dashboard_section_swaplink, #reader__scan_region img, #reader__dashboard_section_csr div, #reader__dashboard_section_csr button { display: none !important; }
+#reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; transform: scale(1.2); transform-origin: center center; border-radius: 16px; }
+
+/* --- TOAST --- */
+.notification-toast { position: fixed; left: 50%; bottom: 30px; transform: translateX(-50%) translateY(20px); background: rgba(15, 23, 42, 0.95); color: white; padding: 18px 22px; border-radius: 16px; box-shadow: 0 22px 60px rgba(15, 23, 42, 0.25); display: inline-flex; align-items: center; gap: 12px; opacity: 0; pointer-events: none; transition: 0.3s ease; z-index: 9999; }
+.notification-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.notification-toast .toast-icon { width: 32px; height: 32px; border-radius: 50%; background: #10B981; display: grid; place-items: center; }
+
+/* --- MOBILE SPECIFIC FIXES --- */
 @media (max-width: 768px) {
     .ticket-grid { grid-template-columns: 1fr; }
     .event-ticket { flex-direction: column; }
     .ticket-date { border-right: none; border-bottom: 2px dashed var(--border-light); padding: 16px; flex-direction: row; gap: 8px; }
     .ticket-date .day { font-size: 24px; }
-}
-
-/* --- REGISTRATION, WITHDRAW & CHECK-IN BUTTONS --- */
-.btn-checkin {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 10px 16px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    background: var(--accent-primary);
-    color: white;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-    transition: transform 0.2s, background 0.2s;
-}
-
-.btn-checkin:hover {
-    background: var(--accent-hover);
-    transform: translateY(-2px);
-}
-
-.btn-checkin i {
-    width: 16px;
-    height: 16px;
-}
-
-/* Make sure action buttons wrap neatly on small mobile screens */
-.ticket-actions {
-    flex-wrap: wrap; 
-}
-
-/* --- QR SCANNER MODAL OVERRIDES --- */
-#reader {
-    width: 100%;
-    border-radius: 16px;
-    overflow: hidden; /* Clips the corners of the video feed perfectly */
-    border: none;
-}
-
-#reader__dashboard_section_csr span,
-#reader__dashboard_section_swaplink,
-#reader__scan_region img,
-#reader__dashboard_section_csr div {
-    display: none !important;
-}
-
-#reader__dashboard_section_csr button {
-    display: none !important; /* Hides the default "Request Camera" button */
-}
-
-#reader video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
-    /* This adds a gentle 20% zoom so you don't have to hold the phone too close */
-    transform: scale(1.2); 
-    transform-origin: center center;
-    border-radius: 16px;
-}
-
-/* --- MOBILE RESPONSIVENESS FIXES --- */
-@media (max-width: 768px) {
-    /* 1. Fix the Header squishing issue caused by iOS Safe Areas */
-    .top-bar {
-        height: auto !important; /* Overrides the strict 70px height */
-        min-height: var(--topbar-height);
-        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
-        padding-bottom: 12px !important;
-    }
     
-    /* 2. Truncate long titles so they don't push the profile menu off-screen */
-    .page-title h3 {
-        font-size: 18px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 140px; 
-    }
-
-    /* 3. Adjust Tabs padding for small screens */
-    .tab-header {
-        padding: 0 16px;
-    }
-    .tab-btn {
-        padding: 16px 20px;
-        font-size: 13px;
-    }
+    /* Adjust Tabs padding for small screens */
+    .tab-header { padding: 0 16px; }
+    .tab-btn { padding: 16px 20px; font-size: 13px; }
 }
