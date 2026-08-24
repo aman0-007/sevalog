@@ -29,7 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const storedUserData = localStorage.getItem('samithi_user');
-    if (storedUserData) {
+    const token = localStorage.getItem('samithi_token');
+
+    if (storedUserData && token) {
         try {
             const user = JSON.parse(storedUserData);
             const nameEl = document.getElementById('user-name-top');
@@ -39,6 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
             if (welcomeEl) welcomeEl.innerText = `Welcome back, ${user.firstName}!`;
             if (nameEl) nameEl.innerText = `${user.firstName} ${user.lastName}`;
             if (initialEl) initialEl.innerText = user.firstName.charAt(0).toUpperCase();
+
+            // FIX 1: Auto-redirect if they open the PWA and land on a public page
+            const path = window.location.pathname;
+            if (path.endsWith('login.html') || path.endsWith('index.html') || path === '/' || path.endsWith('SevaLog/')) {
+                // Dynamically route based on if they are at the root or already inside 'frontend/'
+                const prefix = path.includes('frontend') ? '' : 'frontend/';
+                const dest = user.role === 'admin' ? 'admin/admin.html' : 'volunteer/dashboard.html';
+                window.location.replace(prefix + dest);
+            }
         } catch (e) {
             console.error("Session parse error, clearing.");
             ApiClient.clearSession();

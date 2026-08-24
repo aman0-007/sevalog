@@ -62,23 +62,26 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // STRATEGY B: Static Assets & HTML (Stale-While-Revalidate)
+    // STRATEGY B: Static Assets & HTML (Network-First, Fallback to Cache)
     event.respondWith(
-        caches.match(req).then((cachedRes) => {
-            const fetchPromise = fetch(req).then((networkRes) => {
-                caches.open(CACHE_NAME).then((cache) => {
+        fetch(req)
+            .then((networkRes) => {
+                // If online, fetch the latest file and update the cache
+                return caches.open(CACHE_NAME).then((cache) => {
                     cache.put(req, networkRes.clone());
+                    return networkRes;
                 });
-                return networkRes;
-            }).catch(() => {
-                // If offline and trying to navigate to a new HTML page, show offline.html
-                if (req.mode === 'navigate') {
-                    return caches.match('/offline.html');
-                }
-            });
-
-            // Return cached response immediately if available, while fetching update in background
-            return cachedRes || fetchPromise;
-        })
+            })
+            .catch(() => {
+                // If offline, check the cache
+                return caches.match(req).then((cachedRes) => {
+                    if (cachedRes) return cachedRes;
+                    
+                    // If offline and trying to navigate to a new page, show offline UI
+                    if (req.mode === 'navigate') {
+                        return caches.match('/offline.html');
+                    }
+                });
+            })
     );
 });
