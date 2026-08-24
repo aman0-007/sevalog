@@ -77,6 +77,79 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================================
+    // 3.7. Sidebar Swipe Gestures (Native App Feel)
+    // ==========================================
+    let touchStartX = 0;
+    let touchEndX = 0;
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    const handleGesture = () => {
+        const sidebar = document.getElementById('sidebar');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        if (!sidebar) return;
+
+        const swipeDistanceX = touchEndX - touchStartX;
+        const swipeDistanceY = Math.abs(touchEndY - touchStartY);
+
+        // Safety Lock 1: Ignore if the swipe is more vertical than horizontal (user is scrolling down)
+        if (swipeDistanceY > Math.abs(swipeDistanceX)) return;
+
+        const threshold = 50; // Minimum pixels needed to register as a deliberate swipe
+
+        // ACTION 1: Swipe Right (Open Sidebar)
+        // Safety Lock 2: Only trigger if the swipe started near the left edge (< 40px)
+        if (swipeDistanceX > threshold && touchStartX < 40) {
+            if (!sidebar.classList.contains('open')) {
+                sidebar.classList.add('open');
+                
+                // Update hamburger icon to 'X'
+                if (mobileBtn) {
+                    const iconEl = mobileBtn.querySelector('i');
+                    if (iconEl) {
+                        iconEl.setAttribute('data-lucide', 'x');
+                        if (window.lucide) lucide.createIcons();
+                    }
+                }
+            }
+        }
+
+        // ACTION 2: Swipe Left (Close Sidebar)
+        // Can happen anywhere on the screen as long as the sidebar is currently open
+        if (swipeDistanceX < -threshold) {
+            if (sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+                
+                // Reset hamburger icon to 'Menu'
+                if (mobileBtn) {
+                    const iconEl = mobileBtn.querySelector('i');
+                    if (iconEl) {
+                        iconEl.setAttribute('data-lucide', 'menu');
+                        if (window.lucide) lucide.createIcons();
+                    }
+                }
+            }
+        }
+    };
+
+    // Listen for the start of the touch
+    document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].clientX;
+        touchStartY = e.changedTouches[0].clientY;
+    }, { passive: true });
+
+    // Listen for the end of the touch and calculate the gesture
+    document.addEventListener('touchend', (e) => {
+        touchEndX = e.changedTouches[0].clientX;
+        touchEndY = e.changedTouches[0].clientY;
+        
+        // Only run the gesture logic if we are on a mobile-sized screen
+        if (window.innerWidth <= 900) {
+            handleGesture();
+        }
+    }, { passive: true });
+
     // 4. Scroll Reveal Animations
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {

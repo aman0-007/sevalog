@@ -5,6 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SevaLog | Empowering Communities</title>
     
+    <!-- ========================================== -->
+    <!-- INSTANT AUTH REDIRECT (Prevents Layout Flash) -->
+    <!-- ========================================== -->
+    <script>
+        (function() {
+            const token = localStorage.getItem('samithi_token');
+            const userStr = localStorage.getItem('samithi_user');
+            
+            if (token && userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    // Routes based on user role from the root index file
+                    const dest = user.role === 'admin' ? 'frontend/admin/admin.html' : 'frontend/volunteer/dashboard.html';
+                    
+                    // Instantly warp to dashboard without saving index.html in the Back Button history
+                    window.location.replace(dest);
+                } catch (e) {
+                    // Fail silently if storage is corrupted
+                    localStorage.removeItem('samithi_token');
+                    localStorage.removeItem('samithi_user');
+                }
+            }
+        })();
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -223,7 +248,6 @@
 
     <script src="frontend/public-main.js"></script>
     <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
     <script src="js/home.js"></script>
     <script src="js/pwa.js"></script>
     <script src="js/protect.js"></script>
