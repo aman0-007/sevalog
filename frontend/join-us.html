@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Join the Mission | SevaLog</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="public-layout.css">
     <link rel="stylesheet" href="join-us.css">
@@ -21,6 +24,7 @@
     <!-- Theme Color for Browser Chrome -->
     <meta name="theme-color" content="#3B82F6">
 </head>
+
 <body>
 
     <div class="auth-container">
@@ -30,7 +34,8 @@
                     <i data-lucide="heart"></i> SevaLog
                 </a>
                 <h1>Start your <span class="text-gradient">Seva Journey.</span></h1>
-                <p>Join a community of students making a real impact. Complete your profile to get personalized recommendations.</p>
+                <p>Join a community of students making a real impact. Complete your profile to get personalized
+                    recommendations.</p>
             </div>
         </div>
 
@@ -48,28 +53,33 @@
 
                 <form id="registration-form">
                     <div class="form-grid">
-                        
+
                         <div class="form-section-title full-width">Personal Details</div>
-                        
+
                         <div class="input-group">
                             <label>First Name</label>
-                            <div class="input-field"><i data-lucide="user"></i><input type="text" id="first_name" placeholder="John" required></div>
+                            <div class="input-field"><i data-lucide="user"></i><input type="text" id="first_name"
+                                    placeholder="John" required></div>
                         </div>
                         <div class="input-group">
                             <label>Last Name</label>
-                            <div class="input-field"><i data-lucide="user"></i><input type="text" id="last_name" placeholder="Doe" required></div>
+                            <div class="input-field"><i data-lucide="user"></i><input type="text" id="last_name"
+                                    placeholder="Doe" required></div>
                         </div>
                         <div class="input-group">
                             <label>Email</label>
-                            <div class="input-field"><i data-lucide="mail"></i><input type="email" id="email" placeholder="john@example.com" required></div>
+                            <div class="input-field"><i data-lucide="mail"></i><input type="email" id="email"
+                                    placeholder="john@example.com" required></div>
                         </div>
                         <div class="input-group">
                             <label>Phone</label>
-                            <div class="input-field"><i data-lucide="phone"></i><input type="tel" id="phone_number" placeholder="+91..." required></div>
+                            <div class="input-field"><i data-lucide="phone"></i><input type="tel" id="phone_number"
+                                    placeholder="+91..." required></div>
                         </div>
                         <div class="input-group">
                             <label>Date of Birth</label>
-                            <div class="input-field"><i data-lucide="calendar"></i><input type="date" id="date_of_birth"></div>
+                            <div class="input-field"><i data-lucide="calendar"></i><input type="date"
+                                    id="date_of_birth"></div>
                         </div>
                         <div class="input-group">
                             <label>Gender</label>
@@ -87,107 +97,138 @@
                             <div class="input-field"><i data-lucide="droplet"></i>
                                 <select id="blood_group">
                                     <option value="" disabled selected>Select Blood Group</option>
-                                    <option value="A+">A+</option><option value="A-">A-</option>
-                                    <option value="B+">B+</option><option value="B-">B-</option>
-                                    <option value="O+">O+</option><option value="O-">O-</option>
-                                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
                                 </select>
                             </div>
                         </div>
                         <div class="input-group">
                             <label>Education Level</label>
-                            <div class="input-field"><i data-lucide="book-open"></i><input type="text" id="education_level" placeholder="e.g. Undergraduate"></div>
+                            <div class="input-field"><i data-lucide="book-open"></i><input type="text"
+                                    id="education_level" placeholder="e.g. Undergraduate"></div>
                         </div>
-                        
+
                         <!-- DB Schema Update: Separated College and Profession -->
                         <div class="input-group">
-                            <label>College Name <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(Provide at least one)</span></label>
-                            <div class="input-field"><i data-lucide="building"></i><input type="text" id="college_name" placeholder="e.g. IIT Bombay"></div>
+                            <label>College Name <span
+                                    style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(Provide at
+                                    least one)</span></label>
+                            <div class="input-field"><i data-lucide="building"></i><input type="text" id="college_name"
+                                    placeholder="e.g. IIT Bombay"></div>
                         </div>
                         <div class="input-group">
-                            <label>Profession <span style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(Provide at least one)</span></label>
-                            <div class="input-field"><i data-lucide="briefcase"></i><input type="text" id="profession" placeholder="e.g. Software Engineer"></div>
+                            <label>Profession <span
+                                    style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(Provide at
+                                    least one)</span></label>
+                            <div class="input-field"><i data-lucide="briefcase"></i><input type="text" id="profession"
+                                    placeholder="e.g. Software Engineer"></div>
                         </div>
 
                         <div class="form-section-title full-width">Location Details</div>
-                        
+
                         <div class="input-group full-width">
                             <label>Residential Address</label>
-                            <div class="input-field"><i data-lucide="home"></i><input type="text" id="residential_address" placeholder="Street, Locality..."></div>
+                            <div class="input-field"><i data-lucide="home"></i><input type="text"
+                                    id="residential_address" placeholder="Street, Locality..."></div>
                         </div>
                         <div class="input-group">
                             <label>City</label>
-                            <div class="input-field"><i data-lucide="map"></i><input type="text" id="city" value="Mumbai" required></div>
+                            <div class="input-field"><i data-lucide="map"></i><input type="text" id="city"
+                                    value="Mumbai" required></div>
                         </div>
                         <div class="input-group">
                             <label>State</label>
-                            <div class="input-field"><i data-lucide="map-pin"></i><input type="text" id="state" value="Maharashtra" required></div>
+                            <div class="input-field"><i data-lucide="map-pin"></i><input type="text" id="state"
+                                    value="Maharashtra" required></div>
                         </div>
                         <div class="input-group">
                             <label>Pincode</label>
-                            <div class="input-field"><i data-lucide="hash"></i><input type="text" id="pincode" placeholder="400071"></div>
+                            <div class="input-field"><i data-lucide="hash"></i><input type="text" id="pincode"
+                                    placeholder="400071"></div>
                         </div>
 
                         <div class="form-section-title full-width">Skills & Interests</div>
-                        
+
                         <div class="input-group full-width">
                             <label>Languages Spoken</label>
                             <div class="chip-container">
-                                <label class="chip"><input type="checkbox" name="languages_spoken" value="English"><span>English</span></label>
-                                <label class="chip"><input type="checkbox" name="languages_spoken" value="Hindi"><span>Hindi</span></label>
-                                <label class="chip"><input type="checkbox" name="languages_spoken" value="Marathi"><span>Marathi</span></label>
-                                <label class="chip"><input type="checkbox" name="languages_spoken" value="Gujarati"><span>Gujarati</span></label>
+                                <label class="chip"><input type="checkbox" name="languages_spoken"
+                                        value="English"><span>English</span></label>
+                                <label class="chip"><input type="checkbox" name="languages_spoken"
+                                        value="Hindi"><span>Hindi</span></label>
+                                <label class="chip"><input type="checkbox" name="languages_spoken"
+                                        value="Marathi"><span>Marathi</span></label>
+                                <label class="chip"><input type="checkbox" name="languages_spoken"
+                                        value="Gujarati"><span>Gujarati</span></label>
                             </div>
                         </div>
                         <div class="input-group full-width">
                             <label>Skills</label>
                             <div class="chip-container">
-                                <label class="chip"><input type="checkbox" name="skills" value="Teaching"><span>Teaching</span></label>
-                                <label class="chip"><input type="checkbox" name="skills" value="First Aid"><span>First Aid</span></label>
-                                <label class="chip"><input type="checkbox" name="skills" value="Social Media"><span>Social Media</span></label>
-                                <label class="chip"><input type="checkbox" name="skills" value="Event Mgmt"><span>Event Mgmt</span></label>
+                                <label class="chip"><input type="checkbox" name="skills"
+                                        value="Teaching"><span>Teaching</span></label>
+                                <label class="chip"><input type="checkbox" name="skills" value="First Aid"><span>First
+                                        Aid</span></label>
+                                <label class="chip"><input type="checkbox" name="skills"
+                                        value="Social Media"><span>Social Media</span></label>
+                                <label class="chip"><input type="checkbox" name="skills" value="Event Mgmt"><span>Event
+                                        Mgmt</span></label>
                             </div>
                         </div>
                         <div class="input-group full-width">
                             <label>Interested Activities</label>
                             <div class="chip-container">
-                                <label class="chip"><input type="checkbox" name="interested_activities" value="Environment"><span>Environment</span></label>
-                                <label class="chip"><input type="checkbox" name="interested_activities" value="Education"><span>Education</span></label>
-                                <label class="chip"><input type="checkbox" name="interested_activities" value="Health"><span>Healthcare</span></label>
+                                <label class="chip"><input type="checkbox" name="interested_activities"
+                                        value="Environment"><span>Environment</span></label>
+                                <label class="chip"><input type="checkbox" name="interested_activities"
+                                        value="Education"><span>Education</span></label>
+                                <label class="chip"><input type="checkbox" name="interested_activities"
+                                        value="Health"><span>Healthcare</span></label>
                             </div>
                         </div>
 
                         <div class="form-section-title full-width">Emergency & Health Info</div>
-                        
+
                         <div class="input-group">
                             <label>Emergency Contact Name</label>
-                            <div class="input-field"><i data-lucide="shield-alert"></i><input type="text" id="emergency_contact_name" placeholder="Guardian Name"></div>
+                            <div class="input-field"><i data-lucide="shield-alert"></i><input type="text"
+                                    id="emergency_contact_name" placeholder="Guardian Name"></div>
                         </div>
                         <div class="input-group">
                             <label>Emergency Contact Relation</label>
-                            <div class="input-field"><i data-lucide="users"></i><input type="text" id="emergency_contact_relation" placeholder="e.g. Parent, Sibling"></div>
+                            <div class="input-field"><i data-lucide="users"></i><input type="text"
+                                    id="emergency_contact_relation" placeholder="e.g. Parent, Sibling"></div>
                         </div>
                         <div class="input-group">
                             <label>Emergency Number</label>
-                            <div class="input-field"><i data-lucide="phone-call"></i><input type="tel" id="emergency_contact_number" placeholder="+91..."></div>
+                            <div class="input-field"><i data-lucide="phone-call"></i><input type="tel"
+                                    id="emergency_contact_number" placeholder="+91..."></div>
                         </div>
                         <div class="input-group full-width">
                             <label>Medical Conditions (If any)</label>
                             <div class="input-field">
-                                <textarea id="medical_conditions" rows="2" placeholder="Important for physical seva activities..."></textarea>
+                                <textarea id="medical_conditions" rows="2"
+                                    placeholder="Important for physical seva activities..."></textarea>
                             </div>
                         </div>
 
                         <div class="form-section-title full-width" style="margin-top: 10px;">Security</div>
-                        
+
                         <div class="input-group full-width">
                             <label>Create Password</label>
-                            <div class="input-field"><i data-lucide="lock"></i><input type="password" id="password_hash" placeholder="••••••••" required></div>
+                            <div class="input-field"><i data-lucide="lock"></i><input type="password" id="password_hash"
+                                    placeholder="••••••••" required></div>
                         </div>
                     </div>
 
                     <button type="submit" class="btn btn-primary auth-btn">Create Profile</button>
-                    
+
                     <div class="mobile-login-hint">
                         Already have an account? <a href="login.html">Login here</a>
                     </div>
@@ -199,7 +240,9 @@
     <script src="public-main.js"></script>
     <script src="../js/api.js"></script>
     <script src="../js/auth.js"></script>
-        <script src="../public-main.js"></script>
-        <script src="../js/pwa.js"></script>
-    </body>
+    <script src="../public-main.js"></script>
+    <script src="../js/pwa.js"></script>
+    <script src="../js/protect.js"></script>
+</body>
+
 </html>

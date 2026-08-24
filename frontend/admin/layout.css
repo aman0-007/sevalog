@@ -1,6 +1,38 @@
 /* =========================================
    LAYOUT.CSS (Core, Themes, Sidebar, Header)
    ========================================= */
+/* =========================================
+   PWA NATIVE APP PROTECTIONS
+   ========================================= */
+
+/* 1. Disable text selection globally */
+body {
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    
+    /* Disable iOS long-press popup menu */
+    -webkit-touch-callout: none; 
+    
+    /* Disable double-tap to zoom */
+    touch-action: manipulation;
+}
+
+/* 2. CRITICAL EXCEPTION: Allow users to type in forms */
+input, textarea {
+    -webkit-user-select: auto !important;
+    -ms-user-select: auto !important;
+    user-select: auto !important;
+}
+
+/* 3. Disable "Ghost Dragging" on images and links */
+img, a {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+}
 
 /* 1. Remove the blue flash when tapping links/buttons on mobile */
 * {
