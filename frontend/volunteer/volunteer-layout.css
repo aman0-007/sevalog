@@ -133,7 +133,7 @@ body {
 }
 
 .mobile-menu-btn {
-    display: none;
+    display: none !important;
 }
 
 /* --- MAIN DASHBOARD AREA --- */
@@ -147,7 +147,7 @@ body {
 /* --- MOBILE TWEAKS --- */
 @media (max-width: 900px) {
     .mobile-menu-btn {
-        display: inline-flex;
+        display: inline-flex !important;
     }
     .user-profile-menu span {
         display: none;

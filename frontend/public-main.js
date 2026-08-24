@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const userProfileMenu = document.querySelector('.user-profile-menu');
     if (userProfileMenu) {
         userProfileMenu.addEventListener('click', () => {
-            window.location.href = 'volunteer/settings.html';
+            window.location.href = '../volunteer/settings.html';
         });
     }
 
