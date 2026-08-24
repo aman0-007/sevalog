@@ -88,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let sidebarWidth = 0;
 
     const sidebar = document.getElementById('sidebar');
-    const mobileBtn = document.getElementById('mobile-menu-btn');
 
     if (sidebar) {
         document.addEventListener('touchstart', (e) => {
