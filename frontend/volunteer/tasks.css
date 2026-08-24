@@ -167,7 +167,35 @@
 .notification-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (max-width: 768px) {
+    /* 1. Keep your existing tab content padding */
     .tab-content { padding: 20px 16px; }
+
+    /* 2. Fix the Header squishing issue caused by iOS Safe Areas */
+    .top-bar {
+        height: auto !important; 
+        min-height: var(--topbar-height);
+        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        padding-bottom: 12px !important;
+    }
+    
+    /* 3. Truncate long titles so they don't push the profile menu off-screen */
+    .page-title h3 {
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px; 
+    }
+
+    /* 4. Adjust Tabs padding for small screens */
+    .tab-header {
+        padding: 0 16px;
+    }
+    
+    .tab-btn {
+        padding: 16px 20px;
+        font-size: 13px;
+    }
 }
 
 /* --- TASK GROUP HEADERS --- */

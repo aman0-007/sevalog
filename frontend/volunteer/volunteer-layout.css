@@ -162,7 +162,7 @@ body {
         box-shadow: 4px 0 24px rgba(15, 23, 42, 0.12);
     }
     .sidebar.open {
-        transform: translateX(0);
+        transform: translateX(0) !important; 
     }
     .app-content {
         margin-left: 0;
@@ -189,7 +189,11 @@ body {
 }
 
 /* Base Classes */
-.animate-sidebar { animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@media (min-width: 901px) {
+    .animate-sidebar { 
+        animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; 
+    }
+}
 .animate-topbar { animation: slideInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
 .animate-up {

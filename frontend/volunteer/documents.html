@@ -26,7 +26,7 @@
 </head>
 <body>
 
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar animate-sidebar" id="sidebar">
         <div class="sidebar-logo"><i data-lucide="heart" style="color: var(--accent-primary);"></i> SevaLog</div>
         <nav class="sidebar-nav">
             <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
@@ -42,7 +42,7 @@
     </aside>
 
     <div class="app-content">
-        <header class="top-bar">
+        <header class="top-bar animate-topbar">
             <button id="mobile-menu-btn" class="icon-btn mobile-menu-btn" aria-label="Open navigation"><i data-lucide="menu"></i></button>
             <div class="page-title"><h3>Verified Documents</h3></div>
             <div style="display: flex; align-items: center; gap: 20px;">
@@ -55,7 +55,7 @@
         </header>
 
         <main class="main-viewport">
-            <div id="certificates-container" style="display: flex; flex-direction: column; gap: 40px;">
+            <div id="certificates-container" class="animate-up delay-1" style="display: flex; flex-direction: column; gap: 40px;">
                 <div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading your verified certificates...</div>
             </div>
         </main>

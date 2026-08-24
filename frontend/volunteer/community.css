@@ -80,3 +80,23 @@
 @media (max-width: 900px) {
     .community-grid { grid-template-columns: 1fr; }
 }
+
+/* --- ADD THIS NEW BLOCK FOR MOBILE HEADER FIXES --- */
+@media (max-width: 768px) {
+    /* 1. Fix the Header squishing issue caused by iOS Safe Areas */
+    .top-bar {
+        height: auto !important; 
+        min-height: var(--topbar-height);
+        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        padding-bottom: 12px !important;
+    }
+    
+    /* 2. Truncate long titles so they don't push the profile menu off-screen */
+    .page-title h3 {
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px; 
+    }
+}
