@@ -168,3 +168,37 @@ body {
         margin-left: 0;
     }
 }
+
+/* =========================================
+   PAGE INITIAL LOAD ANIMATIONS
+   ========================================= */
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInDown {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes smoothFadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Base Classes */
+.animate-sidebar { animation: slideInLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-topbar { animation: slideInDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.animate-up {
+    opacity: 0; /* Hide initially to prevent the blink */
+    animation: smoothFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Staggered Delays for the "Waterfall" effect */
+.delay-1 { animation-delay: 0.05s; }
+.delay-2 { animation-delay: 0.15s; }
+.delay-3 { animation-delay: 0.25s; }
+.delay-4 { animation-delay: 0.35s; }

@@ -1,7 +1,7 @@
 // ==========================================
 // API.JS (Optimized Fetch Core)
 // ==========================================
-const BASE_URL = 'http://192.168.1.8:5000/api';
+const BASE_URL = 'https://sai9.tech/api';
 
 const ApiClient = {
     _tokenCache: null, // Memory cache for faster access

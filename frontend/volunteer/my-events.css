@@ -17,18 +17,27 @@
     border-bottom: 1px solid var(--border-light);
     background: var(--bg-surface);
     padding: 0 24px;
+    overflow-x: auto; 
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Hides scrollbar on Firefox */
+}
+
+.tab-header::-webkit-scrollbar {
+    display: none; 
 }
 
 .tab-btn {
-    padding: 20px 32px;
+    padding: 20px 24px; 
     background: transparent;
     border: none;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
     position: relative;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease;    
+    white-space: nowrap; 
+    flex-shrink: 0; 
 }
 
 .tab-btn:hover { color: var(--text-main); }
@@ -327,4 +336,33 @@
     transform: scale(1.2); 
     transform-origin: center center;
     border-radius: 16px;
+}
+
+/* --- MOBILE RESPONSIVENESS FIXES --- */
+@media (max-width: 768px) {
+    /* 1. Fix the Header squishing issue caused by iOS Safe Areas */
+    .top-bar {
+        height: auto !important; /* Overrides the strict 70px height */
+        min-height: var(--topbar-height);
+        padding-top: calc(env(safe-area-inset-top) + 12px) !important;
+        padding-bottom: 12px !important;
+    }
+    
+    /* 2. Truncate long titles so they don't push the profile menu off-screen */
+    .page-title h3 {
+        font-size: 18px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px; 
+    }
+
+    /* 3. Adjust Tabs padding for small screens */
+    .tab-header {
+        padding: 0 16px;
+    }
+    .tab-btn {
+        padding: 16px 20px;
+        font-size: 13px;
+    }
 }

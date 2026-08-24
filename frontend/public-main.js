@@ -42,6 +42,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // ==========================================
+    // 3.5. Close Sidebar on Outside Click (Mobile)
+    // ==========================================
+    document.addEventListener('click', (e) => {
+        const sidebar = document.getElementById('sidebar');
+        const mobileBtn = document.getElementById('mobile-menu-btn');
+        
+        // Check if the sidebar exists and is currently open
+        if (sidebar && sidebar.classList.contains('open')) {
+            // If the click was NOT inside the sidebar, and NOT on the menu button itself
+            if (!sidebar.contains(e.target) && (!mobileBtn || !mobileBtn.contains(e.target))) {
+                sidebar.classList.remove('open');
+                
+                // Reset the hamburger icon back to 'menu'
+                if (mobileBtn) {
+                    const iconElement = mobileBtn.querySelector('i');
+                    if (iconElement) {
+                        iconElement.setAttribute('data-lucide', 'menu');
+                        if (window.lucide) lucide.createIcons();
+                    }
+                }
+            }
+        }
+    });
+
+    // ==========================================
+    // 3.6. User Avatar to Settings Routing
+    // ==========================================
+    const userProfileMenu = document.querySelector('.user-profile-menu');
+    if (userProfileMenu) {
+        userProfileMenu.addEventListener('click', () => {
+            window.location.href = 'volunteer/settings.html';
+        });
+    }
+
     // 4. Scroll Reveal Animations
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
