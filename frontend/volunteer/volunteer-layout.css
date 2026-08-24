@@ -210,6 +210,9 @@ body {
 /* =========================================
    GLOBAL MOBILE HEADER FIX (Applies to ALL pages)
    ========================================= */
+/* =========================================
+   GLOBAL MOBILE HEADER FIX (Applies to ALL pages)
+   ========================================= */
 @media (max-width: 900px) {
     /* 1. Fix the Header squishing issue caused by iOS Safe Areas */
     .top-bar {
@@ -217,14 +220,29 @@ body {
         min-height: var(--topbar-height);
         padding-top: calc(env(safe-area-inset-top) + 12px) !important;
         padding-bottom: 12px !important;
+        /* NEW: Add a strict gap so the 3 sections never overlap */
+        gap: 12px; 
+    }
+
+    /* 2. CRITICAL: Lock the right-side icons so they can NEVER be pushed off-screen */
+    .top-bar > div:last-child {
+        flex-shrink: 0;
+        gap: 10px !important; /* Overrides your inline 20px gap to save screen space */
+    }
+
+    /* 3. Force the title area to act as a flexible, shrinkable container */
+    .page-title {
+        flex: 1; /* Takes up all remaining middle space */
+        min-width: 0; /* The magic property that enables ellipsis inside flexbox! */
+        display: flex;
+        justify-content: center; /* Keeps the title beautifully centered */
     }
     
-    /* 2. Truncate long titles so they don't push the profile menu off-screen */
     .page-title h3 {
-        font-size: 18px;
+        font-size: 17px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        max-width: 140px; 
+        max-width: 100%;
     }
 }
