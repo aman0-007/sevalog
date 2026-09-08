@@ -1,5 +1,5 @@
-const CACHE_NAME = 'sevalog-cache-v4';
-const DYNAMIC_CACHE = 'sevalog-dynamic-v4';
+const CACHE_NAME = 'sevalog-cache-v5';
+const DYNAMIC_CACHE = 'sevalog-dynamic-v5';
 
 // Assets essential for the app shell
 const STATIC_ASSETS = [
