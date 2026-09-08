@@ -45,16 +45,30 @@
                     <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
                 </a>
                 <a href="events.html" class="nav-item" title="Events Management">
-                    <i data-lucide="calendar"></i> <span class="nav-text">Events</span>
+                    <i data-lucide="calendar"></i> <span class="nav-text">Events Management</span>
                 </a>
                 <a href="volunteers.html" class="nav-item" title="Volunteers">
                     <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
                 </a>
+                <a href="gallery.html" class="nav-item" title="Gallery">
+                    <i data-lucide="image"></i> <span class="nav-text">Gallery</span>
+                </a>
                 <a href="admin-tasks.html" class="nav-item active" title="Tasks">
                     <i data-lucide="check-square"></i> <span class="nav-text">Tasks</span>
                 </a>
+                <div style="margin-top: auto; padding-top: 32px; padding-bottom: 8px; border-top: 1px solid var(--border);">
+                    <a href="#" id="logout-btn" class="nav-item" style="color: #EF4444;">
+                        <i data-lucide="log-out"></i> <span class="nav-text">Log Out</span>
+                    </a>
+                </div>
             </nav>
         </aside>
+
+        <script>
+            if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+        </script>
 
         <main class="main-content" id="main-content">
             <!-- TOP HEADER -->

@@ -30,3 +30,56 @@
 .activity-item { display: flex; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); }
 .activity-item:last-child { border-bottom: none; padding-bottom: 0; }
 .loading-text { color: var(--text-muted); font-size: 14px; }
+
+/* =========================================
+   MOBILE RESPONSIVENESS FIXES
+   ========================================= */
+@media (max-width: 768px) {
+    /* 1. Force the grid into a single row of 3 columns */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    /* 2. Re-orient the cards to stack the icon on top of the text */
+    .stat-card {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 16px 8px; /* Tighter padding to fit small screens */
+        gap: 8px;
+    }
+
+    /* 3. Shrink the icons */
+    .stat-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+    }
+    
+    .stat-icon i {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* 4. Scale down typography to prevent clipping */
+    .stat-details p {
+        font-size: 11px;
+        line-height: 1.2;
+    }
+
+    .stat-details h3 {
+        font-size: 20px;
+        margin-top: 2px;
+    }
+
+    /* 5. Clean up Header Spacing */
+    .page-header {
+        margin-bottom: 24px;
+    }
+    
+    .page-header h1 {
+        font-size: 22px;
+    }
+}

@@ -107,13 +107,9 @@
             <div class="content-wrapper">
                 <div class="page-header">
                     <div>
-                        <h1>Dashboard Overview</h1>
-                        <p>Welcome back! Here's the latest impact of your Seva.</p>
+                        <h1>Dashboard</h1>
+                        <!-- <p>Welcome back! Here's the latest impact of your Seva.</p> -->
                     </div>
-                    <!-- Updated Primary Button -->
-                    <button class="primary-btn">
-                        <i data-lucide="plus"></i> New Event
-                    </button>
                 </div>
 
                 <!-- STATS GRID -->
@@ -121,21 +117,22 @@
                     <div class="stat-card">
                         <div class="stat-icon blue"><i data-lucide="users"></i></div>
                         <div class="stat-details">
-                            <p>Total Volunteers</p>
+                            <p>Volunteers</p>
                             <h3 id="stat-volunteers">--</h3>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon green"><i data-lucide="calendar-check"></i></div>
                         <div class="stat-details">
-                            <p>Upcoming Events</p>
+                            <p>Upcoming</p>
                             <h3 id="stat-events">--</h3>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon purple"><i data-lucide="activity"></i></div>
                         <div class="stat-details">
-                            <p>Active Participants</p>
+                            <!-- Fixed label to match the JS data injection -->
+                            <p>Seva Hours</p>
                             <h3 id="stat-participants">--</h3>
                         </div>
                     </div>
@@ -143,7 +140,10 @@
 
                 <!-- RECENT ACTIVITY SECTION -->
                 <section class="recent-activity">
-                    <h2>Recent Registrations</h2>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Recent Activity</h2>
+                        <a href="volunteers.html" style="font-size: 13px; font-weight: 600; color: #3B82F6; text-decoration: none;">View All</a>
+                    </div>
                     <div class="activity-list" id="recent-reg-list">
                         <p class="loading-text">Fetching data...</p>
                     </div>
