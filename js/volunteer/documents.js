@@ -189,8 +189,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Generate the QR Code directly into the box we just created
         const qrContainer = document.getElementById(`cert-qr-${cert.certificate_id}`);
         qrContainer.innerHTML = ""; // Clear it just in case
+        const verifyUrl = `${window.location.origin}/verify?id=${encodeURIComponent(cert.certificate_id)}`;
         new QRCode(qrContainer, {
-            text: `https://sevalog.org/verify/${cert.certificate_id}`, // A standard verification URL
+            text: verifyUrl,
             width: 70,
             height: 70,
             colorDark: "#0F172A",
@@ -219,6 +220,29 @@ window.downloadCertificate = async function(btnElement, certId) {
     if (window.lucide) lucide.createIcons();
 
     try {
+        // Query GET /api/volunteer/certificates/{id}/download
+        try {
+            const downloadRes = await ApiClient.request(`/volunteer/certificates/${encodeURIComponent(certId)}/download`, 'GET');
+            if (downloadRes && downloadRes.success && downloadRes.data) {
+                const freshData = downloadRes.data;
+                // If backend returns updated fields, reflect them dynamically in the DOM
+                if (freshData.recipient_name || freshData.volunteer_name) {
+                    const nameEl = document.querySelector(`#cert-frame-${certId} .cert-name`);
+                    if (nameEl) nameEl.textContent = freshData.recipient_name || freshData.volunteer_name;
+                }
+                if (freshData.event_title) {
+                    const titleEl = document.querySelector(`#cert-frame-${certId} strong`);
+                    if (titleEl) titleEl.textContent = freshData.event_title;
+                }
+                if (freshData.hours_credited) {
+                    const hrsEl = document.querySelector(`#cert-frame-${certId} .seal-hrs`);
+                    if (hrsEl) hrsEl.textContent = freshData.hours_credited;
+                }
+            }
+        } catch (downloadApiErr) {
+            console.log("[Documents] Using cached modal canvas state:", downloadApiErr.message);
+        }
+
         const certFrame = document.getElementById(`cert-frame-${certId}`);
         const canvas = await html2canvas(certFrame, {
             scale: 3, 

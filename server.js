@@ -24,6 +24,14 @@ app.use(express.static(path.join(__dirname, 'frontend', 'volunteer'), {
 }));
 
 // Route fallback helper for direct clean URLs
+app.get('/verify', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'verify.html'));
+});
+
+app.get('/verify/:id', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'verify.html'));
+});
+
 app.use((req, res, next) => {
     const frontendPath = path.join(__dirname, 'frontend', req.path);
     if (fs.existsSync(frontendPath) && fs.statSync(frontendPath).isFile()) {

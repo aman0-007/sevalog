@@ -114,7 +114,7 @@ const ApiClient = {
 
             if (!response.ok) {
                 // Handle unauthorized access (Session Expiry) gracefully
-                if (response.status === 401 && !endpoint.includes('/auth/login')) {
+                if (response.status === 401 && !endpoint.includes('/auth/login') && !endpoint.startsWith('/public/')) {
                     ApiClient.clearSession();
                 }
                 // Fallback to error or message depending on backend structure
