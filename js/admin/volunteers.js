@@ -3,6 +3,7 @@
 // ==========================================
 
 let volunteersData = [];
+let currentViewingUser = null;
 
 // 1. Fetch Lightweight Profiles from Database
 async function loadVolunteers() {
@@ -81,6 +82,7 @@ window.viewProfile = async function(userId) {
     try {
         const response = await ApiClient.request(`/admin/volunteers/${userId}`, 'GET');
         const user = response.data;
+        currentViewingUser = user;
 
         // Header
         const fullName = `${user.first_name} ${user.last_name}`.trim();
@@ -151,27 +153,38 @@ window.viewProfile = async function(userId) {
 
         if (user.attendance_history && user.attendance_history.length > 0) {
             let historyHtml = `
-                <h4 style="margin-bottom:12px; font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; border-bottom: 1px solid var(--border); padding-bottom: 8px;">Recent Event History</h4>
-                <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <h4 style="margin: 0; font-size: 13px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; border: none; padding: 0;">Recent Event History</h4>
+                    <span style="font-size: 11.5px; color: var(--text-muted); font-weight: 500;">${user.attendance_history.length} Event Record(s)</span>
+                </div>
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
                     <table style="width: 100%; font-size: 13px; border-collapse: collapse; text-align: left;">
-                        <thead style="position: sticky; top: 0; background: var(--bg-color); border-bottom: 1px solid var(--border);">
+                        <thead style="position: sticky; top: 0; background: var(--bg-color); border-bottom: 1px solid var(--border); z-index: 1;">
                             <tr>
                                 <th style="padding: 10px; font-weight: 600;">Event</th>
                                 <th style="padding: 10px; font-weight: 600;">Date</th>
                                 <th style="padding: 10px; font-weight: 600;">Status</th>
                                 <th style="padding: 10px; font-weight: 600;">Hours</th>
+                                <th style="padding: 10px; font-weight: 600; text-align: right;">Action</th>
                             </tr>
                         </thead>
                         <tbody>`;
             
-            historyHtml += user.attendance_history.map(record => {
-                const dateStr = new Date(record.event_date).toLocaleDateString('en-IN');
-                const statusColor = record.status === 'present' ? '#10B981' : (['withdrawn', 'absent'].includes(record.status) ? '#EF4444' : 'var(--text-muted)');
+            historyHtml += user.attendance_history.map((record, index) => {
+                const dateStr = record.event_date ? new Date(record.event_date).toLocaleDateString('en-IN') : '--';
+                const status = (record.status || 'registered').toLowerCase();
+                const statusColor = status === 'present' ? '#10B981' : (['withdrawn', 'absent'].includes(status) ? '#EF4444' : 'var(--text-muted)');
+                const hours = parseFloat(record.hours_logged || record.hours_attended || 0).toFixed(1);
                 return `<tr style="border-bottom: 1px solid var(--border);">
-                    <td style="padding: 10px;">${record.title}</td>
-                    <td style="padding: 10px;">${dateStr}</td>
-                    <td style="padding: 10px; color: ${statusColor}; font-weight: 600;">${record.status.toUpperCase()}</td>
-                    <td style="padding: 10px;">${parseFloat(record.hours_logged || 0).toFixed(1)}</td>
+                    <td style="padding: 10px; font-weight: 500;">${record.title || 'Untitled Event'}</td>
+                    <td style="padding: 10px; color: var(--text-muted);">${dateStr}</td>
+                    <td style="padding: 10px; color: ${statusColor}; font-weight: 600;">${status.toUpperCase()}</td>
+                    <td style="padding: 10px; font-weight: 600;">${hours} hrs</td>
+                    <td style="padding: 10px; text-align: right;">
+                        <button type="button" class="btn-secondary" style="padding: 3px 8px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; cursor: pointer;" onclick="openPatchAttendanceModal(event, ${index})" title="Adjust hours or status (PATCH)">
+                            <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i> Adjust
+                        </button>
+                    </td>
                 </tr>`;
             }).join('');
             
@@ -236,5 +249,152 @@ window.closeModal = function() {
     document.getElementById('profileModal').classList.remove('active'); 
 }
 
-// 6. Initialize Data on Load
+// ==========================================
+// 6. ATTENDANCE PATCH MODAL (PATCH /api/admin/events/{id}/attendance/{regId})
+// ==========================================
+
+function toLocalDatetimeString(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+window.openPatchAttendanceModal = function(e, index) {
+    if (e) e.stopPropagation();
+    if (!currentViewingUser || !currentViewingUser.attendance_history) return;
+
+    const record = currentViewingUser.attendance_history[index];
+    if (!record) return;
+
+    // Resolve event ID and registration ID
+    const eventId = record.event_id || record.eventId || (record.event && record.event.id) || record.id;
+    const regId = record.registration_id || record.reg_id || record.attendance_id || (record.event_id ? record.id : null) || record.id;
+    const userId = currentViewingUser.user_id || currentViewingUser.id;
+
+    document.getElementById('patch-reg-id').value = regId || '';
+    document.getElementById('patch-event-id').value = eventId || '';
+    document.getElementById('patch-user-id').value = userId || '';
+
+    // Context Card
+    document.getElementById('patch-event-title').innerText = record.title || 'Event Record';
+    const dateStr = record.event_date ? new Date(record.event_date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : 'Date N/A';
+    document.getElementById('patch-event-date').innerText = dateStr;
+    const volName = `${currentViewingUser.first_name || ''} ${currentViewingUser.last_name || ''}`.trim() || 'Volunteer';
+    document.getElementById('patch-volunteer-name').innerText = volName;
+
+    // Form inputs
+    const statusSelect = document.getElementById('patch-status');
+    if (statusSelect) statusSelect.value = (record.status || 'registered').toLowerCase();
+
+    const hoursInput = document.getElementById('patch-hours');
+    if (hoursInput) hoursInput.value = parseFloat(record.hours_logged || record.hours_attended || 0);
+
+    const checkInInput = document.getElementById('patch-checkin-time');
+    if (checkInInput) checkInInput.value = toLocalDatetimeString(record.check_in_time);
+
+    const checkOutInput = document.getElementById('patch-checkout-time');
+    if (checkOutInput) checkOutInput.value = toLocalDatetimeString(record.check_out_time);
+
+    const remarksInput = document.getElementById('patch-remarks');
+    if (remarksInput) remarksInput.value = record.remarks || record.notes || '';
+
+    const modal = document.getElementById('patchAttendanceModal');
+    if (modal) modal.classList.add('active');
+    if (window.lucide) lucide.createIcons();
+};
+
+window.closePatchAttendanceModal = function() {
+    const modal = document.getElementById('patchAttendanceModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.setPatchHoursPreset = function(hrs) {
+    const input = document.getElementById('patch-hours');
+    if (input) input.value = hrs;
+};
+
+window.setPatchCheckInNow = function() {
+    const input = document.getElementById('patch-checkin-time');
+    if (input) input.value = toLocalDatetimeString(new Date().toISOString());
+};
+
+window.clearPatchCheckIn = function() {
+    const input = document.getElementById('patch-checkin-time');
+    if (input) input.value = '';
+};
+
+window.setPatchCheckOutNow = function() {
+    const input = document.getElementById('patch-checkout-time');
+    if (input) input.value = toLocalDatetimeString(new Date().toISOString());
+};
+
+window.clearPatchCheckOut = function() {
+    const input = document.getElementById('patch-checkout-time');
+    if (input) input.value = '';
+};
+
+window.savePatchAttendance = async function(e) {
+    if (e) e.preventDefault();
+
+    const eventId = document.getElementById('patch-event-id')?.value;
+    const regId = document.getElementById('patch-reg-id')?.value;
+    const userId = document.getElementById('patch-user-id')?.value;
+    const statusVal = document.getElementById('patch-status')?.value;
+    const hoursVal = document.getElementById('patch-hours')?.value;
+    const checkInVal = document.getElementById('patch-checkin-time')?.value;
+    const checkOutVal = document.getElementById('patch-checkout-time')?.value;
+    const remarksVal = document.getElementById('patch-remarks')?.value?.trim();
+
+    if (!eventId || !regId) {
+        alert("Missing event or registration identifier for this record.");
+        return;
+    }
+
+    const submitBtn = document.getElementById('patch-submit-btn');
+    const origText = submitBtn ? submitBtn.innerText : '';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Saving...';
+    }
+
+    try {
+        // Construct partial PATCH payload
+        const payload = {};
+        if (statusVal) payload.status = statusVal;
+        if (hoursVal !== '' && !isNaN(hoursVal)) payload.hours_logged = parseFloat(hoursVal);
+        if (checkInVal) {
+            payload.check_in_time = new Date(checkInVal).toISOString();
+        } else {
+            payload.check_in_time = null;
+        }
+        if (checkOutVal) {
+            payload.check_out_time = new Date(checkOutVal).toISOString();
+        } else {
+            payload.check_out_time = null;
+        }
+        if (remarksVal) payload.remarks = remarksVal;
+
+        // Execute PATCH /api/admin/events/{id}/attendance/{regId}
+        await ApiClient.request(`/admin/events/${eventId}/attendance/${regId}`, 'PATCH', payload);
+
+        closePatchAttendanceModal();
+
+        // Refresh the profile data and background table so updated hours & status display instantly
+        if (userId) {
+            await viewProfile(userId);
+        }
+        loadVolunteers();
+    } catch (err) {
+        alert(`Failed to update attendance record: ${err.message}`);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = origText;
+        }
+    }
+};
+
+// 7. Initialize Data on Load
 document.addEventListener('DOMContentLoaded', loadVolunteers);

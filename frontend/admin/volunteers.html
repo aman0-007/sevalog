@@ -216,6 +216,95 @@
         </div>
     </div>
 
+    <!-- Adjust Event Attendance Modal (PATCH /api/admin/events/{id}/attendance/{regId}) -->
+    <div class="modal-overlay" id="patchAttendanceModal" style="z-index: 300;">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <div>
+                    <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Adjust Event Attendance</h2>
+                    <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0 0;">Update logged hours, status & audit details</p>
+                </div>
+                <button class="icon-btn" onclick="closePatchAttendanceModal()"><i data-lucide="x"></i></button>
+            </div>
+
+            <form id="patchAttendanceForm" onsubmit="savePatchAttendance(event)">
+                <input type="hidden" id="patch-reg-id" value="">
+                <input type="hidden" id="patch-event-id" value="">
+                <input type="hidden" id="patch-user-id" value="">
+
+                <!-- Event & Volunteer Context Card -->
+                <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;">
+                    <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;" id="patch-event-title">Event Title</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+                        <span id="patch-event-date">Date</span>
+                        <span id="patch-volunteer-name" style="font-weight: 500; color: var(--accent);">Volunteer</span>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group">
+                    <label class="form-label" for="patch-status">Attendance Status <span style="color:red">*</span></label>
+                    <select id="patch-status" class="form-input" required>
+                        <option value="present">Present (Attended)</option>
+                        <option value="registered">Registered</option>
+                        <option value="absent">Absent (No Show)</option>
+                        <option value="withdrawn">Withdrawn (Cancelled)</option>
+                        <option value="waitlisted">Waitlisted</option>
+                    </select>
+                </div>
+
+                <!-- Hours Logged with Presets -->
+                <div class="form-group">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="form-label" for="patch-hours" style="margin: 0;">Credit / Logged Hours <span style="color:red">*</span></label>
+                        <div style="display: flex; gap: 4px;">
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(0)">0h</button>
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(1)">1h</button>
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(2)">2h</button>
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(3)">3h</button>
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(4)">4h</button>
+                        </div>
+                    </div>
+                    <input type="number" id="patch-hours" class="form-input" step="0.1" min="0" max="24" required placeholder="0.0">
+                </div>
+
+                <!-- Timestamps -->
+                <div class="form-group" style="margin-bottom: 12px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="form-label" style="margin: 0; font-size: 12.5px;">Check-In Time</label>
+                        <div style="display: flex; gap: 4px;">
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchCheckInNow()">Now</button>
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="clearPatchCheckIn()">Clear</button>
+                        </div>
+                    </div>
+                    <input type="datetime-local" id="patch-checkin-time" class="form-input" style="font-size: 12.5px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="form-label" style="margin: 0; font-size: 12.5px;">Check-Out Time</label>
+                        <div style="display: flex; gap: 4px;">
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchCheckOutNow()">Now</button>
+                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="clearPatchCheckOut()">Clear</button>
+                        </div>
+                    </div>
+                    <input type="datetime-local" id="patch-checkout-time" class="form-input" style="font-size: 12.5px;">
+                </div>
+
+                <!-- Optional Remarks -->
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label" for="patch-remarks" style="font-size: 12.5px;">Coordinator Remarks / Audit Note</label>
+                    <input type="text" id="patch-remarks" class="form-input" placeholder="e.g. Verified by coordinator; adjusted hours" maxlength="255">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closePatchAttendanceModal()">Cancel</button>
+                    <button type="submit" class="primary-btn" id="patch-submit-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../../js/api.js"></script>
     <script src="../../js/auth.js"></script>
     <script src="main.js"></script>

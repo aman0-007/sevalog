@@ -284,12 +284,9 @@
                 <p>Building a better tomorrow through organized, impactful community service. Join thousands of
                     volunteers making a difference today.</p>
                 <div style="display: flex; gap: 16px; margin-top: 24px;">
-                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'"
-                        onmouseout="this.style.color='#94A3B8'"><i data-lucide="twitter" style="width: 20px;"></i></a>
-                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'"
-                        onmouseout="this.style.color='#94A3B8'"><i data-lucide="instagram" style="width: 20px;"></i></a>
-                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'"
-                        onmouseout="this.style.color='#94A3B8'"><i data-lucide="linkedin" style="width: 20px;"></i></a>
+                    <a href="#" aria-label="Twitter" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+                    <a href="#" aria-label="Instagram" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>
+                    <a href="#" aria-label="LinkedIn" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
                 </div>
             </div>
 
@@ -327,7 +324,26 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Public Event Details Modal (GET /api/public/events/{id}) -->
+    <div class="modal-overlay" id="publicEventModal" style="display: none;">
+        <div class="modal-content" style="max-width: 620px; width: 92%; max-height: 88vh; overflow-y: auto; background: white; border-radius: 16px; padding: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); margin: auto;">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 16px;">
+                <div>
+                    <span class="badge" id="modal-ev-category" style="margin-bottom: 8px; font-size: 11px;">Category</span>
+                    <h2 id="modal-ev-title" style="font-size: 22px; font-weight: 700; color: var(--text-main); margin: 4px 0;">Event Title</h2>
+                    <div id="modal-ev-datetime" style="font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; margin-top: 6px;"></div>
+                </div>
+                <button class="icon-btn" id="modal-close-btn" style="background: var(--bg-surface); border: 1px solid var(--border-light); cursor: pointer; padding: 8px; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-ev-body">
+                <div style="text-align: center; padding: 30px; color: var(--text-muted);">Loading details...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/api.js"></script>
     <script src="public-main.js"></script>
     <script src="opportunities.js"></script>
 </body>

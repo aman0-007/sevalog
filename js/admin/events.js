@@ -4,6 +4,7 @@
 
 let searchTimeout = null;
 let currentActiveEventId = null;
+let currentActiveRoster = [];
 
 // ==========================================
 // ZONE 1: FORMATTERS & LOOKUPS
@@ -237,6 +238,9 @@ function renderCoreStats(evData) {
 }
 
 function renderRoster(roster, dynamicStatus, eventId) {
+    currentActiveRoster = roster || [];
+    currentActiveEventId = eventId;
+
     const tbodyVols = document.getElementById('detail-volunteers-body');
     const theadVols = document.getElementById('detail-volunteers-head');
     if (!tbodyVols || !theadVols) return;
@@ -245,13 +249,13 @@ function renderRoster(roster, dynamicStatus, eventId) {
     
     // Table Headers
     if (isPastOrOngoing) {
-        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Check-In / Out</th><th>Status Override</th><th>Hours</th></tr>`;
+        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Check-In / Out</th><th>Status</th><th>Hours</th><th style="text-align: right;">Action</th></tr>`;
     } else {
-        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Contact Info</th><th>Status Override</th><th>Hours</th></tr>`;
+        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Contact Info</th><th>Status</th><th>Hours</th><th style="text-align: right;">Action</th></tr>`;
     }
 
     if (roster.length === 0) {
-        tbodyVols.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">No volunteers registered yet.</td></tr>`;
+        tbodyVols.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No volunteers registered yet.</td></tr>`;
         return;
     }
 
@@ -269,7 +273,7 @@ function renderRoster(roster, dynamicStatus, eventId) {
             middleColumn = `<div style="font-size: 13px;">${vol.email || '--'}</div><div style="font-size: 12px; color: var(--text-muted);">${vol.phone_number || '--'}</div>`;
         }
 
-        // FIX 4: Interactive Admin Attendance Override Dropdown
+        // Interactive Quick Status Override Dropdown
         const interactiveStatusHtml = `
             <select onchange="updateVolunteerStatus('${vol.user_id}', this.value, '${eventId}')" 
                     style="font-size: 12px; font-weight: 600; color: ${color}; padding: 4px; background: ${color}10; border: 1px solid ${color}40; border-radius: 4px; outline: none; cursor: pointer; width: 100%;">
@@ -292,6 +296,11 @@ function renderRoster(roster, dynamicStatus, eventId) {
             <td>${middleColumn}</td>
             <td style="min-width: 120px;">${interactiveStatusHtml}</td>
             <td>${parseFloat(vol.hours_logged || 0).toFixed(2)} hrs</td>
+            <td style="text-align: right;">
+                <button type="button" class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; cursor: pointer;" onclick="openEditAttendanceModal('${vol.user_id}', '${eventId}')" title="Edit status, check-in, and check-out">
+                    <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i> Edit
+                </button>
+            </td>
         </tr>`;
     }).join('');
 }
@@ -343,7 +352,14 @@ function renderLifecycleButtons(eventId, evData, dynamicStatus) {
 
     // FIX 3: Route proper dedicated API paths based on status
     if (evData.status === 'draft') {
-        lifecycleContainer.innerHTML = `<button class="primary-btn" onclick="fireLifecycleApi('${eventId}', 'publish', '${safeTitle}')">Publish Event</button>`;
+        lifecycleContainer.innerHTML = `
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button type="button" class="btn-secondary" style="padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="openEditEventModal('${eventId}')">
+                    <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
+                </button>
+                <button class="primary-btn" onclick="fireLifecycleApi('${eventId}', 'publish', '${safeTitle}')">Publish Event</button>
+            </div>
+        `;
         if (delBtn) {
             delBtn.style.display = 'block';
             delBtn.onclick = () => confirmDeleteEvent(eventId, evData.title);
@@ -351,6 +367,12 @@ function renderLifecycleButtons(eventId, evData, dynamicStatus) {
     } else if (['upcoming', 'ongoing', 'published'].includes(dynamicStatus)) {
         let buttonsHTML = `<div style="display: flex; gap: 8px; align-items: center;">`;
         
+        buttonsHTML += `
+            <button type="button" class="btn-secondary" style="padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;" onclick="openEditEventModal('${eventId}')">
+                <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
+            </button>
+        `;
+
         // Complete Event manually
         if (now >= eventEnd) {
             buttonsHTML += `<button class="primary-btn" style="background: #10B981; border:none;" onclick="fireLifecycleApi('${eventId}', 'complete', '${safeTitle}')">Mark Completed</button>`;
@@ -396,7 +418,157 @@ window.fireLifecycleApi = async function(eventId, action, currentTitle) {
     }
 }
 
-// FIX 4: Dedicated Manual Attendance Override
+// ==========================================
+// ZONE 4B: ATTENDANCE MANAGEMENT (PUT /api/admin/events/{id}/attendance)
+// ==========================================
+
+function toLocalDatetimeString(isoStr) {
+    if (!isoStr) return '';
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+window.openEditAttendanceModal = function(volunteerId, eventId) {
+    const vol = (currentActiveRoster || []).find(v => (v.user_id === volunteerId || v.volunteer_id === volunteerId || v.id === volunteerId));
+    if (!vol) {
+        alert("Volunteer record not found in current roster.");
+        return;
+    }
+
+    document.getElementById('att-volunteer-id').value = volunteerId;
+    document.getElementById('att-event-id').value = eventId;
+
+    const initials = ((vol.first_name?.[0] || '') + (vol.last_name?.[0] || '')).toUpperCase() || 'V';
+    const avatarEl = document.getElementById('att-volunteer-avatar');
+    if (avatarEl) avatarEl.innerText = initials;
+
+    const nameEl = document.getElementById('att-volunteer-name');
+    if (nameEl) nameEl.innerText = `${vol.first_name || ''} ${vol.last_name || ''}`.trim() || 'Volunteer';
+
+    const emailEl = document.getElementById('att-volunteer-email');
+    if (emailEl) emailEl.innerText = vol.email || vol.phone_number || 'Registered Volunteer';
+
+    const statusEl = document.getElementById('att-status');
+    if (statusEl) statusEl.value = (vol.attendance_status || vol.status || 'registered').toLowerCase();
+
+    const inInput = document.getElementById('att-checkin-time');
+    if (inInput) inInput.value = toLocalDatetimeString(vol.check_in_time);
+
+    const outInput = document.getElementById('att-checkout-time');
+    if (outInput) outInput.value = toLocalDatetimeString(vol.check_out_time);
+
+    calculateAttendedHoursPreview();
+
+    const modal = document.getElementById('editAttendanceModal');
+    if (modal) modal.classList.add('active');
+    if (window.lucide) lucide.createIcons();
+};
+
+window.closeAttendanceModal = function() {
+    const modal = document.getElementById('editAttendanceModal');
+    if (modal) modal.classList.remove('active');
+};
+
+window.setAttendanceCheckInNow = function() {
+    const inInput = document.getElementById('att-checkin-time');
+    if (inInput) {
+        inInput.value = toLocalDatetimeString(new Date().toISOString());
+        calculateAttendedHoursPreview();
+    }
+};
+
+window.clearAttendanceCheckIn = function() {
+    const inInput = document.getElementById('att-checkin-time');
+    if (inInput) {
+        inInput.value = '';
+        calculateAttendedHoursPreview();
+    }
+};
+
+window.setAttendanceCheckOutNow = function() {
+    const outInput = document.getElementById('att-checkout-time');
+    if (outInput) {
+        outInput.value = toLocalDatetimeString(new Date().toISOString());
+        calculateAttendedHoursPreview();
+    }
+};
+
+window.clearAttendanceCheckOut = function() {
+    const outInput = document.getElementById('att-checkout-time');
+    if (outInput) {
+        outInput.value = '';
+        calculateAttendedHoursPreview();
+    }
+};
+
+window.calculateAttendedHoursPreview = function() {
+    const inVal = document.getElementById('att-checkin-time')?.value;
+    const outVal = document.getElementById('att-checkout-time')?.value;
+    const previewVal = document.getElementById('att-hours-value');
+    if (!previewVal) return;
+
+    if (inVal && outVal) {
+        const inDate = new Date(inVal);
+        const outDate = new Date(outVal);
+        const diffMs = outDate - inDate;
+        if (diffMs > 0) {
+            const hrs = (diffMs / (1000 * 60 * 60)).toFixed(2);
+            previewVal.innerText = `${hrs} hrs`;
+            previewVal.style.color = '#10B981';
+        } else {
+            previewVal.innerText = 'Check-out must be after check-in';
+            previewVal.style.color = '#EF4444';
+        }
+    } else if (inVal) {
+        previewVal.innerText = 'In Progress (Checked-In)';
+        previewVal.style.color = '#3B82F6';
+    } else {
+        previewVal.innerText = '0.00 hrs';
+        previewVal.style.color = 'var(--text-muted)';
+    }
+};
+
+window.saveVolunteerAttendance = async function(e) {
+    if (e) e.preventDefault();
+    const volunteerId = document.getElementById('att-volunteer-id')?.value;
+    const eventId = document.getElementById('att-event-id')?.value;
+    const status = document.getElementById('att-status')?.value;
+    const inVal = document.getElementById('att-checkin-time')?.value;
+    const outVal = document.getElementById('att-checkout-time')?.value;
+
+    if (!volunteerId || !eventId) return;
+
+    const submitBtn = document.getElementById('att-submit-btn');
+    const origText = submitBtn ? submitBtn.innerText : '';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Saving...';
+    }
+
+    try {
+        const payload = {
+            volunteer_id: volunteerId,
+            status: status,
+            check_in_time: inVal ? new Date(inVal).toISOString() : null,
+            check_out_time: outVal ? new Date(outVal).toISOString() : null
+        };
+
+        await ApiClient.request(`/admin/events/${eventId}/attendance`, 'PUT', payload);
+        closeAttendanceModal();
+        await openDetailsModal(eventId);
+    } catch (err) {
+        alert(`Failed to save attendance: ${err.message}`);
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerText = origText;
+        }
+    }
+};
+
+// Quick 1-click status dropdown handler
 window.updateVolunteerStatus = async function(volunteerId, newStatus, eventId) {
     try {
         const payload = { volunteer_id: volunteerId, status: newStatus };
@@ -404,6 +576,9 @@ window.updateVolunteerStatus = async function(volunteerId, newStatus, eventId) {
         // Auto-inject check in time if manually marked present so math works
         if (newStatus === 'present') {
             payload.check_in_time = new Date().toISOString();
+        } else if (newStatus === 'absent' || newStatus === 'withdrawn') {
+            payload.check_in_time = null;
+            payload.check_out_time = null;
         }
 
         await ApiClient.request(`/admin/events/${eventId}/attendance`, 'PUT', payload);
@@ -412,7 +587,7 @@ window.updateVolunteerStatus = async function(volunteerId, newStatus, eventId) {
         alert(`Failed to update status: ${error.message}`);
         openDetailsModal(eventId);
     }
-}
+};
 
 async function confirmCancelEvent(eventId, eventTitle) {
     if(!confirm(`WARNING: Are you sure you want to CANCEL "${eventTitle}"?\n\nThis will withdraw all registered volunteers and permanently mark the event as cancelled.`)) return;
@@ -437,17 +612,104 @@ async function confirmDeleteEvent(eventId, eventTitle) {
 }
 
 // ==========================================
-// ZONE 5: CREATE EVENT FORM
+// ZONE 5: CREATE & EDIT EVENT FORM
 // ==========================================
-function openModal() { document.getElementById('eventModal').classList.add('active'); }
-function closeModal() { document.getElementById('eventModal').classList.remove('active'); document.getElementById('createEventForm').reset(); }
-function closeDetailsModal() { document.getElementById('eventDetailsModal').classList.remove('active'); currentActiveEventId = null; }
+function openModal() { 
+    const titleEl = document.getElementById('eventModalTitle');
+    if (titleEl) titleEl.innerText = "Create New Event";
+    const editIdEl = document.getElementById('ev-editing-id');
+    if (editIdEl) editIdEl.value = "";
+    document.getElementById('createEventForm').reset();
+    
+    const toggleContainer = document.getElementById('ev-publish-toggle-container');
+    if (toggleContainer) toggleContainer.style.display = 'flex';
+    
+    const submitBtn = document.getElementById('submit-event-btn');
+    const isToggleChecked = document.getElementById('ev-publish-toggle').checked;
+    submitBtn.innerText = isToggleChecked ? 'Create & Publish Event' : 'Save Event as Draft';
+    if (isToggleChecked) submitBtn.classList.remove('btn-draft'); else submitBtn.classList.add('btn-draft');
+    
+    document.getElementById('eventModal').classList.add('active'); 
+}
+
+function closeModal() { 
+    document.getElementById('eventModal').classList.remove('active'); 
+    document.getElementById('createEventForm').reset(); 
+    const editIdEl = document.getElementById('ev-editing-id');
+    if (editIdEl) editIdEl.value = "";
+}
+
+function closeDetailsModal() { 
+    document.getElementById('eventDetailsModal').classList.remove('active'); 
+    currentActiveEventId = null; 
+}
+
+// Open Edit Event Modal (PUT /api/admin/events/{id})
+window.openEditEventModal = async function(eventId) {
+    try {
+        const res = await ApiClient.request(`/admin/events/${eventId}`, 'GET');
+        const ev = res.data || res;
+        if (!ev) return alert("Could not load event data.");
+
+        const titleEl = document.getElementById('eventModalTitle');
+        if (titleEl) titleEl.innerText = "Edit Event Details";
+        
+        const editIdEl = document.getElementById('ev-editing-id');
+        if (editIdEl) editIdEl.value = eventId;
+
+        const form = document.getElementById('createEventForm');
+        form.querySelector('#ev-title').value = ev.title || '';
+        form.querySelector('#ev-category').value = ev.category || 'Food Drive';
+        
+        if (ev.event_date) {
+            const dateObj = new Date(ev.event_date);
+            const yyyy = dateObj.getFullYear();
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            form.querySelector('#ev-date').value = `${yyyy}-${mm}-${dd}`;
+        }
+        
+        form.querySelector('#ev-start').value = ev.start_time ? ev.start_time.substring(0, 5) : '';
+        form.querySelector('#ev-end').value = ev.end_time ? ev.end_time.substring(0, 5) : '';
+        form.querySelector('#ev-location-name').value = ev.location_name || '';
+        form.querySelector('#ev-location-address').value = ev.location_address || '';
+        form.querySelector('#ev-maps-link').value = ev.google_maps_link || '';
+        form.querySelector('#ev-vol-needed').value = ev.volunteers_needed || 10;
+        form.querySelector('#ev-min-vol').value = ev.min_volunteers || 1;
+        form.querySelector('#ev-max-volunteers').value = ev.max_volunteers || '';
+        
+        if (ev.registration_deadline) {
+            const dlObj = new Date(ev.registration_deadline);
+            dlObj.setMinutes(dlObj.getMinutes() - dlObj.getTimezoneOffset());
+            form.querySelector('#ev-deadline').value = dlObj.toISOString().slice(0, 16);
+        } else {
+            form.querySelector('#ev-deadline').value = '';
+        }
+
+        form.querySelector('#ev-contact-name').value = ev.contact_person_name || '';
+        form.querySelector('#ev-contact-phone').value = ev.contact_person_phone || '';
+        form.querySelector('#ev-desc').value = ev.description || '';
+
+        // Hide publish toggle in edit mode
+        const toggleContainer = document.getElementById('ev-publish-toggle-container');
+        if (toggleContainer) toggleContainer.style.display = 'none';
+
+        const submitBtn = document.getElementById('submit-event-btn');
+        submitBtn.innerText = "Save Changes";
+        submitBtn.classList.remove('btn-draft');
+
+        document.getElementById('eventModal').classList.add('active');
+    } catch (err) {
+        alert("Failed to load event for editing: " + err.message);
+    }
+};
 
 document.getElementById('createEventForm').addEventListener('submit', async (e) => {
     e.preventDefault(); 
     const form = e.target;
     const submitBtn = form.querySelector('button[type="submit"]');
     const isPublishing = document.getElementById('ev-publish-toggle').checked;
+    const editingId = document.getElementById('ev-editing-id').value;
     
     const eventDate = form.querySelector('#ev-date').value;
     const startTime = form.querySelector('#ev-start').value;
@@ -481,18 +743,34 @@ document.getElementById('createEventForm').addEventListener('submit', async (e) 
     };
 
     try {
-        const createResponse = await ApiClient.request('/admin/events', 'POST', payload);
-        if (isPublishing) await ApiClient.request(`/admin/events/${createResponse.data.event_id}/publish`, 'POST');
-        
-        form.reset();
-        closeModal();
-        loadEvents(); 
+        if (editingId) {
+            // PUT /api/admin/events/{id}
+            await ApiClient.request(`/admin/events/${editingId}`, 'PUT', payload);
+            alert("Event details updated successfully!");
+            closeModal();
+            loadEvents();
+            if (currentActiveEventId === editingId) {
+                openEventDetails(editingId);
+            }
+        } else {
+            // POST /api/admin/events
+            const createResponse = await ApiClient.request('/admin/events', 'POST', payload);
+            if (isPublishing) await ApiClient.request(`/admin/events/${createResponse.data.event_id}/publish`, 'POST');
+            form.reset();
+            closeModal();
+            loadEvents(); 
+        }
     } catch (error) {
         alert(`Action Failed: ${error.message}`);
     } finally {
         const isToggleChecked = document.getElementById('ev-publish-toggle').checked;
-        submitBtn.innerText = isToggleChecked ? 'Create & Publish Event' : 'Save Event as Draft';
-        if(isToggleChecked) submitBtn.classList.remove('btn-draft'); else submitBtn.classList.add('btn-draft');
+        if (document.getElementById('ev-editing-id').value) {
+            submitBtn.innerText = 'Save Changes';
+            submitBtn.classList.remove('btn-draft');
+        } else {
+            submitBtn.innerText = isToggleChecked ? 'Create & Publish Event' : 'Save Event as Draft';
+            if(isToggleChecked) submitBtn.classList.remove('btn-draft'); else submitBtn.classList.add('btn-draft');
+        }
         submitBtn.disabled = false;
     }
 });

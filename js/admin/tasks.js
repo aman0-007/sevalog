@@ -4,6 +4,7 @@
 
 let allTasks = [];
 let currentUser = null;
+let currentActiveTaskId = null;
 
 // Column definitions for Kanban
 const COLUMNS = [
@@ -200,19 +201,100 @@ function openCreateTaskModal() {
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     const localNow = now.toISOString().slice(0, 16);
     document.getElementById('task-deadline').min = localNow;    
+    
+    const titleEl = document.getElementById('taskModalTitle');
+    if (titleEl) titleEl.innerText = "Create New Task";
+    const editIdEl = document.getElementById('task-editing-id');
+    if (editIdEl) editIdEl.value = "";
+    document.getElementById('createTaskForm').reset();
+    
+    const eventField = document.getElementById('task-event');
+    if (eventField) eventField.closest('.form-group').style.display = 'block';
+    const hoursField = document.getElementById('task-est-hours');
+    if (hoursField) hoursField.closest('.form-group').style.display = 'block';
+
+    const btn = document.getElementById('submit-task-btn');
+    if (btn) btn.innerText = "Assign Task";
+
     document.getElementById('createTaskModal').classList.add('active'); 
 }
 
 function closeCreateTaskModal() { 
     document.getElementById('createTaskModal').classList.remove('active');
     document.getElementById('createTaskForm').reset();
+    const editIdEl = document.getElementById('task-editing-id');
+    if (editIdEl) editIdEl.value = "";
 }
 
 function closeTaskDetailsModal() { 
     document.getElementById('taskDetailsModal').classList.remove('active'); 
+    currentActiveTaskId = null;
 }
 
+// Open Edit Task Modal (PUT /api/admin/tasks/{id})
+window.openEditTaskModal = async function(taskId) {
+    try {
+        const res = await ApiClient.request(`/admin/tasks/${taskId}`, 'GET');
+        const task = res.data;
+        if (!task) return alert("Task not found.");
+
+        const titleEl = document.getElementById('taskModalTitle');
+        if (titleEl) titleEl.innerText = "Edit Task Details";
+        
+        const editIdEl = document.getElementById('task-editing-id');
+        if (editIdEl) editIdEl.value = taskId;
+
+        document.getElementById('task-title').value = task.title || '';
+        document.getElementById('task-desc').value = task.description || '';
+        document.getElementById('task-assignee').value = task.assigned_to || '';
+        
+        if (task.deadline) {
+            const dl = new Date(task.deadline);
+            dl.setMinutes(dl.getMinutes() - dl.getTimezoneOffset());
+            document.getElementById('task-deadline').value = dl.toISOString().slice(0, 16);
+        } else {
+            document.getElementById('task-deadline').value = '';
+        }
+
+        document.getElementById('task-public-toggle').checked = task.is_public !== false;
+
+        // Hide non-editable fields during detail edit
+        const eventField = document.getElementById('task-event');
+        if (eventField) eventField.closest('.form-group').style.display = 'none';
+        const hoursField = document.getElementById('task-est-hours');
+        if (hoursField) hoursField.closest('.form-group').style.display = 'none';
+
+        const btn = document.getElementById('submit-task-btn');
+        if (btn) btn.innerText = "Save Task Changes";
+
+        document.getElementById('createTaskModal').classList.add('active');
+    } catch (err) {
+        alert("Failed to load task for editing: " + err.message);
+    }
+};
+
+window.openEditTaskFromModal = function() {
+    if (!currentActiveTaskId) return;
+    const tId = currentActiveTaskId;
+    closeTaskDetailsModal();
+    openEditTaskModal(tId);
+};
+
+window.confirmDeleteTaskFromModal = async function() {
+    if (!currentActiveTaskId) return;
+    if (!confirm("Are you sure you want to delete this task? This cannot be undone.")) return;
+    try {
+        await ApiClient.request(`/admin/tasks/${currentActiveTaskId}`, 'DELETE');
+        alert("Task deleted successfully.");
+        closeTaskDetailsModal();
+        await fetchTasks();
+    } catch (err) {
+        alert("Failed to delete task: " + err.message);
+    }
+};
+
 async function openTaskDetailsModal(taskId) {
+    currentActiveTaskId = taskId;
     const modal = document.getElementById('taskDetailsModal');
     modal.classList.add('active');
     
@@ -254,6 +336,12 @@ async function openTaskDetailsModal(taskId) {
         
         const isFrozen = ['completed', 'cancelled'].includes(task.status);
         
+        // Header Edit & Delete controls
+        const editBtn = document.getElementById('btn-edit-task');
+        const deleteBtn = document.getElementById('btn-delete-task');
+        if (editBtn) editBtn.style.display = (isCreator && !isFrozen) ? 'inline-flex' : 'none';
+        if (deleteBtn) deleteBtn.style.display = isCreator ? 'inline-flex' : 'none';
+
         let actionHtml = '';
 
         if (!isFrozen) {
@@ -315,31 +403,52 @@ async function openTaskDetailsModal(taskId) {
 // API MUTATIONS
 // ==========================================
 
-// Create Task Submit
+// Create & Edit Task Submit
 document.getElementById('createTaskForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('submit-task-btn');
-    btn.innerText = "Creating...";
+    const editingId = document.getElementById('task-editing-id').value;
+    btn.innerText = "Processing...";
     btn.disabled = true;
 
-    const payload = {
-        title: document.getElementById('task-title').value,
-        assigned_to: document.getElementById('task-assignee').value,
-        event_id: document.getElementById('task-event').value || null,
-        deadline: document.getElementById('task-deadline').value || null,
-        description: document.getElementById('task-desc').value,
-        is_public: document.getElementById('task-public-toggle').checked,
-        hours_awarded: parseFloat(document.getElementById('task-est-hours').value) || 0
-    };
-
     try {
-        await ApiClient.request('/admin/tasks', 'POST', payload);
-        closeCreateTaskModal();
-        await fetchTasks();
+        if (editingId) {
+            // PUT /api/admin/tasks/{id}
+            const updatePayload = {
+                title: document.getElementById('task-title').value.trim(),
+                description: document.getElementById('task-desc').value.trim() || null,
+                deadline: document.getElementById('task-deadline').value || null,
+                assigned_to: document.getElementById('task-assignee').value,
+                is_public: document.getElementById('task-public-toggle').checked
+            };
+            await ApiClient.request(`/admin/tasks/${editingId}`, 'PUT', updatePayload);
+            alert("Task updated successfully!");
+            closeCreateTaskModal();
+            await fetchTasks();
+        } else {
+            // POST /api/admin/tasks
+            const payload = {
+                title: document.getElementById('task-title').value,
+                assigned_to: document.getElementById('task-assignee').value,
+                event_id: document.getElementById('task-event').value || null,
+                deadline: document.getElementById('task-deadline').value || null,
+                description: document.getElementById('task-desc').value,
+                is_public: document.getElementById('task-public-toggle').checked,
+                hours_awarded: parseFloat(document.getElementById('task-est-hours').value) || 0
+            };
+
+            await ApiClient.request('/admin/tasks', 'POST', payload);
+            closeCreateTaskModal();
+            await fetchTasks();
+        }
     } catch (err) {
-        alert("Failed to create task: " + err.message);
+        alert("Operation failed: " + err.message);
     } finally {
-        btn.innerText = "Assign Task";
+        if (document.getElementById('task-editing-id').value) {
+            btn.innerText = "Save Task Changes";
+        } else {
+            btn.innerText = "Assign Task";
+        }
         btn.disabled = false;
     }
 });

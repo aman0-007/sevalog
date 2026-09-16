@@ -131,10 +131,11 @@
     <div class="modal-overlay" id="createTaskModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create New Task</h2>
+                <h2 id="taskModalTitle">Create New Task</h2>
                 <button class="icon-btn" onclick="closeCreateTaskModal()"><i data-lucide="x"></i></button>
             </div>
             <form id="createTaskForm">
+                <input type="hidden" id="task-editing-id" value="">
                 <div class="form-group">
                     <label class="form-label">Task Title <span style="color:red">*</span></label>
                     <input type="text" id="task-title" class="form-input" required
@@ -199,7 +200,15 @@
                     <p id="detail-task-event"
                         style="font-size: 13px; color: var(--primary); margin-top: 4px; font-weight: 500;"></p>
                 </div>
-                <button class="icon-btn" onclick="closeTaskDetailsModal()"><i data-lucide="x"></i></button>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <button type="button" class="btn-secondary" id="btn-edit-task" style="display: none; padding: 6px 12px; font-size: 13px; align-items: center; gap: 4px;" onclick="openEditTaskFromModal()">
+                        <i data-lucide="edit-3" style="width: 14px; height: 14px;"></i> Edit
+                    </button>
+                    <button type="button" class="btn-danger-outline" id="btn-delete-task" style="display: none; padding: 6px 12px; font-size: 13px; align-items: center; gap: 4px;" onclick="confirmDeleteTaskFromModal()">
+                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Delete
+                    </button>
+                    <button class="icon-btn" onclick="closeTaskDetailsModal()"><i data-lucide="x"></i></button>
+                </div>
             </div>
 
             <div class="info-grid"

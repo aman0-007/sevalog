@@ -11,24 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let topVolunteers = [];
 
-        try {
-            // Attempt to fetch real data from Supabase
-            if (typeof _supabase !== 'undefined') {
-                const { data, error } = await _supabase
-                    .from('profiles')
-                    .select('full_name, total_hours_served')
-                    .order('total_hours_served', { ascending: false })
-                    .limit(3);
-
-                if (!error && data && data.length > 0) {
-                    topVolunteers = data;
-                }
-            }
-        } catch (err) {
-            console.warn("Could not fetch leaderboard data, using fallback.", err);
-        }
-
-        // Fallback data if DB is empty or fails
+        // Fallback or top community seva contributors
         if (topVolunteers.length < 3) {
             topVolunteers = [
                 { full_name: "Priya Sharma", total_hours_served: 142 }, // 1st

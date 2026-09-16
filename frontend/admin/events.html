@@ -160,11 +160,12 @@
     <div class="modal-overlay" id="eventModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Create New Event</h2>
+                <h2 id="eventModalTitle">Create New Event</h2>
                 <button class="icon-btn" onclick="closeModal()"><i data-lucide="x"></i></button>
             </div>
 
             <form id="createEventForm">
+                <input type="hidden" id="ev-editing-id" value="">
                 <div class="form-grid">
                     <!-- 1. Basic Info -->
                     <div class="form-group full">
@@ -255,7 +256,7 @@
                     </div>
                 </div>
 
-                <div class="publish-toggle-container">
+                <div class="publish-toggle-container" id="ev-publish-toggle-container">
                     <label class="toggle-switch">
                         <input type="checkbox" id="ev-publish-toggle" checked>
                         <span class="toggle-slider"></span>
@@ -441,6 +442,77 @@
             </div>
             <p id="qr-timer-text" style="font-size: 12px; color: #64748B; margin-top: 8px; font-weight: 500;">
                 Initializing...</p>
+        </div>
+    </div>
+
+    <!-- Edit Attendance Modal (PUT /api/admin/events/{id}/attendance) -->
+    <div class="modal-overlay" id="editAttendanceModal" style="z-index: 350;">
+        <div class="modal-content" style="max-width: 480px;">
+            <div class="modal-header">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Update Volunteer Attendance</h2>
+                <button class="icon-btn" onclick="closeAttendanceModal()"><i data-lucide="x"></i></button>
+            </div>
+            <form id="editAttendanceForm" onsubmit="saveVolunteerAttendance(event)">
+                <input type="hidden" id="att-volunteer-id" value="">
+                <input type="hidden" id="att-event-id" value="">
+
+                <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px;">
+                    <div id="att-volunteer-avatar" class="avatar-sm" style="width: 38px; height: 38px; font-size: 14px;">--</div>
+                    <div>
+                        <div id="att-volunteer-name" style="font-size: 14px; font-weight: 600; color: var(--text-main);">--</div>
+                        <div id="att-volunteer-email" style="font-size: 12px; color: var(--text-muted);">--</div>
+                    </div>
+                </div>
+
+                <!-- Status field -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label" style="font-weight: 600; font-size: 13px; margin-bottom: 6px; display: block;">
+                        Attendance Status <span style="color:red">*</span>
+                    </label>
+                    <select id="att-status" class="form-input" required style="width: 100%; font-size: 13px;">
+                        <option value="registered">Registered</option>
+                        <option value="present">Present (Attended)</option>
+                        <option value="absent">Absent (No Show)</option>
+                        <option value="withdrawn">Withdrawn (Cancelled)</option>
+                        <option value="waitlisted">Waitlisted</option>
+                    </select>
+                </div>
+
+                <!-- Check-in Time field -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="form-label" style="font-weight: 600; font-size: 13px; margin: 0;">Check-In Timestamp</label>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" class="btn-secondary" style="padding: 2px 8px; font-size: 11px;" onclick="setAttendanceCheckInNow()">Set to Now</button>
+                            <button type="button" class="btn-secondary" style="padding: 2px 8px; font-size: 11px;" onclick="clearAttendanceCheckIn()">Clear</button>
+                        </div>
+                    </div>
+                    <input type="datetime-local" id="att-checkin-time" class="form-input" style="width: 100%; font-size: 13px;" onchange="calculateAttendedHoursPreview()">
+                </div>
+
+                <!-- Check-out Time field -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <label class="form-label" style="font-weight: 600; font-size: 13px; margin: 0;">Check-Out Timestamp</label>
+                        <div style="display: flex; gap: 6px;">
+                            <button type="button" class="btn-secondary" style="padding: 2px 8px; font-size: 11px;" onclick="setAttendanceCheckOutNow()">Set to Now</button>
+                            <button type="button" class="btn-secondary" style="padding: 2px 8px; font-size: 11px;" onclick="clearAttendanceCheckOut()">Clear</button>
+                        </div>
+                    </div>
+                    <input type="datetime-local" id="att-checkout-time" class="form-input" style="width: 100%; font-size: 13px;" onchange="calculateAttendedHoursPreview()">
+                </div>
+
+                <!-- Estimated Hours Calculation Preview -->
+                <div id="att-hours-preview" style="background: rgba(37, 99, 235, 0.05); border: 1px dashed rgba(37, 99, 235, 0.3); border-radius: 8px; padding: 10px 14px; margin-bottom: 20px; font-size: 12.5px; color: var(--accent-primary); display: flex; align-items: center; justify-content: space-between;">
+                    <span>Calculated Service Hours:</span>
+                    <strong id="att-hours-value" style="font-size: 13px;">0.00 hrs</strong>
+                </div>
+
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn-secondary" onclick="closeAttendanceModal()">Cancel</button>
+                    <button type="submit" class="primary-btn" id="att-submit-btn">Save Attendance</button>
+                </div>
+            </form>
         </div>
     </div>
 

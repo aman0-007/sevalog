@@ -19,11 +19,80 @@ const ApiClient = {
         ApiClient._tokenCache = token;
     },
 
-    clearSession: () => {
+    clearSession: (redirectUrl = null) => {
         localStorage.removeItem('samithi_token');
         localStorage.removeItem('samithi_user');
         ApiClient._tokenCache = null;
-        window.location.href = '../../index.html'; // Adjust path if needed
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        } else {
+            const isVolunteer = window.location.pathname.includes('/volunteer/');
+            const isAdmin = window.location.pathname.includes('/admin/');
+            const prefix = (isVolunteer || isAdmin) ? '../../' : (window.location.pathname.includes('/frontend/') ? '../' : '');
+            window.location.href = prefix + 'index.html';
+        }
+    },
+
+    validateSession: async () => {
+        const token = ApiClient.getToken();
+        if (!token) return null;
+
+        try {
+            // First attempt to call /auth/me with Bearer token
+            const headers = { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            };
+            const res = await fetch(`${BASE_URL}/auth/me`, { method: 'GET', headers });
+
+            if (res.ok) {
+                const data = await res.json();
+                const freshUser = data.data || data.user || data;
+                if (freshUser && (freshUser.id || freshUser.user_id || freshUser.email)) {
+                    // Standardize firstName / lastName
+                    if (!freshUser.firstName && freshUser.first_name) freshUser.firstName = freshUser.first_name;
+                    if (!freshUser.lastName && freshUser.last_name) freshUser.lastName = freshUser.last_name;
+
+                    const existing = JSON.parse(localStorage.getItem('samithi_user') || '{}');
+                    const merged = { ...existing, ...freshUser };
+                    localStorage.setItem('samithi_user', JSON.stringify(merged));
+                    return merged;
+                }
+            } else if (res.status === 401) {
+                console.warn("[Auth] Session expired or invalid (401). Clearing session.");
+                ApiClient.clearSession();
+                return null;
+            } else if (res.status === 404) {
+                // If backend does not have /auth/me route yet, fall back to /volunteer/profile or /admin/dashboard-stats
+                const existing = JSON.parse(localStorage.getItem('samithi_user') || '{}');
+                if (existing.role === 'volunteer') {
+                    try {
+                        const profRes = await ApiClient.request('/volunteer/profile', 'GET');
+                        if (profRes && profRes.data) {
+                            const p = profRes.data;
+                            const merged = {
+                                ...existing,
+                                firstName: p.first_name || existing.firstName,
+                                lastName: p.last_name || existing.lastName,
+                                email: p.email || existing.email,
+                                total_hours: p.total_hours !== undefined ? p.total_hours : existing.total_hours
+                            };
+                            localStorage.setItem('samithi_user', JSON.stringify(merged));
+                            return merged;
+                        }
+                    } catch (e) {
+                        if (e.message && e.message.includes('401')) {
+                            ApiClient.clearSession();
+                            return null;
+                        }
+                    }
+                }
+            }
+            return JSON.parse(localStorage.getItem('samithi_user') || 'null');
+        } catch (err) {
+            console.warn("[Auth] Session validation failed:", err.message);
+            return JSON.parse(localStorage.getItem('samithi_user') || 'null');
+        }
     },
 
     throwTo404: () => {

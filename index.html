@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SevaLog | Empowering Communities</title>
+    <meta name="description" content="NGO management and volunteer tracking platform empowering communities through action, event coordination, and service hour logging.">
+    <meta property="og:title" content="SevaLog | Empowering Communities">
+    <meta property="og:description" content="NGO management and volunteer tracking platform empowering communities through action, event coordination, and service hour logging.">
     
     <!-- ========================================== -->
     <!-- INSTANT AUTH REDIRECT (Prevents Layout Flash) -->
@@ -92,9 +95,9 @@
 
             <div class="hero-visual reveal" style="transition-delay: 0.4s;">
                 <div class="visual-circle"></div>
-                <div class="visual-card">
-                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; text-align: left;">
-                        <div style="width: 48px; height: 48px; background: var(--accent-glow); color: var(--accent-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <div class="visual-card" id="hero-visual-card">
+                    <div id="hero-event-header" style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px; text-align: left;">
+                        <div id="hero-event-icon" style="width: 48px; height: 48px; background: var(--accent-glow); color: var(--accent-primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <i data-lucide="calendar-check"></i>
                         </div>
                         <div>
@@ -102,11 +105,11 @@
                             <p id="hero-event-date" style="font-size: 13px; color: var(--text-muted);">Finding next Seva...</p>
                         </div>
                     </div>
-                    <div style="background: var(--bg-surface); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 16px;">
+                    <div id="hero-event-stats" style="background: var(--bg-surface); padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600; display: flex; justify-content: space-between; margin-bottom: 16px;">
                         <span>Volunteers Needed</span>
                         <span id="hero-event-count" style="color: var(--accent-primary);">-- / --</span>
                     </div>
-                    <a href="frontend/opportunities.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;">Join Event</a>
+                    <a id="hero-event-btn" href="frontend/opportunities.html" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;">Join Event</a>
                 </div>
             </div>
         </section>
@@ -207,9 +210,9 @@
                 </a>
                 <p>Building a better tomorrow through organized, impactful community service. Join thousands of volunteers making a difference today.</p>
                 <div style="display: flex; gap: 16px; margin-top: 24px;">
-                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="twitter" style="width: 20px;"></i></a>
-                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="instagram" style="width: 20px;"></i></a>
-                    <a href="#" style="color: #94A3B8; transition: 0.2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><i data-lucide="linkedin" style="width: 20px;"></i></a>
+                    <a href="#" aria-label="Twitter" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
+                    <a href="#" aria-label="Instagram" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>
+                    <a href="#" aria-label="LinkedIn" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
                 </div>
             </div>
             

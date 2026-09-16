@@ -31,27 +31,52 @@ document.addEventListener('DOMContentLoaded', () => {
     const storedUserData = localStorage.getItem('samithi_user');
     const token = localStorage.getItem('samithi_token');
 
+    // Route Protection: Redirect if attempting to access protected area without token
+    const currentPath = window.location.pathname;
+    const isProtectedArea = currentPath.includes('/admin/') || currentPath.includes('/volunteer/');
+    const isLoginPage = currentPath.endsWith('login.html');
+
+    if (isProtectedArea && !isLoginPage && (!token || !storedUserData)) {
+        console.warn("[Auth] Access to protected area denied: No session found.");
+        const prefix = currentPath.includes('/admin/') || currentPath.includes('/volunteer/') ? '../' : '';
+        window.location.replace(prefix + 'login.html');
+        return;
+    }
+
     if (storedUserData && token) {
         try {
-            const user = JSON.parse(storedUserData);
+            const cachedUser = JSON.parse(storedUserData);
             const nameEl = document.getElementById('user-name-top');
             const welcomeEl = document.getElementById('welcome-text');
             const initialEl = document.getElementById('user-initial');
 
-            if (welcomeEl) welcomeEl.innerText = `Welcome back, ${user.firstName}!`;
-            if (nameEl) nameEl.innerText = `${user.firstName} ${user.lastName}`;
-            if (initialEl) initialEl.innerText = user.firstName.charAt(0).toUpperCase();
+            const fName = cachedUser.firstName || cachedUser.first_name || 'User';
+            const lName = cachedUser.lastName || cachedUser.last_name || '';
 
-            // FIX 1: Auto-redirect if they open the PWA and land on a public page
-            const path = window.location.pathname;
-            if (path.endsWith('login.html') || path.endsWith('index.html') || path === '/' || path.endsWith('SevaLog/')) {
-                // Dynamically route based on if they are at the root or already inside 'frontend/'
-                const prefix = path.includes('frontend') ? '' : 'frontend/';
-                const dest = user.role === 'admin' ? 'admin/admin.html' : 'volunteer/dashboard.html';
+            if (welcomeEl) welcomeEl.innerText = `Welcome back, ${fName}!`;
+            if (nameEl) nameEl.innerText = `${fName} ${lName}`.trim();
+            if (initialEl) initialEl.innerText = fName.charAt(0).toUpperCase();
+
+            // Auto-redirect if user lands on public/login page while authenticated
+            if (currentPath.endsWith('login.html') || currentPath.endsWith('index.html') || currentPath === '/' || currentPath.endsWith('SevaLog/')) {
+                const prefix = currentPath.includes('frontend') ? '' : 'frontend/';
+                const dest = cachedUser.role === 'admin' ? 'admin/admin.html' : 'volunteer/dashboard.html';
                 window.location.replace(prefix + dest);
             }
+
+            // Asynchronously validate session against /api/auth/me
+            ApiClient.validateSession().then((freshUser) => {
+                if (freshUser) {
+                    const freshFName = freshUser.firstName || freshUser.first_name || fName;
+                    const freshLName = freshUser.lastName || freshUser.last_name || lName;
+                    if (welcomeEl) welcomeEl.innerText = `Welcome back, ${freshFName}!`;
+                    if (nameEl) nameEl.innerText = `${freshFName} ${freshLName}`.trim();
+                    if (initialEl) initialEl.innerText = freshFName.charAt(0).toUpperCase();
+                }
+            });
+
         } catch (e) {
-            console.error("Session parse error, clearing.");
+            console.error("Session parse error, clearing:", e);
             ApiClient.clearSession();
         }
     }

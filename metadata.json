@@ -1,0 +1,8 @@
+{
+  "name": "SevaLog",
+  "description": "NGO management and volunteer tracking platform empowering communities through action, event coordination, and service hour logging.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
