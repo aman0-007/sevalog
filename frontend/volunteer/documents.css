@@ -8,17 +8,17 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 32px;
-    background: white;
+    background: var(--surface);
     padding: 24px 32px;
     border-radius: 16px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
 }
 
 /* --- 2. LOCKED MASTER BANNER --- */
 .locked-certificate {
-    background: #F8FAFC;
-    border: 2px dashed #CBD5E1;
+    background: var(--surface);
+    border: 1px dashed var(--border);
     border-radius: 16px;
     padding: 20px 24px;
     display: flex;
@@ -28,6 +28,99 @@
     gap: 24px;
     margin-bottom: 32px;
     width: 100%;
+    box-shadow: var(--shadow-soft);
+}
+
+.locked-cert-icon-box {
+    background: var(--bg-surface);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.locked-cert-title {
+    font-size: 15px;
+    color: var(--text-main);
+    margin: 0 0 4px 0;
+    font-weight: 700;
+}
+
+.locked-cert-subtitle {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin: 0;
+}
+
+.locked-progress-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.locked-progress-val {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-main);
+}
+
+.doc-section-header {
+    font-size: 18px;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+}
+
+.doc-empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--surface);
+    border-radius: 16px;
+    border: 1px dashed var(--border);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.doc-empty-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--bg-surface);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    color: var(--accent-primary);
+    border: 1px solid var(--border);
+}
+
+.doc-empty-text {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0;
+    font-weight: 500;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+.loading-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
 
 .locked-progress-container {
@@ -39,14 +132,14 @@
 .locked-progress-bg {
     width: 100%;
     height: 8px;
-    background: #E2E8F0;
+    background: var(--border);
     border-radius: 10px;
     overflow: hidden;
 }
 
 .locked-progress-fill {
     height: 100%;
-    background: #94A3B8;
+    background: var(--accent-primary);
     border-radius: 10px;
     transition: width 1s ease;
 }
@@ -98,25 +191,26 @@
 }
 
 .cert-card {
-    background: white;
-    border: 1px solid var(--border-light);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
     cursor: pointer;
+    box-shadow: var(--shadow-soft);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .cert-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.06);
+    box-shadow: var(--shadow-hover);
 }
 
 .cert-card-master {
-    background: linear-gradient(135deg, #FEF3C7, #FDE68A);
-    border: 1px solid #FCD34D;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
 
@@ -148,9 +242,9 @@
 
 /* Custom Scrollbar for Modal content on Windows */
 #modal-certificate-render-area::-webkit-scrollbar { height: 8px; }
-#modal-certificate-render-area::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-#modal-certificate-render-area::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-#modal-certificate-render-area::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+#modal-certificate-render-area::-webkit-scrollbar-track { background: var(--bg-surface); border-radius: 10px; }
+#modal-certificate-render-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+#modal-certificate-render-area::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
 
 /* --- 5. PREMIUM CERTIFICATE DESIGN --- */

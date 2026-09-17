@@ -40,6 +40,18 @@ app.get('/verify/:id', (req, res) => {
     res.sendFile(path.join(__dirname, 'frontend', 'verify.html'));
 });
 
+app.get('/forgot-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'forgot-password.html'));
+});
+
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'reset-password.html'));
+});
+
+app.get('/reset-password/:userId/:token', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'reset-password.html'));
+});
+
 app.use((req, res, next) => {
     const frontendPath = path.join(__dirname, 'frontend', req.path);
     if (fs.existsSync(frontendPath) && fs.statSync(frontendPath).isFile()) {

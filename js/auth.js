@@ -20,6 +20,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const getVal = (id) => document.getElementById(id)?.value.trim() || '';
     const getChecked = (name) => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
 
+    // Global Alert Notification Helpers
+    const showAlert = (elId, message, type = 'error') => {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.className = `auth-alert auth-alert-${type} visible`;
+        const iconName = type === 'success' ? 'check-circle-2' : (type === 'info' ? 'info' : 'alert-circle');
+        el.innerHTML = `<i data-lucide="${iconName}"></i><div>${message}</div>`;
+        if (window.lucide) lucide.createIcons();
+    };
+
+    const hideAlert = (elId) => {
+        const el = document.getElementById(elId);
+        if (el) {
+            el.className = 'auth-alert';
+            el.innerHTML = '';
+        }
+    };
+
+    // Global Password Visibility Toggle
+    const setupPwToggle = (toggleBtnId, inputId) => {
+        const toggleBtn = document.getElementById(toggleBtnId);
+        const input = document.getElementById(inputId);
+        if (toggleBtn && input) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                toggleBtn.innerHTML = `<i data-lucide="${isPassword ? 'eye-off' : 'eye'}" style="width: 18px; height: 18px;"></i>`;
+                if (window.lucide) lucide.createIcons();
+            });
+        }
+    };
+
     // ==========================================
     // 1. GLOBAL SESSION UI
     // ==========================================
@@ -100,12 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const loginForm = document.getElementById('login-form'); 
     if (loginForm) {
+        setupPwToggle('toggle-login-password', 'login-password');
+
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = loginForm.querySelector('button');
+            const btn = document.getElementById('login-submit-btn') || loginForm.querySelector('button[type="submit"]') || loginForm.querySelector('button');
             const origHtml = btn.innerHTML;
             
             try {
+                hideAlert('login-alert');
                 setButtonState(btn, true);
                 const email = getVal('login-email');
                 const password = getVal('login-password');
@@ -115,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 window.location.href = response.data.user.role === 'admin' ? 'admin/admin.html' : 'volunteer/dashboard.html';
             } catch (error) {
-                alert(error.message);
+                showAlert('login-alert', error.message || 'Invalid email or password. Please try again.', 'error');
                 setButtonState(btn, false, origHtml);
             }
         });
@@ -126,16 +162,182 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================
     const regForm = document.getElementById('registration-form');
     if (regForm) {
+        setupPwToggle('toggle-reg-password', 'password_hash');
+        setupPwToggle('toggle-reg-confirm', 'confirm_password');
+
+        const dobInput = document.getElementById('date_of_birth');
+        if (dobInput) {
+            dobInput.max = new Date().toISOString().split('T')[0];
+        }
+
+        // Live validation for email
+        const emailInput = document.getElementById('email');
+        const emailHint = document.getElementById('email-hint');
+        const emailWrapper = document.getElementById('email-field-wrapper');
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+        const validateEmailLive = () => {
+            if (!emailInput || !emailHint) return;
+            const val = emailInput.value.trim();
+            if (!val) {
+                emailHint.textContent = '';
+                emailHint.className = 'field-live-feedback';
+                emailWrapper?.classList.remove('is-valid', 'is-invalid');
+                return;
+            }
+            if (emailRegex.test(val)) {
+                emailHint.textContent = '✓ Valid email address format';
+                emailHint.className = 'field-live-feedback is-valid';
+                emailWrapper?.classList.add('is-valid');
+                emailWrapper?.classList.remove('is-invalid');
+            } else {
+                emailHint.textContent = 'Please enter a valid email format (e.g. name@domain.com)';
+                emailHint.className = 'field-live-feedback is-invalid';
+                emailWrapper?.classList.add('is-invalid');
+                emailWrapper?.classList.remove('is-valid');
+            }
+        };
+
+        if (emailInput) {
+            emailInput.addEventListener('input', validateEmailLive);
+            emailInput.addEventListener('blur', validateEmailLive);
+        }
+
+        // Live validation for password and confirm password
+        const pwInput = document.getElementById('password_hash');
+        const confirmPwInput = document.getElementById('confirm_password');
+        const pwHint = document.getElementById('password-hint');
+        const confirmPwHint = document.getElementById('confirm-password-hint');
+        const pwWrapper = document.getElementById('password-field-wrapper');
+        const confirmPwWrapper = document.getElementById('confirm-password-field-wrapper');
+
+        const validatePasswordsLive = () => {
+            const pwVal = pwInput?.value || '';
+            const confirmVal = confirmPwInput?.value || '';
+
+            // Password length check
+            if (pwHint) {
+                if (!pwVal) {
+                    pwHint.textContent = '';
+                    pwHint.className = 'field-live-feedback';
+                    pwWrapper?.classList.remove('is-valid', 'is-invalid');
+                } else if (pwVal.length < 6) {
+                    pwHint.textContent = `At least 6 characters required (${pwVal.length}/6)`;
+                    pwHint.className = 'field-live-feedback is-invalid';
+                    pwWrapper?.classList.add('is-invalid');
+                    pwWrapper?.classList.remove('is-valid');
+                } else {
+                    pwHint.textContent = '✓ Minimum 6 characters met';
+                    pwHint.className = 'field-live-feedback is-valid';
+                    pwWrapper?.classList.add('is-valid');
+                    pwWrapper?.classList.remove('is-invalid');
+                }
+            }
+
+            // Confirm password matching check
+            if (confirmPwHint) {
+                if (!confirmVal) {
+                    confirmPwHint.textContent = '';
+                    confirmPwHint.className = 'field-live-feedback';
+                    confirmPwWrapper?.classList.remove('is-valid', 'is-invalid');
+                } else if (pwVal && confirmVal === pwVal) {
+                    if (pwVal.length >= 6) {
+                        confirmPwHint.textContent = '✓ Passwords match';
+                        confirmPwHint.className = 'field-live-feedback is-valid';
+                        confirmPwWrapper?.classList.add('is-valid');
+                        confirmPwWrapper?.classList.remove('is-invalid');
+                    } else {
+                        confirmPwHint.textContent = 'Passwords match, but min. 6 characters required';
+                        confirmPwHint.className = 'field-live-feedback is-invalid';
+                        confirmPwWrapper?.classList.add('is-invalid');
+                        confirmPwWrapper?.classList.remove('is-valid');
+                    }
+                } else {
+                    confirmPwHint.textContent = '✕ Passwords do not match';
+                    confirmPwHint.className = 'field-live-feedback is-invalid';
+                    confirmPwWrapper?.classList.add('is-invalid');
+                    confirmPwWrapper?.classList.remove('is-valid');
+                }
+            }
+        };
+
+        if (pwInput) {
+            pwInput.addEventListener('input', validatePasswordsLive);
+        }
+        if (confirmPwInput) {
+            confirmPwInput.addEventListener('input', validatePasswordsLive);
+        }
+
         regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = regForm.querySelector('button');
+            const btn = regForm.querySelector('button[type="submit"]') || regForm.querySelector('button');
             const origHtml = btn.innerHTML;
             
             try {
+                hideAlert('reg-alert');
+
+                // 1. Password validation & matching
+                const password = getVal('password_hash');
+                const confirmPassword = getVal('confirm_password');
+                if (password.length < 6) {
+                    throw new Error("Password must be at least 6 characters long.");
+                }
+                if (password !== confirmPassword) {
+                    throw new Error("Passwords do not match. Please verify your confirm password.");
+                }
+
+                // 2. Email constraint
+                const email = getVal('email');
+                if (!email || !emailRegex.test(email)) {
+                    throw new Error("Please enter a valid email address (e.g. name@domain.com).");
+                }
+
+                // 3. Phone number constraint (10 digits, optional +91)
+                const phone = getVal('phone_number');
+                const cleanPhone = phone.replace(/[\s\-]/g, '');
+                if (!cleanPhone || !/^(\+91)?[0-9]{10}$/.test(cleanPhone)) {
+                    throw new Error("Please enter a valid 10-digit mobile number.");
+                }
+
+                // Emergency contact phone constraint (if provided)
+                const emergencyPhone = getVal('emergency_contact_number');
+                if (emergencyPhone) {
+                    const cleanEmergPhone = emergencyPhone.replace(/[\s\-]/g, '');
+                    if (!/^(\+91)?[0-9]{10}$/.test(cleanEmergPhone)) {
+                        throw new Error("Please enter a valid 10-digit emergency contact number.");
+                    }
+                }
+
+                // 3. Date of birth constraint
+                const dob = getVal('date_of_birth');
+                if (dob) {
+                    const dobDate = new Date(dob);
+                    const today = new Date();
+                    if (dobDate > today) {
+                        throw new Error("Date of Birth cannot be in the future.");
+                    }
+                }
+
+                // 4. Pincode constraint (6 digits)
+                const pincode = getVal('pincode');
+                if (pincode && !/^[0-9]{6}$/.test(pincode.trim())) {
+                    throw new Error("Please enter a valid 6-digit postal pincode.");
+                }
+
+                // 5. Gender & Blood Group constraints
+                const gender = getVal('gender');
+                if (!gender) {
+                    throw new Error("Please select your Gender.");
+                }
+
+                const bloodGroup = getVal('blood_group');
+                if (!bloodGroup) {
+                    throw new Error("Please select your Blood Group.");
+                }
+
                 // Pre-flight check for the CHECK constraint
                 const college = getVal('college_name');
                 const prof = getVal('profession');
-                
                 if (!college && !prof) {
                     throw new Error("Please provide either your College Name or Profession.");
                 }
@@ -147,8 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     firstName: getVal('first_name'),
                     lastName: getVal('last_name'),
                     email: getVal('email'),
-                    password: getVal('password_hash'),
-                    phoneNumber: getVal('phone_number'),
+                    password: password,
+                    phoneNumber: cleanPhone,
                     collegeName: college,
                     profession: prof
                 };
@@ -163,15 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     profession: prof,
                     city: getVal('city'),
                     residentialAddress: getVal('residential_address'),
-                    dateOfBirth: getVal('date_of_birth'),
-                    gender: getVal('gender'),
-                    bloodGroup: getVal('blood_group'),
+                    dateOfBirth: dob,
+                    gender: gender,
+                    bloodGroup: bloodGroup,
                     educationLevel: getVal('education_level'),
                     state: getVal('state'),
-                    pincode: getVal('pincode'),
+                    pincode: pincode ? pincode.trim() : '',
                     emergencyContactName: getVal('emergency_contact_name'),
                     emergencyContactRelation: getVal('emergency_contact_relation'),
-                    emergencyContactNumber: getVal('emergency_contact_number'),
+                    emergencyContactNumber: emergencyPhone ? emergencyPhone.trim() : '',
                     medicalConditions: getVal('medical_conditions'),
                     languagesSpoken: getChecked('languages_spoken'),
                     skills: getChecked('skills'),
@@ -182,7 +384,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.location.href = 'volunteer/dashboard.html'; 
 
             } catch (error) {
-                alert("Registration Failed: " + error.message);
+                showAlert('reg-alert', error.message || 'Registration failed. Please review your details.', 'error');
+                document.getElementById('reg-alert')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 setButtonState(btn, false, origHtml);
             }
         });
@@ -221,6 +424,313 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 errText.innerText = error.message;
                 errBox.style.display = "flex";
+                setButtonState(btn, false, origHtml);
+            }
+        });
+    }
+
+    // ==========================================
+    // 5. ALERT NOTIFICATION HELPERS (Hoisted to top)
+    // ==========================================
+
+    // ==========================================
+    // 6. FORGOT PASSWORD (MODAL & STANDALONE)
+    // ==========================================
+    const forgotLink = document.getElementById('forgot-password-link');
+    const forgotModal = document.getElementById('forgot-password-modal');
+    const forgotModalClose = document.getElementById('forgot-modal-close');
+
+    if (forgotLink && forgotModal) {
+        forgotLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            forgotModal.classList.add('active');
+            const emailInput = document.getElementById('forgot-modal-email');
+            const loginEmail = document.getElementById('login-email');
+            if (emailInput && loginEmail && loginEmail.value.trim()) {
+                emailInput.value = loginEmail.value.trim();
+            }
+            emailInput?.focus();
+        });
+
+        forgotModalClose?.addEventListener('click', () => {
+            forgotModal.classList.remove('active');
+            hideAlert('forgot-modal-alert');
+        });
+
+        forgotModal.addEventListener('click', (e) => {
+            if (e.target === forgotModal) {
+                forgotModal.classList.remove('active');
+                hideAlert('forgot-modal-alert');
+            }
+        });
+    }
+
+    // Modal Form submission
+    const forgotModalForm = document.getElementById('forgot-password-modal-form');
+    if (forgotModalForm) {
+        forgotModalForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('forgot-modal-submit-btn') || forgotModalForm.querySelector('button[type="submit"]');
+            const origHtml = btn.innerHTML;
+            const email = getVal('forgot-modal-email');
+
+            try {
+                hideAlert('forgot-modal-alert');
+                setButtonState(btn, true);
+
+                const response = await ApiClient.request('/auth/forgot-password', 'POST', { email });
+                const successMsg = response.message || "A password reset link has been dispatched to your email.";
+                showAlert('forgot-modal-alert', successMsg, 'success');
+                btn.disabled = true;
+                btn.innerHTML = `<i data-lucide="check" style="width:18px;"></i> Reset Link Sent`;
+                if (window.lucide) lucide.createIcons();
+            } catch (error) {
+                showAlert('forgot-modal-alert', error.message || "Failed to send reset link. Please try again.", 'error');
+                setButtonState(btn, false, origHtml);
+            }
+        });
+    }
+
+    // Standalone Page Form submission (frontend/forgot-password.html)
+    const forgotPageForm = document.getElementById('forgot-password-page-form');
+    if (forgotPageForm) {
+        forgotPageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('forgot-page-submit-btn') || forgotPageForm.querySelector('button[type="submit"]');
+            const origHtml = btn.innerHTML;
+            const email = getVal('forgot-page-email');
+
+            try {
+                hideAlert('forgot-page-alert');
+                setButtonState(btn, true);
+
+                const response = await ApiClient.request('/auth/forgot-password', 'POST', { email });
+                const successMsg = response.message || "A password reset link has been dispatched to your email address.";
+                showAlert('forgot-page-alert', successMsg, 'success');
+                btn.disabled = true;
+                btn.innerHTML = `<i data-lucide="check" style="width:18px;"></i> Reset Link Sent`;
+                if (window.lucide) lucide.createIcons();
+            } catch (error) {
+                showAlert('forgot-page-alert', error.message || "Failed to request password reset.", 'error');
+                setButtonState(btn, false, origHtml);
+            }
+        });
+    }
+
+    // ==========================================
+    // 7. RESET PASSWORD (POST /auth/reset-password/{userId}/{token})
+    // ==========================================
+    const resetPageForm = document.getElementById('reset-password-page-form');
+    if (resetPageForm) {
+        const tokenBadge = document.getElementById('token-detected-badge');
+        const tokenBadgeText = document.getElementById('token-badge-text');
+        const manualFields = document.getElementById('manual-token-fields');
+        const hiddenUserIdInput = document.getElementById('hidden-user-id');
+        const hiddenTokenInput = document.getElementById('hidden-token');
+        const manualUserIdInput = document.getElementById('reset-user-id');
+        const manualTokenInput = document.getElementById('reset-token');
+
+        const linkInput = document.getElementById('reset-link-input');
+        const parseLinkBtn = document.getElementById('btn-parse-link');
+        const linkFeedback = document.getElementById('link-extract-feedback');
+
+        // Helper to parse reset links in any format
+        const parseResetLink = (linkStr) => {
+            if (!linkStr || typeof linkStr !== 'string') return null;
+            linkStr = linkStr.trim();
+            if (!linkStr) return null;
+
+            let userId = null;
+            let token = null;
+
+            try {
+                // Ensure proper protocol for URL constructor
+                const testUrl = (linkStr.startsWith('http://') || linkStr.startsWith('https://'))
+                    ? linkStr
+                    : 'https://placeholder.local/' + linkStr.replace(/^\/+/, '');
+                const urlObj = new URL(testUrl);
+
+                // 1. Check query parameters (?userId=...&token=...)
+                userId = urlObj.searchParams.get('userId') || urlObj.searchParams.get('user_id') || urlObj.searchParams.get('id');
+                token = urlObj.searchParams.get('token') || urlObj.searchParams.get('t');
+
+                // 2. Check path segments (/reset-password/:userId/:token)
+                if (!userId || !token) {
+                    const segments = urlObj.pathname.split('/').filter(Boolean);
+                    const resetIdx = segments.findIndex(s => s === 'reset-password' || s === 'reset-password.html');
+                    if (resetIdx !== -1 && segments.length >= resetIdx + 3) {
+                        userId = segments[resetIdx + 1];
+                        token = segments[resetIdx + 2];
+                    }
+                }
+            } catch (e) {
+                // URL parsing failed, fall through to regex
+            }
+
+            // 3. Fallback regex matching for path segment (/reset-password/UUID/TOKEN)
+            if (!userId || !token) {
+                const pathMatch = linkStr.match(/reset-password(?:\.html)?\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_.-]+)/i);
+                if (pathMatch) {
+                    userId = pathMatch[1];
+                    token = pathMatch[2];
+                }
+            }
+
+            // 4. Fallback regex for query parameters
+            if (!userId) {
+                const uMatch = linkStr.match(/[?&](?:userId|user_id|id)=([a-zA-Z0-9_-]+)/i);
+                if (uMatch) userId = uMatch[1];
+            }
+            if (!token) {
+                const tMatch = linkStr.match(/[?&](?:token|t)=([a-zA-Z0-9_.-]+)/i);
+                if (tMatch) token = tMatch[1];
+            }
+
+            if (userId && token) {
+                return { userId, token };
+            }
+            return null;
+        };
+
+        // Helper to apply extracted details to DOM
+        const applyExtractedDetails = (userId, token, fromInput = false) => {
+            if (hiddenUserIdInput) hiddenUserIdInput.value = userId;
+            if (hiddenTokenInput) hiddenTokenInput.value = token;
+            if (manualUserIdInput) manualUserIdInput.value = userId;
+            if (manualTokenInput) manualTokenInput.value = token;
+
+            if (tokenBadge) {
+                tokenBadge.style.display = 'inline-flex';
+                if (tokenBadgeText) {
+                    const shortId = userId.length > 8 ? `${userId.slice(0, 8)}...` : userId;
+                    tokenBadgeText.textContent = `Security Token Verified (${shortId})`;
+                }
+            }
+
+            if (manualFields) {
+                manualFields.style.display = 'none';
+            }
+
+            if (fromInput && linkFeedback) {
+                linkFeedback.style.display = 'block';
+                linkFeedback.style.color = '#166534';
+                linkFeedback.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 5px;"><i data-lucide="check-circle" style="width: 14px;"></i> Link verified! Details auto-fetched.</span>`;
+                if (window.lucide) lucide.createIcons();
+
+                // Focus new password input for instant smooth UX
+                const newPwInput = document.getElementById('reset-new-password');
+                if (newPwInput) newPwInput.focus();
+            }
+        };
+
+        // Step 1: Detect userId and token from existing browser URL (Path or Query Parameter)
+        const initialParsed = parseResetLink(window.location.href);
+        if (initialParsed) {
+            if (linkInput) linkInput.value = window.location.href;
+            applyExtractedDetails(initialParsed.userId, initialParsed.token, false);
+        } else {
+            if (manualFields) manualFields.style.display = 'block';
+            if (tokenBadge) tokenBadge.style.display = 'none';
+        }
+
+        // Handler for parsing pasted/entered link
+        const handleProcessLink = () => {
+            const rawVal = linkInput ? linkInput.value.trim() : '';
+            if (!rawVal) {
+                if (linkFeedback) {
+                    linkFeedback.style.display = 'block';
+                    linkFeedback.style.color = '#991B1B';
+                    linkFeedback.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 5px;"><i data-lucide="alert-circle" style="width: 14px;"></i> Please paste a link first.</span>`;
+                    if (window.lucide) lucide.createIcons();
+                }
+                return;
+            }
+
+            const parsed = parseResetLink(rawVal);
+            if (parsed) {
+                applyExtractedDetails(parsed.userId, parsed.token, true);
+            } else {
+                if (linkFeedback) {
+                    linkFeedback.style.display = 'block';
+                    linkFeedback.style.color = '#991B1B';
+                    linkFeedback.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 5px;"><i data-lucide="alert-circle" style="width: 14px;"></i> Could not find both User ID and Token in the link. Please check the URL or use manual fields below.</span>`;
+                    if (window.lucide) lucide.createIcons();
+                }
+                if (manualFields) manualFields.style.display = 'block';
+            }
+        };
+
+        if (parseLinkBtn) {
+            parseLinkBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                handleProcessLink();
+            });
+        }
+
+        if (linkInput) {
+            linkInput.addEventListener('paste', () => {
+                setTimeout(handleProcessLink, 50);
+            });
+            linkInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleProcessLink();
+                }
+            });
+        }
+
+        // Toggle Password Visibility Handlers (Reusing shared helper)
+        setupPwToggle('toggle-new-pw', 'reset-new-password');
+        setupPwToggle('toggle-confirm-pw', 'reset-confirm-password');
+
+        // Form Submit Handler
+        resetPageForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('reset-page-submit-btn') || resetPageForm.querySelector('button[type="submit"]');
+            const origHtml = btn.innerHTML;
+
+            const userId = (hiddenUserIdInput && hiddenUserIdInput.value.trim()) || getVal('reset-user-id');
+            const token = (hiddenTokenInput && hiddenTokenInput.value.trim()) || getVal('reset-token');
+            const newPassword = getVal('reset-new-password');
+            const confirmPassword = getVal('reset-confirm-password');
+
+            try {
+                hideAlert('reset-page-alert');
+
+                if (!userId) {
+                    throw new Error("User ID is missing. Paste your reset link in the box above or enter your User ID.");
+                }
+                if (!token) {
+                    throw new Error("Security Token is missing. Paste your reset link in the box above or enter your token.");
+                }
+                if (newPassword.length < 6) {
+                    throw new Error("Password must be at least 6 characters long.");
+                }
+                if (newPassword !== confirmPassword) {
+                    throw new Error("Passwords do not match. Please re-enter.");
+                }
+
+                setButtonState(btn, true);
+
+                const response = await ApiClient.request(
+                    `/auth/reset-password/${encodeURIComponent(userId)}/${encodeURIComponent(token)}`,
+                    'POST',
+                    { newPassword }
+                );
+
+                const successMsg = (response && response.message) || "Password reset successfully! Redirecting you to sign in...";
+                showAlert('reset-page-alert', successMsg, 'success');
+                btn.disabled = true;
+                btn.innerHTML = `<i data-lucide="check" style="width:18px;"></i> Password Updated!`;
+                if (window.lucide) lucide.createIcons();
+
+                // Smooth redirect to login page after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+
+            } catch (error) {
+                showAlert('reset-page-alert', error.message || "Failed to reset password. The link or token may be invalid or expired.", 'error');
                 setButtonState(btn, false, origHtml);
             }
         });

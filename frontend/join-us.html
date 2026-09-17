@@ -51,40 +51,43 @@
                     <p>New here? Create your profile to join the initiative.</p>
                 </div>
 
+                <div id="reg-alert" class="auth-alert"></div>
+
                 <form id="registration-form">
                     <div class="form-grid">
 
                         <div class="form-section-title full-width">Personal Details</div>
 
                         <div class="input-group">
-                            <label>First Name</label>
+                            <label for="first_name">First Name</label>
                             <div class="input-field"><i data-lucide="user"></i><input type="text" id="first_name"
                                     placeholder="John" required></div>
                         </div>
                         <div class="input-group">
-                            <label>Last Name</label>
+                            <label for="last_name">Last Name</label>
                             <div class="input-field"><i data-lucide="user"></i><input type="text" id="last_name"
                                     placeholder="Doe" required></div>
                         </div>
                         <div class="input-group">
-                            <label>Email</label>
-                            <div class="input-field"><i data-lucide="mail"></i><input type="email" id="email"
-                                    placeholder="john@example.com" required></div>
+                            <label for="email">Email</label>
+                            <div class="input-field" id="email-field-wrapper"><i data-lucide="mail"></i><input type="email" id="email"
+                                    placeholder="john@example.com" autocomplete="email" required></div>
+                            <div id="email-hint" class="field-live-feedback" aria-live="polite"></div>
                         </div>
                         <div class="input-group">
-                            <label>Phone</label>
+                            <label for="phone_number">Phone Number</label>
                             <div class="input-field"><i data-lucide="phone"></i><input type="tel" id="phone_number"
-                                    placeholder="+91..." required></div>
+                                    placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" inputmode="tel" title="Please enter a 10-digit mobile number" required></div>
                         </div>
                         <div class="input-group">
-                            <label>Date of Birth</label>
+                            <label for="date_of_birth">Date of Birth</label>
                             <div class="input-field"><i data-lucide="calendar"></i><input type="date"
-                                    id="date_of_birth"></div>
+                                    id="date_of_birth" min="1920-01-01"></div>
                         </div>
                         <div class="input-group">
-                            <label>Gender</label>
+                            <label for="gender">Gender</label>
                             <div class="input-field"><i data-lucide="users"></i>
-                                <select id="gender">
+                                <select id="gender" required>
                                     <option value="" disabled selected>Select Gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -93,9 +96,9 @@
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Blood Group</label>
+                            <label for="blood_group">Blood Group</label>
                             <div class="input-field"><i data-lucide="droplet"></i>
-                                <select id="blood_group">
+                                <select id="blood_group" required>
                                     <option value="" disabled selected>Select Blood Group</option>
                                     <option value="A+">A+</option>
                                     <option value="A-">A-</option>
@@ -148,9 +151,9 @@
                                     value="Maharashtra" required></div>
                         </div>
                         <div class="input-group">
-                            <label>Pincode</label>
+                            <label for="pincode">Pincode</label>
                             <div class="input-field"><i data-lucide="hash"></i><input type="text" id="pincode"
-                                    placeholder="400071"></div>
+                                    placeholder="6-digit pincode" pattern="[0-9]{6}" maxlength="6" inputmode="numeric" title="Please enter a valid 6-digit postal code"></div>
                         </div>
 
                         <div class="form-section-title full-width">Skills & Interests</div>
@@ -196,22 +199,22 @@
                         <div class="form-section-title full-width">Emergency & Health Info</div>
 
                         <div class="input-group">
-                            <label>Emergency Contact Name</label>
+                            <label for="emergency_contact_name">Emergency Contact Name</label>
                             <div class="input-field"><i data-lucide="shield-alert"></i><input type="text"
                                     id="emergency_contact_name" placeholder="Guardian Name"></div>
                         </div>
                         <div class="input-group">
-                            <label>Emergency Contact Relation</label>
+                            <label for="emergency_contact_relation">Emergency Contact Relation</label>
                             <div class="input-field"><i data-lucide="users"></i><input type="text"
                                     id="emergency_contact_relation" placeholder="e.g. Parent, Sibling"></div>
                         </div>
                         <div class="input-group">
-                            <label>Emergency Number</label>
+                            <label for="emergency_contact_number">Emergency Number</label>
                             <div class="input-field"><i data-lucide="phone-call"></i><input type="tel"
-                                    id="emergency_contact_number" placeholder="+91..."></div>
+                                    id="emergency_contact_number" placeholder="10-digit emergency number" pattern="[0-9]{10}" maxlength="10" inputmode="tel" title="Please enter a 10-digit emergency number"></div>
                         </div>
                         <div class="input-group full-width">
-                            <label>Medical Conditions (If any)</label>
+                            <label for="medical_conditions">Medical Conditions (If any)</label>
                             <div class="input-field">
                                 <textarea id="medical_conditions" rows="2"
                                     placeholder="Important for physical seva activities..."></textarea>
@@ -220,10 +223,28 @@
 
                         <div class="form-section-title full-width" style="margin-top: 10px;">Security</div>
 
-                        <div class="input-group full-width">
-                            <label>Create Password</label>
-                            <div class="input-field"><i data-lucide="lock"></i><input type="password" id="password_hash"
-                                    placeholder="••••••••" required></div>
+                        <div class="input-group">
+                            <label for="password_hash">Create Password</label>
+                            <div class="input-field" id="password-field-wrapper">
+                                <i data-lucide="lock"></i>
+                                <input type="password" id="password_hash" placeholder="Min. 6 characters" minlength="6" autocomplete="new-password" required>
+                                <button type="button" class="input-password-toggle" id="toggle-reg-password" aria-label="Toggle password visibility" title="Show or hide password">
+                                    <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </div>
+                            <div id="password-hint" class="field-live-feedback" aria-live="polite"></div>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="confirm_password">Confirm Password</label>
+                            <div class="input-field" id="confirm-password-field-wrapper">
+                                <i data-lucide="shield-check"></i>
+                                <input type="password" id="confirm_password" placeholder="Repeat password" minlength="6" autocomplete="new-password" required>
+                                <button type="button" class="input-password-toggle" id="toggle-reg-confirm" aria-label="Toggle confirm password visibility" title="Show or hide password">
+                                    <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                                </button>
+                            </div>
+                            <div id="confirm-password-hint" class="field-live-feedback" aria-live="polite"></div>
                         </div>
                     </div>
 

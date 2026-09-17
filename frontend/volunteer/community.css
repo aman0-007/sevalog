@@ -17,11 +17,11 @@
 .social-feed { display: flex; flex-direction: column; gap: 24px; }
 
 .feed-post {
-    background: white;
+    background: var(--surface);
     border-radius: 16px;
     padding: 24px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
 }
 
 .post-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
@@ -32,7 +32,7 @@
 .post-body { font-size: 15px; line-height: 1.6; color: var(--text-main); margin-bottom: 16px; }
 .post-highlight { font-weight: 700; color: var(--accent-primary); }
 
-.post-actions { display: flex; gap: 16px; border-top: 1px solid var(--border-light); padding-top: 16px; }
+.post-actions { display: flex; gap: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
 .action-btn { display: flex; align-items: center; gap: 6px; background: transparent; border: none; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
 .action-btn:hover { color: var(--accent-primary); }
 .action-btn.active { color: #F59E0B; }
@@ -40,19 +40,19 @@
 
 /* --- LEADERBOARD CARD --- */
 .leaderboard-card {
-    background: white; border-radius: 16px; border: 1px solid var(--border-light);
-    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); overflow: hidden; margin-bottom: 32px;
+    background: var(--surface); border-radius: 16px; border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 32px;
 }
 
-.lb-header { padding: 24px; border-bottom: 1px solid var(--border-light); background: var(--bg-surface); }
-.lb-header h3 { font-size: 18px; margin-bottom: 16px; }
+.lb-header { padding: 24px; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
+.lb-header h3 { font-size: 18px; margin-bottom: 16px; color: var(--text-main); }
 
-.lb-tabs { display: flex; background: white; border-radius: 8px; padding: 4px; border: 1px solid var(--border-light); }
+.lb-tabs { display: flex; background: var(--surface); border-radius: 8px; padding: 4px; border: 1px solid var(--border); }
 .lb-tab { flex: 1; padding: 8px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-muted); border-radius: 6px; cursor: pointer; transition: 0.2s; }
 .lb-tab.active { background: var(--accent-glow); color: var(--accent-primary); }
 
 .lb-content { padding: 0; }
-.lb-row { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-light); transition: background 0.2s; }
+.lb-row { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border); transition: background 0.2s; }
 .lb-row:hover { background: var(--bg-surface); }
 .lb-row:last-child { border-bottom: none; }
 

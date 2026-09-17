@@ -47,18 +47,38 @@ html, body {
 
 :root {
     --bg-base: #FFFFFF;
+    --bg-color: #F8FAFC;
+    --surface: #FFFFFF;
     --bg-surface: #F8FAFC;
     --text-main: #0F172A;
     --text-muted: #64748B;
+    --border: #E2E8F0;
     --border-light: #E2E8F0;
     --bg-dark: #0F172A;
     --accent-primary: #2563EB;
+    --accent: #2563EB;
     --accent-hover: #1D4ED8;
     --accent-glow: rgba(37, 99, 235, 0.15);
     
     --radius-full: 9999px;
     --radius-lg: 24px;
     --max-width: 1200px;
+}
+
+[data-theme="dark"] {
+    --bg-base: #0B0F19;
+    --bg-color: #0B0F19;
+    --surface: #111827;
+    --bg-surface: #1E293B;
+    --text-main: #F8FAFC;
+    --text-muted: #94A3B8;
+    --border: #1F2937;
+    --border-light: #1F2937;
+    --bg-dark: #0B0F19;
+    --accent-primary: #3B82F6;
+    --accent: #3B82F6;
+    --accent-hover: #60A5FA;
+    --accent-glow: rgba(59, 130, 246, 0.2);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

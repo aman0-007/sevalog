@@ -3,10 +3,10 @@
    ========================================= */
 
 .events-container {
-    background: #FFFFFF;
+    background: var(--surface);
     border-radius: 24px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
     min-height: 60vh;
 }
@@ -14,7 +14,7 @@
 /* --- THE TABS (Smooth Swipe enabled) --- */
 .tab-header {
     display: flex;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border);
     background: var(--bg-surface);
     padding: 0 24px;
     overflow-x: auto; 
@@ -56,10 +56,10 @@
 
 /* --- THE EVENT TICKETS --- */
 .ticket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 24px; }
-.event-ticket { display: flex; background: white; border: 1px solid var(--border-light); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; position: relative; cursor: pointer; }
-.event-ticket:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+.event-ticket { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-soft); transition: transform 0.2s, box-shadow 0.2s; position: relative; cursor: pointer; }
+.event-ticket:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
 
-.ticket-date { background: var(--bg-surface); padding: 24px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 2px dashed var(--border-light); min-width: 100px; }
+.ticket-date { background: var(--bg-surface); padding: 24px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-right: 2px dashed var(--border); min-width: 100px; }
 .ticket-date .month { font-size: 13px; font-weight: 800; color: var(--accent-primary); text-transform: uppercase; }
 .ticket-date .day { font-size: 32px; font-weight: 800; color: var(--text-main); line-height: 1.1; }
 
@@ -68,7 +68,7 @@
 .t-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; font-weight: 500; }
 .t-row i { width: 16px; color: var(--accent-primary); }
 
-.ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
 
 /* Buttons & Badges */
 .btn-register, .btn-cancel, .btn-checkin { display: inline-flex; align-items: center; justify-content: center; min-width: 130px; padding: 10px 16px; border-radius: 12px; font-size: 13px; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; gap: 6px; }
@@ -86,17 +86,17 @@
 .registered-pill, .verified-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(16, 185, 129, 0.1); color: #10B981; border-radius: 20px; font-size: 12px; font-weight: 800; border: 1px solid rgba(16, 185, 129, 0.2); }
 
 /* --- MODAL UI --- */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px); z-index: 999; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; }
 .modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-content { background: #FFFFFF; width: 100%; max-width: 600px; border-radius: 20px; padding: 24px; transform: translateY(20px); transition: 0.3s ease; border: 1px solid var(--border-light); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+.modal-content { background: var(--surface); width: 100%; max-width: 600px; border-radius: 20px; padding: 24px; transform: translateY(20px); transition: 0.3s ease; border: 1px solid var(--border); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
 .modal-overlay.active .modal-content { transform: translateY(0); }
 
-.modal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 24px; border-bottom: 1px solid var(--border-light); background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(16, 185, 129, 0.05)); }
+.modal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 24px; border-bottom: 1px solid var(--border); background: var(--bg-surface); }
 .modal-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .modal-title-row h2 { margin: 0; font-size: 22px; font-weight: 800; color: var(--text-main); line-height: 1.2; }
 .modal-header p { margin: 0; color: var(--accent-primary); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 6px; }
 
-.details-modal-close { width: 44px; height: 44px; border: 1px solid var(--border-light); border-radius: 12px; background: white; color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s ease; flex-shrink: 0; }
+.details-modal-close { width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); color: var(--text-muted); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s ease; flex-shrink: 0; }
 .details-modal-close:hover { background: var(--bg-surface); color: var(--accent-primary); border-color: var(--accent-glow); }
 
 /* --- QR SCANNER --- */
@@ -136,6 +136,6 @@
 
     .ticket-grid { grid-template-columns: 1fr; }
     .event-ticket { flex-direction: column; }
-    .ticket-date { border-right: none; border-bottom: 2px dashed var(--border-light); padding: 16px; flex-direction: row; gap: 8px; }
+    .ticket-date { border-right: none; border-bottom: 2px dashed var(--border); padding: 16px; flex-direction: row; gap: 8px; }
     .ticket-date .day { font-size: 24px; }
 }

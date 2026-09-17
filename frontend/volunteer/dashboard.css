@@ -79,12 +79,11 @@
 
 /* --- 3. DASHBOARD BOXES (Widgets) --- */
 .dashboard-box {
-    background: #FFFFFF;
+    background: var(--surface);
     border-radius: 20px;
-    border: 1px solid rgba(0,0,0,0.05); /* Softer border for premium feel */
+    border: 1px solid var(--border);
     overflow: hidden;
-    /* Soft, wide shadow for a floating feel */
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.06); 
+    box-shadow: var(--shadow-soft); 
     transition: transform 0.3s ease;
 }
 
@@ -94,7 +93,7 @@
 
 .box-header {
     padding: 20px 24px;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -140,7 +139,7 @@
     top: 24px;
     bottom: -20px;
     width: 2px;
-    background: var(--border-light);
+    background: var(--border);
 }
 
 /* Base dot style */
@@ -193,8 +192,8 @@
     width: 40px;
     height: 40px;
     border-radius: 10px;
-    border: 1px solid var(--border-light);
-    background: white;
+    border: 1px solid var(--border);
+    background: var(--surface);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -304,24 +303,24 @@
 
 .event-ticket {
     display: flex;
-    background: white;
-    border: 1px solid var(--border-light);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    box-shadow: var(--shadow-soft);
     transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
     min-width: 0;
     cursor: pointer;
 }
-.event-ticket:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+.event-ticket:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); }
 
 /* Left Date Box */
 .ticket-date {
     background: var(--bg-surface);
     padding: 24px 20px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    border-right: 2px dashed var(--border-light); /* Perforated ticket look */
+    border-right: 2px dashed var(--border); /* Perforated ticket look */
     min-width: 100px;
     flex-shrink: 0;
 }
@@ -335,7 +334,7 @@
 .t-row i { width: 16px; color: var(--accent-primary); }
 
 /* Buttons & Badges */
-.ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-light); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.ticket-actions { margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
 
 .btn-register,
 .btn-cancel {
@@ -432,8 +431,8 @@
     align-items: flex-start;
     gap: 16px;
     padding: 24px;
-    border-bottom: 1px solid var(--border-light);
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.04), rgba(16, 185, 129, 0.05));
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
 }
 
 .modal-title-block {
@@ -470,9 +469,9 @@
 .details-modal-close {
     width: 44px;
     height: 44px;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border);
     border-radius: 12px;
-    background: white;
+    background: var(--surface);
     color: var(--text-muted);
     display: flex;
     align-items: center;
@@ -491,7 +490,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
     z-index: 999;
     display: flex;
@@ -509,15 +508,15 @@
 }
 
 .modal-content {
-    background: #FFFFFF;
+    background: var(--surface);
     width: 100%;
     max-width: 600px;
     border-radius: 20px;
     padding: 24px;
     transform: translateY(20px);
     transition: 0.3s ease;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
 .modal-overlay.active .modal-content {
@@ -527,6 +526,6 @@
 @media (max-width: 768px) {
     .ticket-grid { grid-template-columns: 1fr; }
     .event-ticket { flex-direction: column; }
-    .ticket-date { border-right: none; border-bottom: 2px dashed var(--border-light); padding: 16px; flex-direction: row; gap: 8px; }
+    .ticket-date { border-right: none; border-bottom: 2px dashed var(--border); padding: 16px; flex-direction: row; gap: 8px; }
     .ticket-date .day { font-size: 24px; }
 }

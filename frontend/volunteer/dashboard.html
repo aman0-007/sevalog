@@ -26,37 +26,21 @@
 </head>
 <body>
 
-    <aside class="sidebar animate-sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <i data-lucide="heart" style="color: var(--accent-primary);"></i>
-            SevaLog
-        </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</a>
-            <a href="my-events.html" class="nav-item"><i data-lucide="calendar"></i> My Events</a>
-            <a href="volunteer-tasks.html" class="nav-item"><i data-lucide="check-square"></i> Tasks</a>
-            <a href="community.html" class="nav-item"><i data-lucide="users"></i> Community Hub</a>
-            <a href="documents.html" class="nav-item"><i data-lucide="file-text"></i> Documents</a>
-            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-light);">
-                <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
-                <a href="#" id="logout-btn" class="nav-item" style="color: #EF4444;"><i data-lucide="log-out"></i> Log Out</a>
-            </div>
-        </nav>
-    </aside>
-
-    <div class="app-content">
-        <header class="top-bar animate-topbar">
-            <button id="mobile-menu-btn" class="icon-btn mobile-menu-btn" aria-label="Open navigation"><i data-lucide="menu"></i></button>
-            <div class="page-title">
-                <h3 id="welcome-text">Loading Dashboard...</h3>
+        <!-- TOP HEADER WITH APP NAME & VOLUNTEER PROFILE INITIAL (ADMIN-STYLE) -->
+        <header class="top-header">
+            <div class="header-left">
+                <a href="dashboard.html" class="header-brand" title="SevaLog">
+                    <i data-lucide="heart" class="brand-icon"></i>
+                    <span>SevaLog</span>
+                </a>
             </div>
             
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <button class="icon-btn"><i data-lucide="bell"></i></button>
-                <div class="user-profile-menu">
-                    <div class="avatar" id="user-initial">U</div>
-                    <span id="user-name-top" style="font-weight: 700; font-size: 14px;">User</span>
-                </div>
+            <div class="header-right">
+                <span id="welcome-text" style="display:none;"></span>
+                <span id="user-name-top" style="display:none;"></span>
+                <button class="header-admin-btn" id="volunteer-profile-btn" onclick="openAdminModal()" title="Volunteer Profile" aria-label="Open Volunteer Profile">
+                    <div class="header-admin-avatar" id="header-user-avatar"><span id="user-initial">V</span></div>
+                </button>
             </div>
         </header>
 
@@ -183,9 +167,9 @@
                     </div>
                 </div>
 
-                <hr style="border: none; border-top: 1px solid var(--border-light); margin: 24px 0;">
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">
 
-                <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+                <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
                     <div style="display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap;">
                         <div style="display: flex; gap: 12px; align-items: flex-start; flex: 1; min-width: 0; margin-bottom: 12px;">
                             <i data-lucide="map-pin" style="width: 20px; color: var(--text-muted); margin-top: 2px; flex-shrink: 0;"></i>
@@ -195,11 +179,11 @@
                                 <span id="detail-address" style="font-size: 14px; color: var(--text-muted); line-height: 1.5; display: block;">--</span>
                             </div>
                         </div>
-                        <a id="detail-map-link" href="#" target="_blank" style="font-size: 13px; font-weight: 700; color: var(--accent-primary); display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; text-decoration: none; background: white; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border-light); transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.02); white-space: nowrap; flex-shrink: 0;">
+                        <a id="detail-map-link" href="#" target="_blank" style="font-size: 13px; font-weight: 700; color: var(--accent-primary); display: inline-flex; align-items: center; gap: 6px; margin-left: 12px; text-decoration: none; background: var(--surface); padding: 8px 14px; border-radius: 10px; border: 1px solid var(--border); transition: 0.2s; box-shadow: var(--shadow-soft); white-space: nowrap; flex-shrink: 0;">
                             <i data-lucide="external-link" style="width: 14px;"></i> Open in Google Maps
                         </a>
                     </div>
-                    <div id="detail-map-embed" style="margin-top: 16px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border-light); background: white; display: none;">
+                    <div id="detail-map-embed" style="margin-top: 16px; border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-surface); display: none;">
                         <iframe id="detail-map-iframe" title="Location map" style="width: 100%; height: 220px; border: 0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
@@ -207,6 +191,414 @@
                 <div>
                     <span style="display:block; font-size: 14px; color: var(--text-main); font-weight: 700; margin-bottom: 8px;">About this Activity</span>
                     <p id="detail-desc" style="font-size: 14px; color: var(--text-muted); line-height: 1.7; white-space: pre-wrap;">--</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLOATING BOTTOM NAVIGATION -->
+    <nav class="volunteer-mobile-nav" aria-label="Volunteer Navigation">
+        <a href="dashboard.html" class="mobile-nav-item active" title="Dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="my-events.html" class="mobile-nav-item" title="Events">
+            <i data-lucide="calendar"></i>
+            <span>Events</span>
+        </a>
+        <a href="volunteer-tasks.html" class="mobile-nav-item" title="Tasks">
+            <i data-lucide="check-square"></i>
+            <span>Tasks</span>
+        </a>
+        <a href="community.html" class="mobile-nav-item" title="Community">
+            <i data-lucide="users"></i>
+            <span>Community</span>
+        </a>
+        <a href="documents.html" class="mobile-nav-item" title="Documents">
+            <i data-lucide="file-text"></i>
+            <span>Documents</span>
+        </a>
+    </nav>
+
+    <!-- VOLUNTEER PROFILE BOTTOM SHEET MODAL (MATCHING ADMIN SIDE) -->
+    <div id="admin-modal-overlay" class="admin-sheet-overlay" onclick="handleAdminOverlayClick(event)">
+        <div class="admin-sheet-container" role="dialog" aria-modal="true" aria-labelledby="admin-sheet-title">
+            <!-- Drag Handle -->
+            <div class="sheet-handle-bar" onclick="closeAdminModal()">
+                <div class="sheet-drag-pill"></div>
+            </div>
+
+            <!-- Sheet Header -->
+            <div class="sheet-header">
+                <div class="sheet-header-title">
+                    <h2 id="admin-sheet-title">Volunteer Profile</h2>
+                    <p>Manage appearance and session</p>
+                </div>
+                <button class="sheet-close-btn" onclick="closeAdminModal()" aria-label="Close Profile Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Sheet Body -->
+            <div class="sheet-body">
+                <!-- User Profile Card -->
+                <div class="admin-profile-card">
+                    <div class="admin-card-avatar" id="modal-user-avatar">V</div>
+                    <div class="admin-card-details">
+                        <div class="admin-card-name-row">
+                            <h3 id="modal-user-name">Volunteer</h3>
+                            <span class="admin-role-badge">
+                                <i data-lucide="award"></i>
+                                <span id="modal-user-role-badge">Volunteer</span>
+                            </span>
+                        </div>
+                        <p class="admin-card-email" id="modal-user-email">volunteer@sevalog.in</p>
+                    </div>
+                </div>
+
+                <!-- Session Data List -->
+                <div class="admin-info-section">
+                    <h4 class="sheet-section-title">Session Details</h4>
+                    <div class="admin-info-list">
+                        <div class="admin-info-item">
+                            <div class="info-label">
+                                <i data-lucide="shield"></i>
+                                <span>Role</span>
+                            </div>
+                            <div class="info-value" id="modal-info-role">Active Volunteer</div>
+                        </div>
+                        <div class="admin-info-item">
+                            <div class="info-label">
+                                <i data-lucide="activity"></i>
+                                <span>Status</span>
+                            </div>
+                            <div class="info-value">
+                                <span class="status-indicator-badge">
+                                    <span class="status-dot-active"></span>
+                                    Active Session
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences & Account Section -->
+                <div class="admin-preferences-section">
+                    <h4 class="sheet-section-title">Preferences</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Theme Toggle Row -->
+                        <div class="theme-switch-row" onclick="toggleTheme()" style="cursor: pointer;">
+                            <div class="theme-switch-info">
+                                <div class="theme-switch-icon">
+                                    <i data-lucide="moon" id="modal-theme-icon-moon"></i>
+                                    <i data-lucide="sun" id="modal-theme-icon-sun" style="display: none;"></i>
+                                </div>
+                                <div>
+                                    <div class="theme-switch-title">Appearance Mode</div>
+                                    <div class="theme-switch-desc" id="modal-theme-status-text">Light appearance enabled</div>
+                                </div>
+                            </div>
+                            <button type="button" class="theme-toggle-switch" id="modal-theme-toggle-switch" role="switch" aria-checked="false" aria-label="Toggle Dark Mode">
+                                <span class="theme-toggle-thumb"></span>
+                            </button>
+                        </div>
+
+                        <!-- Account Settings Row (Similar to Theme Switcher) -->
+                        <div class="account-settings-row" onclick="openVolunteerSettingsModal()" id="open-settings-modal-btn" role="button" tabindex="0" style="cursor: pointer;">
+                            <div class="theme-switch-info">
+                                <div class="theme-switch-icon">
+                                    <i data-lucide="user-cog"></i>
+                                </div>
+                                <div>
+                                    <div class="theme-switch-title">Account Settings</div>
+                                    <div class="theme-switch-desc">Manage profile, skills & security</div>
+                                </div>
+                            </div>
+                            <div class="account-settings-chevron">
+                                <i data-lucide="chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions: Logout -->
+                <div class="sheet-actions">
+                    <button type="button" id="logout-btn" class="sheet-logout-btn">
+                        <i data-lucide="log-out"></i>
+                        <span>Log Out</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VOLUNTEER ACCOUNT SETTINGS MODAL -->
+    <div id="volunteer-settings-modal-overlay" class="settings-modal-overlay" onclick="handleSettingsOverlayClick(event)">
+        <div class="settings-modal-container" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+            <!-- Modal Header -->
+            <div class="settings-modal-header">
+                <div class="settings-header-left">
+                    <button type="button" class="settings-back-btn" onclick="backToVolunteerProfileModal()" title="Back to Profile" aria-label="Back to Profile">
+                        <i data-lucide="arrow-left"></i>
+                    </button>
+                    <div class="settings-title-group">
+                        <div class="settings-title-badge">
+                            <i data-lucide="user-cog"></i>
+                            <span>Volunteer Account</span>
+                        </div>
+                        <h2 id="settings-modal-title">Account Settings</h2>
+                    </div>
+                </div>
+                <button type="button" class="sheet-close-btn" onclick="closeVolunteerSettingsModal()" aria-label="Close Settings">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Tab Navigation Bar -->
+            <div class="settings-modal-tabs" role="tablist">
+                <button type="button" class="settings-tab-btn active" data-tab="tab-personal" onclick="switchSettingsTab('tab-personal')">
+                    <i data-lucide="user"></i>
+                    <span>Personal</span>
+                </button>
+                <button type="button" class="settings-tab-btn" data-tab="tab-skills" onclick="switchSettingsTab('tab-skills')">
+                    <i data-lucide="briefcase"></i>
+                    <span>Skills & Service</span>
+                </button>
+                <button type="button" class="settings-tab-btn" data-tab="tab-emergency" onclick="switchSettingsTab('tab-emergency')">
+                    <i data-lucide="heart-pulse"></i>
+                    <span>Emergency</span>
+                </button>
+                <button type="button" class="settings-tab-btn" data-tab="tab-security" onclick="switchSettingsTab('tab-security')">
+                    <i data-lucide="shield-check"></i>
+                    <span>Security</span>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="settings-modal-body">
+                <!-- Form: Profile Details -->
+                <form id="modal-profile-form" onsubmit="handleModalProfileSubmit(event)">
+                    <!-- TAB 1: Personal -->
+                    <div class="settings-modal-panel active" id="modal-tab-personal">
+                        <div class="panel-intro">
+                            <h3>Personal Information</h3>
+                            <p>Update your volunteer identity and residential address.</p>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-first-name">First Name <span class="req-star">*</span></label>
+                                <input type="text" id="modal-first-name" required placeholder="First name">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-last-name">Last Name <span class="req-star">*</span></label>
+                                <input type="text" id="modal-last-name" required placeholder="Last name">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-dob">Date of Birth</label>
+                                <input type="date" id="modal-dob">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-gender">Gender</label>
+                                <select id="modal-gender" class="form-input">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-blood-group">Blood Group</label>
+                            <select id="modal-blood-group" class="form-input">
+                                <option value="">Select Blood Group</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-address">Residential Address</label>
+                            <textarea id="modal-address" rows="2" placeholder="Full residential street address"></textarea>
+                        </div>
+
+                        <div class="form-row form-row-3">
+                            <div class="form-group">
+                                <label for="modal-city">City</label>
+                                <input type="text" id="modal-city" placeholder="City">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-state">State</label>
+                                <input type="text" id="modal-state" placeholder="State">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-pincode">Pincode</label>
+                                <input type="text" id="modal-pincode" placeholder="Pincode">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: Skills & Service -->
+                    <div class="settings-modal-panel" id="modal-tab-skills">
+                        <div class="panel-intro">
+                            <h3>Background & Skills</h3>
+                            <p>Education, current vocation, and skills you bring to seva.</p>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-education">Highest Education Level</label>
+                                <input type="text" id="modal-education" placeholder="e.g. Bachelor's Degree">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-college">College / University</label>
+                                <input type="text" id="modal-college" placeholder="e.g. IIT Bombay">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-profession">Profession / Vocation</label>
+                            <input type="text" id="modal-profession" placeholder="e.g. Software Engineer, Teacher, Student">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-skills">Skills <span class="label-hint">(Comma separated)</span></label>
+                            <input type="text" id="modal-skills" placeholder="e.g. Teaching, Event Coordination, First Aid">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-languages">Languages Spoken <span class="label-hint">(Comma separated)</span></label>
+                            <input type="text" id="modal-languages" placeholder="e.g. English, Hindi, Telugu, Marathi">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-activities">Interested Activities <span class="label-hint">(Comma separated)</span></label>
+                            <input type="text" id="modal-activities" placeholder="e.g. Food Distribution, Tree Plantation, Medical Camp">
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: Emergency & Health -->
+                    <div class="settings-modal-panel" id="modal-tab-emergency">
+                        <div class="panel-intro">
+                            <h3>Emergency & Medical Information</h3>
+                            <p>Critical details for on-field safety during volunteer drives.</p>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-emergency-name">Emergency Contact Name</label>
+                                <input type="text" id="modal-emergency-name" placeholder="Full name of contact">
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-emergency-relation">Relationship</label>
+                                <input type="text" id="modal-emergency-relation" placeholder="e.g. Parent, Spouse, Sibling">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-emergency-phone">Emergency Contact Phone</label>
+                            <input type="tel" id="modal-emergency-phone" placeholder="10-digit mobile number">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="modal-medical">Medical Conditions / Allergies (if any)</label>
+                            <textarea id="modal-medical" rows="3" placeholder="List any allergies, dietary or physical conditions coordinators should know"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Shared Action Bar for Tabs 1, 2, 3 -->
+                    <div class="settings-modal-footer" id="modal-profile-footer">
+                        <div class="settings-footer-left">
+                            <span id="modal-profile-msg" class="settings-status-msg"></span>
+                        </div>
+                        <div class="settings-footer-actions">
+                            <button type="button" class="btn-cancel-modal" onclick="closeVolunteerSettingsModal()">Cancel</button>
+                            <button type="submit" class="btn-save-modal" id="modal-save-profile-btn">
+                                <i data-lucide="check"></i>
+                                <span>Save Changes</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- TAB 4: Security & Password (Separate Form) -->
+                <div class="settings-modal-panel" id="modal-tab-security">
+                    <div class="panel-intro">
+                        <h3>Account Credentials & Security</h3>
+                        <p>Your verified login identifiers and password management.</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="modal-email">Registered Email</label>
+                            <input type="email" id="modal-email" class="input-readonly" readonly>
+                            <span class="field-note"><i data-lucide="lock"></i> Contact admin to change email</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="modal-phone">Registered Phone</label>
+                            <input type="text" id="modal-phone" class="input-readonly" readonly>
+                            <span class="field-note"><i data-lucide="lock"></i> Verified login phone number</span>
+                        </div>
+                    </div>
+
+                    <div class="security-divider">
+                        <div class="divider-line"></div>
+                        <span class="divider-text">Change Password</span>
+                        <div class="divider-line"></div>
+                    </div>
+
+                    <form id="modal-password-form" onsubmit="handleModalPasswordSubmit(event)">
+                        <div class="form-group">
+                            <label for="modal-curr-pwd">Current Password <span class="req-star">*</span></label>
+                            <div class="password-input-wrap">
+                                <input type="password" id="modal-curr-pwd" required placeholder="Enter current password">
+                                <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('modal-curr-pwd')" title="Toggle visibility" aria-label="Toggle password visibility">
+                                    <i data-lucide="eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="modal-new-pwd">New Password <span class="req-star">*</span></label>
+                                <div class="password-input-wrap">
+                                    <input type="password" id="modal-new-pwd" required minlength="6" placeholder="Min 6 characters">
+                                    <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('modal-new-pwd')" title="Toggle visibility" aria-label="Toggle password visibility">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-confirm-pwd">Confirm New Password <span class="req-star">*</span></label>
+                                <div class="password-input-wrap">
+                                    <input type="password" id="modal-confirm-pwd" required minlength="6" placeholder="Retype new password">
+                                    <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('modal-confirm-pwd')" title="Toggle visibility" aria-label="Toggle password visibility">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="password-form-footer">
+                            <div id="modal-pwd-msg-wrap" style="min-height: 20px;">
+                                <span id="modal-pwd-msg" class="settings-status-msg"></span>
+                            </div>
+                            <button type="submit" class="btn-save-modal btn-update-pwd-full" id="modal-save-pwd-btn">
+                                <i data-lucide="key"></i>
+                                <span>Update Password</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>

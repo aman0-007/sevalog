@@ -50,20 +50,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="locked-certificate">
                     <!-- Left: Icon & Text Grouped Together -->
                     <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
-                        <div style="background: white; padding: 12px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
-                            <i data-lucide="lock" style="width: 24px; height: 24px; color: #94A3B8;"></i>
+                        <div class="locked-cert-icon-box">
+                            <i data-lucide="lock" style="width: 24px; height: 24px; color: var(--text-muted);"></i>
                         </div>
                         <div>
-                            <h3 style="font-size: 15px; color: #0F172A; margin-bottom: 2px; font-weight: 700;">Master Service Diploma</h3>
-                            <p style="color: #64748B; font-size: 12px; margin: 0;">Unlocks at 60 verified hours.</p>
+                            <h3 class="locked-cert-title">Master Service Diploma</h3>
+                            <p class="locked-cert-subtitle">Unlocks at 60 verified hours.</p>
                         </div>
                     </div>
                     
                     <!-- Right/Bottom: Progress Bar -->
                     <div class="locked-progress-container">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase;">Progress</span>
-                            <span style="font-size: 11px; font-weight: 800; color: #0F172A;">${currentHours} / 60 Hrs</span>
+                            <span class="locked-progress-label">Progress</span>
+                            <span class="locked-progress-val">${currentHours} / 60 Hrs</span>
                         </div>
                         <div class="locked-progress-bg">
                             <div class="locked-progress-fill" style="width: ${progressPct}%;"></div>
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             // --- 2. THE EVENT CERTIFICATES LIST ---
-            html += `<h3 style="font-size: 18px; color: var(--text-main); margin-bottom: 16px; border-bottom: 1px solid var(--border-light); padding-bottom: 8px;">Event Certificates</h3>`;
+            html += `<h3 class="doc-section-header">Event Certificates</h3>`;
             
             if (standardCerts.length > 0) {
                 html += `<div class="cert-card-grid">`;
@@ -81,8 +81,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 html += `</div>`;
             } else {
                 html += `
-                <div style="text-align: center; padding: 40px 20px; background: #F8FAFC; border-radius: 16px; border: 1px dashed var(--border-light);">
-                    <p style="color: var(--text-muted); font-size: 14px;">Complete your first event check-out to earn an event certificate.</p>
+                <div class="doc-empty-state">
+                    <div class="doc-empty-icon">
+                        <i data-lucide="award" style="width: 24px; height: 24px;"></i>
+                    </div>
+                    <p class="doc-empty-text">Complete your first event check-out to earn an event certificate.</p>
                 </div>`;
             }
 
@@ -108,14 +111,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         return `
         <div class="${cssClass}" onclick="openCertificateModal('${cert.certificate_id}')">
-            <span class="status-badge" style="background: rgba(15, 23, 42, 0.05); color: #0F172A; width: fit-content; font-size: 11px;">
+            <span class="status-badge" style="background: var(--bg-surface); color: var(--accent-primary); border: 1px solid var(--border); width: fit-content; font-size: 11px;">
                 <i data-lucide="${icon}" style="width: 12px; display: inline; margin-bottom: -2px;"></i> ${badgeText}
             </span>
-            <h4 style="margin: 0; font-size: 16px; color: #0F172A; line-height: 1.3;">${title}</h4>
-            <div style="font-size: 13px; color: #475569; margin-top: auto;">
-                <i data-lucide="clock" style="width: 14px; display: inline; margin-bottom: -2px;"></i> <b>${cert.hours_credited}</b> Hours Credited
+            <h4 style="margin: 0; font-size: 16px; color: var(--text-main); line-height: 1.3;">${title}</h4>
+            <div style="font-size: 13px; color: var(--text-muted); margin-top: auto;">
+                <i data-lucide="clock" style="width: 14px; display: inline; margin-bottom: -2px; color: var(--accent-primary);"></i> <b style="color: var(--text-main);">${cert.hours_credited}</b> Hours Credited
                 <br>
-                <i data-lucide="calendar" style="width: 14px; display: inline; margin-bottom: -2px; margin-top: 6px;"></i> Issued: ${date}
+                <i data-lucide="calendar" style="width: 14px; display: inline; margin-bottom: -2px; margin-top: 6px; color: var(--accent-primary);"></i> Issued: ${date}
             </div>
         </div>`;
     }

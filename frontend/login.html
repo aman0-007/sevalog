@@ -42,43 +42,85 @@
             <div class="form-wrapper reveal">
                 <div class="form-header">
                     <h2>Sign In</h2>
-                    <p>Don't have an account? <a href="join-us.html">Create one</a></p>
+                    <p>Welcome back! Please enter your details to continue.</p>
                 </div>
+
+                <div id="login-alert" class="auth-alert"></div>
 
                 <form id="login-form">
                     <div class="input-group">
-                        <label>Email Address</label>
+                        <label for="login-email">Email Address</label>
                         <div class="input-field">
                             <i data-lucide="mail"></i>
-                            <input type="email" id="login-email" placeholder="john@example.com" required>
+                            <input type="email" id="login-email" placeholder="john@example.com" autocomplete="email" required>
                         </div>
                     </div>
 
                     <div class="input-group">
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <label style="margin-bottom: 0;">Password</label>
-                            <a href="#"
-                                style="font-size: 13px; color: var(--accent-primary); text-decoration: none; font-weight: 600;">Forgot?</a>
+                        <div class="input-label-row">
+                            <label for="login-password">Password</label>
+                            <button type="button" id="forgot-password-link" class="forgot-link-btn" aria-haspopup="dialog">
+                                Forgot password?
+                            </button>
                         </div>
                         <div class="input-field">
                             <i data-lucide="lock"></i>
-                            <input type="password" id="login-password" placeholder="••••••••" required>
+                            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+                            <button type="button" class="input-password-toggle" id="toggle-login-password" aria-label="Toggle password visibility" title="Show or hide password">
+                                <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary auth-btn">
-                        Sign In to Dashboard <i data-lucide="log-in"></i>
+                    <button type="submit" id="login-submit-btn" class="btn btn-primary auth-btn">
+                        Sign In to Dashboard <i data-lucide="arrow-right"></i>
                     </button>
+
+                    <div class="auth-switch-link">
+                        Don't have an account? <a href="join-us.html">Create one</a>
+                    </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div id="forgot-password-modal" class="auth-modal-overlay">
+        <div class="auth-modal-card">
+            <div class="auth-modal-header">
+                <div>
+                    <h3 class="auth-modal-title">Reset Password</h3>
+                    <p class="auth-modal-desc">Enter your registered email to receive a password reset link.</p>
+                </div>
+                <button type="button" id="forgot-modal-close" class="auth-modal-close" aria-label="Close modal">
+                    <i data-lucide="x" style="width: 18px;"></i>
+                </button>
+            </div>
+
+            <div id="forgot-modal-alert" class="auth-alert"></div>
+
+            <form id="forgot-password-modal-form">
+                <div class="input-group">
+                    <label for="forgot-modal-email">Registered Email</label>
+                    <div class="input-field">
+                        <i data-lucide="mail"></i>
+                        <input type="email" id="forgot-modal-email" placeholder="john@example.com" autocomplete="email" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="forgot-modal-submit-btn" class="btn btn-primary auth-btn" style="margin-top: 20px;">
+                    Send Reset Link <i data-lucide="send"></i>
+                </button>
+            </form>
+
+            <div style="margin-top: 18px; text-align: center; font-size: 13px; color: var(--text-muted);">
+                Received a token? <a href="reset-password.html" style="color: var(--accent-primary); font-weight: 700; text-decoration: none;">Set new password here</a>
             </div>
         </div>
     </div>
 
     <script src="public-main.js"></script>
     <script src="../js/api.js"></script>
-    <script src="../js/auth.js"></script>
-    <script src="../public-main.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/pwa.js"></script>
     <script src="../js/protect.js"></script>

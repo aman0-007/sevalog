@@ -3,10 +3,10 @@
    ========================================= */
 
 .tasks-container {
-    background: #FFFFFF;
+    background: var(--surface);
     border-radius: 24px;
-    border: 1px solid var(--border-light);
-    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-soft);
     overflow: hidden;
     min-height: 60vh;
 }
@@ -14,7 +14,7 @@
 /* --- TABS --- */
 .tab-header {
     display: flex;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid var(--border);
     background: var(--bg-surface);
     padding: 0 24px;
     overflow-x: auto;
@@ -59,12 +59,12 @@
 }
 
 .task-card {
-    background: #FFFFFF;
-    border: 1px solid var(--border-light);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 20px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    box-shadow: var(--shadow-soft);
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     display: flex;
     flex-direction: column;
@@ -72,7 +72,7 @@
 
 .task-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    box-shadow: var(--shadow-hover);
     border-color: var(--accent-glow);
 }
 
@@ -97,7 +97,7 @@
 .card-footer {
     margin-top: auto;
     padding-top: 16px;
-    border-top: 1px dashed var(--border-light);
+    border-top: 1px dashed var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -125,8 +125,8 @@
 /* --- MODAL UI --- */
 .modal-header {
     padding: 24px;
-    border-bottom: 1px solid var(--border-light);
-    background: #F8FAFC;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-surface);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -142,7 +142,9 @@
 .form-input {
     width: 100%;
     padding: 12px;
-    border: 1px solid var(--border-light);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-main);
     border-radius: 8px;
     font-family: inherit;
     font-size: 14px;
@@ -211,14 +213,14 @@
     color: var(--text-muted);
     margin-bottom: 16px;
     padding-bottom: 8px;
-    border-bottom: 2px solid var(--border-light);
+    border-bottom: 2px solid var(--border);
 }
 
 /* --- MODAL OVERLAY FIX --- */
 .modal-overlay {
     position: fixed !important; 
     inset: 0; 
-    background: rgba(15, 23, 42, 0.75) !important;
+    background: rgba(0, 0, 0, 0.7) !important;
     backdrop-filter: blur(4px); 
     z-index: 99999 !important; /* Force to absolute top */
     display: flex !important; 
@@ -236,5 +238,7 @@
 }
 
 .modal-content {
-    background-color: #FFFFFF !important;
+    background-color: var(--surface) !important;
+    color: var(--text-main);
+    border: 1px solid var(--border);
 }

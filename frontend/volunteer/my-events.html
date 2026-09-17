@@ -28,33 +28,21 @@
 </head>
 <body>
 
-    <aside class="sidebar animate-sidebar" id="sidebar">
-        <!-- Sidebar content remains identical -->
-        <div class="sidebar-logo"><i data-lucide="heart" style="color: var(--accent-primary);"></i> SevaLog</div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item"><i data-lucide="layout-dashboard"></i> Dashboard</a>
-            <a href="my-events.html" class="nav-item active"><i data-lucide="calendar"></i> My Events</a>
-            <a href="volunteer-tasks.html" class="nav-item"><i data-lucide="check-square"></i> Tasks</a>
-            <a href="community.html" class="nav-item"><i data-lucide="users"></i> Community Hub</a>
-            <a href="documents.html" class="nav-item"><i data-lucide="file-text"></i> Documents</a>
-            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border-light);">
-                <a href="settings.html" class="nav-item"><i data-lucide="settings"></i> Settings</a>
-                <a href="#" id="logout-btn" class="nav-item" style="color: #EF4444;"><i data-lucide="log-out"></i> Log Out</a>
+        <!-- TOP HEADER WITH APP NAME & VOLUNTEER PROFILE INITIAL (ADMIN-STYLE) -->
+        <header class="top-header">
+            <div class="header-left">
+                <a href="dashboard.html" class="header-brand" title="SevaLog">
+                    <i data-lucide="heart" class="brand-icon"></i>
+                    <span>SevaLog</span>
+                </a>
             </div>
-        </nav>
-    </aside>
-
-    <div class="app-content">
-        <!-- Header & Main Viewport remain identical -->
-        <header class="top-bar animate-topbar">
-            <button id="mobile-menu-btn" class="icon-btn mobile-menu-btn" aria-label="Open navigation"><i data-lucide="menu"></i></button>
-            <div class="page-title"><h3>My Schedule</h3></div>
-            <div style="display: flex; align-items: center; gap: 20px;">
-                <button class="icon-btn"><i data-lucide="bell"></i></button>
-                <div class="user-profile-menu">
-                    <div class="avatar" id="user-initial">U</div>
-                    <span id="user-name-top" style="font-weight: 700; font-size: 14px;">User</span>
-                </div>
+            
+            <div class="header-right">
+                <span id="welcome-text" style="display:none;"></span>
+                <span id="user-name-top" style="display:none;"></span>
+                <button class="header-admin-btn" id="volunteer-profile-btn" onclick="openAdminModal()" title="Volunteer Profile" aria-label="Open Volunteer Profile">
+                    <div class="header-admin-avatar" id="header-user-avatar"><span id="user-initial">V</span></div>
+                </button>
             </div>
         </header>
 
@@ -114,16 +102,16 @@
                 </div>
 
                 <!-- NEW: Attendance Stats (Only visible if checked in) -->
-                <div id="detail-attendance-stats" style="display: none; background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; padding: 16px; margin-bottom: 24px; align-items: center; justify-content: space-between;">
-                    <div><span style="display:block; font-size: 12px; color: #166534; font-weight: 700; text-transform: uppercase;">Check-in</span><span id="detail-checkin" style="font-size: 15px; font-weight: 800; color: #15803D;">--</span></div>
-                    <div><span style="display:block; font-size: 12px; color: #166534; font-weight: 700; text-transform: uppercase;">Check-out</span><span id="detail-checkout" style="font-size: 15px; font-weight: 800; color: #15803D;">--</span></div>
-                    <div style="text-align: right;"><span style="display:block; font-size: 12px; color: #166534; font-weight: 700; text-transform: uppercase;">Hours Logged</span><span id="detail-hours" style="font-size: 15px; font-weight: 800; color: #15803D;">--</span></div>
+                <div id="detail-attendance-stats" style="display: none; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 16px; margin-bottom: 24px; align-items: center; justify-content: space-between;">
+                    <div><span style="display:block; font-size: 12px; color: #10B981; font-weight: 700; text-transform: uppercase;">Check-in</span><span id="detail-checkin" style="font-size: 15px; font-weight: 800; color: #10B981;">--</span></div>
+                    <div><span style="display:block; font-size: 12px; color: #10B981; font-weight: 700; text-transform: uppercase;">Check-out</span><span id="detail-checkout" style="font-size: 15px; font-weight: 800; color: #10B981;">--</span></div>
+                    <div style="text-align: right;"><span style="display:block; font-size: 12px; color: #10B981; font-weight: 700; text-transform: uppercase;">Hours Logged</span><span id="detail-hours" style="font-size: 15px; font-weight: 800; color: #10B981;">--</span></div>
                 </div>
 
-                <hr style="border: none; border-top: 1px solid var(--border-light); margin: 24px 0;">
+                <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">
                 
                 <!-- NEW: Location with Embedded Map -->
-                <div style="background: #F8FAFC; border: 1px solid var(--border-light); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
+                <div style="background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 24px;">
                     <div style="display: flex; gap: 12px; align-items: flex-start; margin-bottom: 16px;">
                         <i data-lucide="map-pin" style="width: 20px; color: var(--text-muted); margin-top: 2px; flex-shrink: 0;"></i>
                         <div style="flex: 1; min-width: 0;">
@@ -134,7 +122,7 @@
                     </div>
                     
                     <!-- The iframe already contains its own "View larger map" button -->
-                    <div id="detail-map-embed" style="border-radius: 14px; overflow: hidden; border: 1px solid var(--border-light); background: white; display: none;">
+                    <div id="detail-map-embed" style="border-radius: 14px; overflow: hidden; border: 1px solid var(--border); background: var(--bg-surface); display: none;">
                         <iframe id="detail-map-iframe" title="Location map" style="width: 100%; height: 220px; border: 0;" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                 </div>
@@ -162,6 +150,142 @@
             </div>
 
             <p style="color: #94A3B8; font-size: 13px; margin-top: 20px; line-height: 1.5;">Point your camera at the admin's screen to log your attendance.</p>
+        </div>
+    </div>
+
+    <!-- FLOATING BOTTOM NAVIGATION -->
+    <nav class="volunteer-mobile-nav" aria-label="Volunteer Navigation">
+        <a href="dashboard.html" class="mobile-nav-item" title="Dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="my-events.html" class="mobile-nav-item active" title="Events">
+            <i data-lucide="calendar"></i>
+            <span>Events</span>
+        </a>
+        <a href="volunteer-tasks.html" class="mobile-nav-item" title="Tasks">
+            <i data-lucide="check-square"></i>
+            <span>Tasks</span>
+        </a>
+        <a href="community.html" class="mobile-nav-item" title="Community">
+            <i data-lucide="users"></i>
+            <span>Community</span>
+        </a>
+        <a href="documents.html" class="mobile-nav-item" title="Documents">
+            <i data-lucide="file-text"></i>
+            <span>Documents</span>
+        </a>
+    </nav>
+
+    <!-- VOLUNTEER PROFILE BOTTOM SHEET MODAL (MATCHING ADMIN SIDE) -->
+    <div id="admin-modal-overlay" class="admin-sheet-overlay" onclick="handleAdminOverlayClick(event)">
+        <div class="admin-sheet-container" role="dialog" aria-modal="true" aria-labelledby="admin-sheet-title">
+            <!-- Drag Handle -->
+            <div class="sheet-handle-bar" onclick="closeAdminModal()">
+                <div class="sheet-drag-pill"></div>
+            </div>
+
+            <!-- Sheet Header -->
+            <div class="sheet-header">
+                <div class="sheet-header-title">
+                    <h2 id="admin-sheet-title">Volunteer Profile</h2>
+                    <p>Manage appearance and session</p>
+                </div>
+                <button class="sheet-close-btn" onclick="closeAdminModal()" aria-label="Close Profile Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Sheet Body -->
+            <div class="sheet-body">
+                <!-- User Profile Card -->
+                <div class="admin-profile-card">
+                    <div class="admin-card-avatar" id="modal-user-avatar">V</div>
+                    <div class="admin-card-details">
+                        <div class="admin-card-name-row">
+                            <h3 id="modal-user-name">Volunteer</h3>
+                            <span class="admin-role-badge">
+                                <i data-lucide="award"></i>
+                                <span id="modal-user-role-badge">Volunteer</span>
+                            </span>
+                        </div>
+                        <p class="admin-card-email" id="modal-user-email">volunteer@sevalog.in</p>
+                    </div>
+                </div>
+
+                <!-- Session Data List -->
+                <div class="admin-info-section">
+                    <h4 class="sheet-section-title">Session Details</h4>
+                    <div class="admin-info-list">
+                        <div class="admin-info-item">
+                            <div class="info-label">
+                                <i data-lucide="shield"></i>
+                                <span>Role</span>
+                            </div>
+                            <div class="info-value" id="modal-info-role">Active Volunteer</div>
+                        </div>
+                        <div class="admin-info-item">
+                            <div class="info-label">
+                                <i data-lucide="activity"></i>
+                                <span>Status</span>
+                            </div>
+                            <div class="info-value">
+                                <span class="status-indicator-badge">
+                                    <span class="status-dot-active"></span>
+                                    Active Session
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences & Account Section -->
+                <div class="admin-preferences-section">
+                    <h4 class="sheet-section-title">Preferences</h4>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Theme Toggle Row -->
+                        <div class="theme-switch-row" onclick="toggleTheme()" style="cursor: pointer;">
+                            <div class="theme-switch-info">
+                                <div class="theme-switch-icon">
+                                    <i data-lucide="moon" id="modal-theme-icon-moon"></i>
+                                    <i data-lucide="sun" id="modal-theme-icon-sun" style="display: none;"></i>
+                                </div>
+                                <div>
+                                    <div class="theme-switch-title">Appearance Mode</div>
+                                    <div class="theme-switch-desc" id="modal-theme-status-text">Light appearance enabled</div>
+                                </div>
+                            </div>
+                            <button type="button" class="theme-toggle-switch" id="modal-theme-toggle-switch" role="switch" aria-checked="false" aria-label="Toggle Dark Mode">
+                                <span class="theme-toggle-thumb"></span>
+                            </button>
+                        </div>
+
+                        <!-- Account Settings Row (Similar to Theme Switcher) -->
+                        <div class="account-settings-row" onclick="openVolunteerSettingsModal()" id="open-settings-modal-btn" role="button" tabindex="0" style="cursor: pointer;">
+                            <div class="theme-switch-info">
+                                <div class="theme-switch-icon">
+                                    <i data-lucide="user-cog"></i>
+                                </div>
+                                <div>
+                                    <div class="theme-switch-title">Account Settings</div>
+                                    <div class="theme-switch-desc">Manage profile, skills & security</div>
+                                </div>
+                            </div>
+                            <div class="account-settings-chevron">
+                                <i data-lucide="chevron-right"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions: Logout -->
+                <div class="sheet-actions">
+                    <button type="button" id="logout-btn" class="sheet-logout-btn">
+                        <i data-lucide="log-out"></i>
+                        <span>Log Out</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
