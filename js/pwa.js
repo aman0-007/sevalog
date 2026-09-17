@@ -4,12 +4,52 @@
 
 let deferredPrompt;
 
-// 1. Register the Service Worker
+// 1. Register the Service Worker with automatic updates
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('[PWA] Service Worker Registered successfully.', reg.scope))
+            .then(reg => {
+                console.log('[PWA] Service Worker Registered successfully:', reg.scope);
+                
+                // Immediately check if there is an updated service worker on server
+                reg.update().catch(() => {});
+
+                // If an updated worker is found and already waiting, prompt/force it to activate
+                if (reg.waiting) {
+                    reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('[PWA] New version ready - auto activating');
+                            }
+                        });
+                    }
+                });
+            })
             .catch(err => console.error('[PWA] Service Worker Registration Failed:', err));
+    });
+
+    // Check for updates when user returns to app/tab
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && navigator.serviceWorker.ready) {
+            navigator.serviceWorker.ready.then(reg => {
+                reg.update().catch(() => {});
+            });
+        }
+    });
+
+    // When the new service worker takes control, refresh page smoothly to load new assets
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+            refreshing = true;
+            console.log('[PWA] Service worker updated. Refreshing page to load latest version...');
+            window.location.reload();
+        }
     });
 }
 

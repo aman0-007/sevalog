@@ -60,7 +60,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = response.data || [];
             globalEventsData = data;
 
-            const upcomingEvents = data.filter(ev => ev.dynamic_status === 'upcoming' || ev.dynamic_status === 'ongoing');
+            const now = new Date();
+            const upcomingEvents = data.filter(ev => {
+                if (ev.dynamic_status === 'cancelled' || ev.dynamic_status === 'completed') return false;
+                
+                // Real-time verification of event date and end time
+                const datePart = (ev.event_date || '').split('T')[0];
+                const safeEndTime = ev.end_time || '23:59:00';
+                const eventEnd = datePart ? new Date(`${datePart}T${safeEndTime}`) : null;
+                
+                if (eventEnd && !isNaN(eventEnd.getTime()) && eventEnd < now) {
+                    return false; // Event has already concluded
+                }
+                
+                return ev.dynamic_status === 'upcoming' || ev.dynamic_status === 'ongoing' || !ev.dynamic_status;
+            });
 
             if (upcomingEvents.length === 0) {
                 container.innerHTML = '<p class="empty-msg">There are no upcoming events yet.</p>';

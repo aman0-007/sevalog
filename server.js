@@ -7,6 +7,14 @@ const PORT = 3000;
 
 app.use(express.json());
 
+// Explicitly prevent HTTP caching for service worker file so browsers immediately see updates
+app.get('/sw.js', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.sendFile(path.join(__dirname, 'sw.js'));
+});
+
 // Serve static assets from the root directory
 app.use(express.static(path.join(__dirname), {
     extensions: ['html', 'htm']

@@ -1,7 +1,8 @@
-const CACHE_NAME = 'sevalog-cache-v5';
-const DYNAMIC_CACHE = 'sevalog-dynamic-v5';
+const CACHE_VERSION = 'sevalog-v7';
+const CACHE_NAME = `sevalog-cache-${CACHE_VERSION}`;
+const DYNAMIC_CACHE = `sevalog-dynamic-${CACHE_VERSION}`;
 
-// Assets essential for the app shell
+// Assets essential for the offline app shell
 const STATIC_ASSETS = [
     '/',
     '/index.html',
@@ -14,70 +15,87 @@ const STATIC_ASSETS = [
     'https://unpkg.com/lucide@latest'
 ];
 
-// 1. Install Event - Cache App Shell
+// 1. Install Event - Cache App Shell & Immediately skip waiting
 self.addEventListener('install', (event) => {
+    // Force the waiting service worker to become active immediately
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            console.log('[Service Worker] Caching App Shell');
+            console.log('[Service Worker] Caching App Shell for', CACHE_NAME);
             return cache.addAll(STATIC_ASSETS);
         })
     );
-    self.skipWaiting();
 });
 
-// 2. Activate Event - Clean up old caches
+// 2. Activate Event - Purge all previous caches & take control of all open windows immediately
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cache) => {
                     if (cache !== CACHE_NAME && cache !== DYNAMIC_CACHE) {
-                        console.log('[Service Worker] Deleting old cache:', cache);
+                        console.log('[Service Worker] Purging obsolete cache:', cache);
                         return caches.delete(cache);
                     }
                 })
             );
+        }).then(() => {
+            // Claim all open clients immediately without requiring reloads or reinstall
+            return self.clients.claim();
         })
     );
-    self.clients.claim();
 });
 
-// 3. Fetch Event - Advanced Routing Strategy
+// 3. Fetch Event - True Network-First Strategy
+// Always fetch fresh from the network so updates appear instantly.
+// Falls back to cache or offline.html only when disconnected.
 self.addEventListener('fetch', (event) => {
     const req = event.request;
+
+    // Do not intercept non-GET requests (e.g. POST / PUT / PATCH)
+    if (req.method !== 'GET') {
+        return;
+    }
+
     const url = new URL(req.url);
 
-    // STRATEGY A: API Requests (Network First, fallback to cache)
+    // STRATEGY A: API Requests (Network First, update dynamic cache, fallback to cache)
     if (url.pathname.startsWith('/api/')) {
         event.respondWith(
             fetch(req)
                 .then((networkRes) => {
-                    return caches.open(DYNAMIC_CACHE).then((cache) => {
-                        cache.put(req, networkRes.clone());
-                        return networkRes;
-                    });
+                    if (networkRes && networkRes.status === 200) {
+                        const copy = networkRes.clone();
+                        caches.open(DYNAMIC_CACHE).then((cache) => {
+                            cache.put(req, copy);
+                        });
+                    }
+                    return networkRes;
                 })
                 .catch(() => caches.match(req))
         );
         return;
     }
 
-    // STRATEGY B: Static Assets & HTML (Network-First, Fallback to Cache)
+    // STRATEGY B: Web Pages, JS, CSS, and Assets (Always Network-First)
     event.respondWith(
         fetch(req)
             .then((networkRes) => {
-                // If online, fetch the latest file and update the cache
-                return caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(req, networkRes.clone());
-                    return networkRes;
-                });
+                // If network fetch succeeded, update cache for offline use
+                if (networkRes && networkRes.status === 200) {
+                    const copy = networkRes.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(req, copy);
+                    });
+                }
+                return networkRes;
             })
             .catch(() => {
-                // If offline, check the cache
+                // Network failed -> Device is offline. Serve from cache.
                 return caches.match(req).then((cachedRes) => {
                     if (cachedRes) return cachedRes;
-                    
-                    // If offline and trying to navigate to a new page, show offline UI
+
+                    // If offline and navigating to a page, show offline fallback
                     if (req.mode === 'navigate') {
                         return caches.match('/offline.html');
                     }
