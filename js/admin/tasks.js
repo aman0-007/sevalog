@@ -61,17 +61,26 @@ function linkify(text) {
 }
 
 // --- HELPER: Format Deadline ---
-function formatDeadline(dateString) {
-    if (!dateString) return 'No Deadline';
+function formatDeadline(dateString, status) {
+    if (!dateString) return '<span style="color:var(--text-muted); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="clock" style="width:12px; height:12px; display:inline;"></i> No Deadline</span>';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return escapeHTML(dateString);
+
+    const formatted = date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+    // Completed, cancelled, and review-pending tasks must NOT be flagged as Overdue or Due Soon
+    const isResolvedOrSubmitted = ['completed', 'cancelled', 'pending_verification'].includes(status);
+    if (isResolvedOrSubmitted) {
+        return `<span style="color:var(--text-muted); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="calendar" style="width:12px; height:12px; display:inline;"></i> ${formatted}</span>`;
+    }
+
     const now = new Date();
     const isPast = date < now;
     const isSoon = (date - now) < (24 * 60 * 60 * 1000) && !isPast; // within 24 hrs
     
-    let formatted = date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-    if (isPast) return `<span class="deadline-danger"><i data-lucide="alert-circle" style="width:12px; height:12px; display:inline;"></i> Overdue: ${formatted}</span>`;
-    if (isSoon) return `<span class="deadline-warning"><i data-lucide="clock" style="width:12px; height:12px; display:inline;"></i> Due Soon: ${formatted}</span>`;
-    return formatted;
+    if (isPast) return `<span class="deadline-danger" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="alert-circle" style="width:12px; height:12px; display:inline;"></i> Overdue: ${formatted}</span>`;
+    if (isSoon) return `<span class="deadline-warning" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="clock" style="width:12px; height:12px; display:inline;"></i> Due Soon: ${formatted}</span>`;
+    return `<span style="color:var(--text-muted); display:inline-flex; align-items:center; gap:4px;"><i data-lucide="calendar" style="width:12px; height:12px; display:inline;"></i> ${formatted}</span>`;
 }
 
 // --- HELPER: Escape HTML to prevent XSS ---
@@ -175,7 +184,7 @@ function renderKanban() {
                     </div>
                 </div>
                 <div style="margin-top: 8px; font-size: 11px;">
-                    ${formatDeadline(task.deadline)}
+                    ${formatDeadline(task.deadline, task.status)}
                 </div>
             </div>
             `;
@@ -315,7 +324,7 @@ async function openTaskDetailsModal(taskId) {
         document.getElementById('detail-task-title').innerText = task.title;
         document.getElementById('detail-task-event').innerText = task.event_title ? `Linked to: ${task.event_title}` : '';
         document.getElementById('detail-task-assignee').innerText = `${task.assignee_first} ${task.assignee_last}`;
-        document.getElementById('detail-task-deadline').innerHTML = formatDeadline(task.deadline);
+        document.getElementById('detail-task-deadline').innerHTML = formatDeadline(task.deadline, task.status);
         document.getElementById('detail-task-desc').innerHTML = linkify(task.description);
 
         // Map the reward hours to the 3rd column if it exists in HTML

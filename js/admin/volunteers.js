@@ -38,27 +38,26 @@ function renderTable(dataToRender) {
 
     tbody.innerHTML = dataToRender.map(vol => {
         const fullName = `${vol.first_name || ''} ${vol.last_name || ''}`.trim();
-        const initial = vol.first_name ? vol.first_name.charAt(0).toUpperCase() : 'V';
         const joinedDate = vol.created_at ? new Date(vol.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '--';
 
         return `
         <tr onclick="viewProfile('${vol.user_id}')">
-            <td>
+            <td class="col-volunteer">
                 <div class="volunteer-name-cell">
-                    <div class="mini-avatar" style="${!vol.is_active ? 'filter: grayscale(1); opacity: 0.5;' : ''}">${initial}</div>
-                    <span style="font-weight: 600; ${!vol.is_active ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${fullName || 'Anonymous'}</span>
+                    <span class="volunteer-name-text" style="font-weight: 600; color: var(--text-main); ${!vol.is_active ? 'text-decoration: line-through; color: var(--text-muted);' : ''}">${fullName || 'Anonymous'}</span>
                 </div>
             </td>
-            <td>
-                <div style="font-size: 13px; font-weight: 500;">${vol.email || '--'}</div>
+            <td class="col-contact">
+                <div style="font-size: 13px; font-weight: 500; color: var(--text-main); word-break: break-word; overflow-wrap: anywhere;">${vol.email || '--'}</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${vol.phone_number || '--'}</div>
             </td>
-            <td>
-                <div style="font-size: 13px;">${vol.city || 'Mumbai'}</div>
-                <div style="font-size: 12px; color: var(--text-muted);">Joined ${joinedDate}</div>
+            <td class="col-location">
+                <div style="font-size: 13px; font-weight: 500; color: var(--text-main);">${vol.city || 'Mumbai'}</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Joined ${joinedDate}</div>
             </td>
-
-            <td style="font-weight: 600; color: ${vol.is_active ? 'var(--accent)' : 'var(--text-muted)'};">${vol.total_hours_served || 0} hrs</td>
+            <td class="col-hours" style="text-align: right; font-weight: 600; color: ${vol.is_active ? 'var(--accent)' : 'var(--text-muted)'}; white-space: nowrap;">
+                ${vol.total_hours_served || 0} hrs
+            </td>
         </tr>
     `}).join('');
 }

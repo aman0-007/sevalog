@@ -9,13 +9,13 @@ let currentActiveRoster = [];
 // ==========================================
 // ZONE 1: FORMATTERS & LOOKUPS
 // ==========================================
-const dateFormatter = new Intl.DateTimeFormat('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+const dateFormatter = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 const formatTime = (timeString) => {
     if (!timeString) return '--';
     const [hours, minutes] = timeString.split(':');
     const d = new Date();
-    d.setHours(hours, minutes);
-    return d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit', hour12: true });
+    d.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 };
 
 const STATUS_UI_MAP = {
@@ -64,9 +64,46 @@ function getEventBadges(event) {
 // ZONE 2: MAIN TABLE RENDERING
 // ==========================================
 function debounceLoadEvents() {
+    const searchVal = document.getElementById('filter-search')?.value.trim();
+    const clearBtn = document.getElementById('filter-search-clear');
+    if (clearBtn) {
+        clearBtn.style.display = searchVal ? 'flex' : 'none';
+    }
     if (searchTimeout) clearTimeout(searchTimeout);
     searchTimeout = setTimeout(loadEvents, 350); 
 }
+
+function clearEventSearch() {
+    const input = document.getElementById('filter-search');
+    if (input) {
+        input.value = '';
+        const clearBtn = document.getElementById('filter-search-clear');
+        if (clearBtn) clearBtn.style.display = 'none';
+        loadEvents();
+    }
+}
+
+function setStatusFilter(status, element) {
+    const statusInput = document.getElementById('filter-status');
+    if (statusInput) statusInput.value = status;
+
+    const chips = document.querySelectorAll('.events-status-chips .status-chip');
+    chips.forEach(chip => {
+        const isSelected = (element ? chip === element : chip.getAttribute('data-status') === status);
+        chip.classList.toggle('active', isSelected);
+        chip.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+    });
+
+    if (element && typeof element.scrollIntoView === 'function') {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+
+    loadEvents();
+}
+
+window.debounceLoadEvents = debounceLoadEvents;
+window.clearEventSearch = clearEventSearch;
+window.setStatusFilter = setStatusFilter;
 
 async function loadEvents() {
     const tbody = document.getElementById('events-table-body');
@@ -126,23 +163,25 @@ async function loadEvents() {
 
             return `
             <tr onclick="openDetailsModal('${ev.event_id}')" style="cursor: pointer;">
-                <td style="font-weight: 600;">${ev.title}</td>
-                <td>
-                    <div>${dateFormatter.format(new Date(ev.event_date))}</div>
-                    <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                        <i data-lucide="clock" style="width: 12px; height: 12px; display: inline; margin-bottom: -2px;"></i> 
-                        ${formatTime(ev.start_time)} - ${formatTime(ev.end_time)}
+                <td style="font-weight: 600; min-width: 160px;">${ev.title}</td>
+                <td class="col-datetime-cell">
+                    <div class="event-datetime-box">
+                        <div class="event-date-row">${dateFormatter.format(new Date(ev.event_date))}</div>
+                        <div class="event-time-row">
+                            <i data-lucide="clock" class="time-icon"></i> 
+                            <span>${formatTime(ev.start_time)} – ${formatTime(ev.end_time)}</span>
+                        </div>
                     </div>
                 </td>
-                <td>${ev.location_name}</td>
-                <td>
+                <td style="white-space: nowrap;">${ev.location_name || '--'}</td>
+                <td style="white-space: nowrap;">
                     <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: ${isFull ? '#10B981' : 'var(--text-main)'};">
                         <i data-lucide="users" style="width: 16px; height: 16px;"></i>
                         ${currentRegs} / ${maxVols}
                     </div>
                 </td>
                 <td>
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
                         <div>${badgeHtml}</div>
                         <div style="display: flex; gap: 6px;">${quickActions}</div>
                     </div>
@@ -165,7 +204,7 @@ async function openDetailsModal(eventId) {
     
     // Set Loading States
     document.getElementById('detail-title').innerText = "Fetching Event Data...";
-    document.getElementById('detail-volunteers-body').innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Fetching secure roster...</td></tr>`;
+    document.getElementById('detail-volunteers-body').innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Fetching secure roster...</td></tr>`;
     const timelineContainer = document.getElementById('detail-timeline-container');
     if(timelineContainer) timelineContainer.innerHTML = `<div style="text-align: center; color: var(--text-muted);">Fetching audit logs...</div>`;
     
@@ -187,41 +226,51 @@ async function openDetailsModal(eventId) {
 
     } catch (error) {
         document.getElementById('detail-title').innerText = "Network Error";
-        document.getElementById('detail-volunteers-body').innerHTML = `<tr><td colspan="4" style="text-align: center; color: #EF4444;">Failed to load secure context: ${error.message}</td></tr>`;
+        document.getElementById('detail-volunteers-body').innerHTML = `<tr><td colspan="6" style="text-align: center; color: #EF4444;">Failed to load secure context: ${error.message}</td></tr>`;
     }
 }
 
 function renderCoreStats(evData) {
     document.getElementById('detail-title').innerText = evData.title || 'Untitled Event';
     document.getElementById('detail-status-badge').innerHTML = getEventBadges(evData);
-    // Date & Time formatting
+    
+    const catEl = document.getElementById('detail-category');
+    if (catEl) {
+        catEl.innerText = evData.category ? `• ${evData.category}` : '';
+        catEl.style.display = evData.category ? 'inline-block' : 'none';
+    }
+
+    // Date & Time formatting (compact)
     const evDate = new Date(evData.event_date);
     const dateFormatted = isNaN(evDate.getTime()) 
         ? (evData.event_date || '--') 
-        : evDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        : evDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     const timeFormatted = `${formatTime(evData.start_time)} – ${formatTime(evData.end_time)}`;
     
     document.getElementById('detail-datetime').innerHTML = `
-        <div style="font-weight: 600; color: var(--text-main); font-size: 15px;">${dateFormatted}</div>
-        <div style="font-size: 13px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px;">
-            <i data-lucide="clock" style="width: 13px; height: 13px;"></i> ${timeFormatted}
+        <div class="detail-date-title">${dateFormatted}</div>
+        <div class="detail-time-row">
+            <i data-lucide="clock" class="detail-time-icon"></i> <span>${timeFormatted}</span>
         </div>
     `;
-    document.getElementById('detail-location').innerText = evData.location_name || 'No location set';
+    const locEl = document.getElementById('detail-location');
+    if (locEl) locEl.innerText = evData.location_name || 'No location set';
     document.getElementById('detail-desc').innerText = evData.description || 'No description provided.';
 
-    // FIX 2: Calculate capacity dynamically from the secure roster
+    // Capacity dynamically from the secure roster
     const roster = evData.roster || [];
     const registeredCount = roster.filter(v => ['registered', 'present'].includes(v.attendance_status || v.status)).length;
     const waitlistCount = roster.filter(v => (v.attendance_status || v.status) === 'waitlisted').length;
-    const maxVolunteers = evData.max_volunteers || 'No Limit';
+    
+    const hasLimit = evData.max_volunteers && Number(evData.max_volunteers) > 0;
+    const maxVolunteers = hasLimit ? evData.max_volunteers : '∞';
     
     document.getElementById('detail-capacity-text').innerText = `${registeredCount} / ${maxVolunteers} Reg.`;
     
     // Progress Bar Coloring
     const progressBar = document.getElementById('detail-capacity-bar');
-    if (evData.max_volunteers && progressBar) {
-        const pct = Math.min((registeredCount / evData.max_volunteers) * 100, 100);
+    if (hasLimit && progressBar) {
+        const pct = Math.min((registeredCount / Number(evData.max_volunteers)) * 100, 100);
         progressBar.style.width = `${pct}%`;
         if (pct >= 100) progressBar.style.backgroundColor = '#EF4444'; // Red
         else if (pct >= 80) progressBar.style.backgroundColor = '#F59E0B'; // Yellow
@@ -235,18 +284,26 @@ function renderCoreStats(evData) {
     document.getElementById('detail-creator').innerHTML = `Created by: <span style="color: var(--text-main); font-weight: 500;">${evData.creator_first || 'System'} ${evData.creator_last || ''}</span>`;
     const pocDiv = document.getElementById('detail-poc');
     if (evData.contact_person_name && pocDiv) {
-        pocDiv.innerHTML = `PoC: <span style="color: var(--text-main);">${evData.contact_person_name}</span> ${evData.contact_person_phone ? `<br/>📞 ${evData.contact_person_phone}` : ''}`;
+        pocDiv.innerHTML = `
+            <div style="font-weight: 600; color: var(--text-main); font-size: 13.5px;">${evData.contact_person_name}</div>
+            ${evData.contact_person_phone ? `<div style="font-size: 12px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px;"><i data-lucide="phone" style="width: 12px; height: 12px;"></i> ${evData.contact_person_phone}</div>` : ''}
+        `;
         pocDiv.style.display = 'block';
     } else if (pocDiv) pocDiv.style.display = 'none';
 
-    // Registration Deadline
+    // Registration Deadline - only show if the event is NOT completed, cancelled, or archived
     const deadlineDiv = document.getElementById('detail-deadline');
-    if (evData.registration_deadline && deadlineDiv) {
+    const primaryStatus = (evData.dynamic_status || evData.status || '').toLowerCase();
+    const isCompletedOrInactive = ['completed', 'cancelled', 'archived'].includes(primaryStatus);
+
+    if (evData.registration_deadline && deadlineDiv && !isCompletedOrInactive) {
         const dObj = new Date(evData.registration_deadline);
         const formattedDeadline = !isNaN(dObj.getTime())
-            ? dObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+            ? dObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
             : evData.registration_deadline;
-        deadlineDiv.innerHTML = `<i data-lucide="alert-circle" style="width: 12px; height: 12px;"></i> Reg. closes ${formattedDeadline}`;
+        const isPastDeadline = !isNaN(dObj.getTime()) && dObj < new Date();
+        const label = isPastDeadline ? 'Reg. closed on' : 'Reg. closes';
+        deadlineDiv.innerHTML = `<i data-lucide="${isPastDeadline ? 'clock' : 'alert-circle'}" style="width: 12px; height: 12px;"></i> ${label} ${formattedDeadline}`;
         deadlineDiv.style.display = 'inline-flex';
     } else if (deadlineDiv) {
         deadlineDiv.style.display = 'none';
@@ -261,33 +318,31 @@ function renderRoster(roster, dynamicStatus, eventId) {
     const theadVols = document.getElementById('detail-volunteers-head');
     if (!tbodyVols || !theadVols) return;
     
-    const isPastOrOngoing = ['ongoing', 'completed', 'archived'].includes(dynamicStatus);
-    
-    // Table Headers
-    if (isPastOrOngoing) {
-        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Check-In / Out</th><th>Status</th><th>Hours</th><th style="text-align: right;">Action</th></tr>`;
-    } else {
-        theadVols.innerHTML = `<tr><th>Volunteer</th><th>Contact Info</th><th>Status</th><th>Hours</th><th style="text-align: right;">Action</th></tr>`;
-    }
+    // Separate distinct In and Out columns
+    theadVols.innerHTML = `<tr>
+        <th>Volunteer</th>
+        <th style="white-space: nowrap;">In</th>
+        <th style="white-space: nowrap;">Out</th>
+        <th>Status</th>
+        <th style="white-space: nowrap;">Hours</th>
+        <th style="text-align: right; white-space: nowrap;">Action</th>
+    </tr>`;
 
     if (roster.length === 0) {
-        tbodyVols.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No volunteers registered yet.</td></tr>`;
+        tbodyVols.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 16px;">No volunteers registered yet.</td></tr>`;
         return;
     }
 
     tbodyVols.innerHTML = roster.map(vol => {
         const status = (vol.attendance_status || vol.status || 'UNKNOWN').toLowerCase();
         const color = status === 'withdrawn' ? '#EF4444' : (status === 'present' ? '#10B981' : (status === 'waitlisted' ? '#F59E0B' : 'var(--text-main)'));
-        const initials = (vol.first_name?.[0] || '') + (vol.last_name?.[0] || '');
         
-        let middleColumn = '';
-        if (isPastOrOngoing) {
-            const inTime = vol.check_in_time ? new Date(vol.check_in_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--';
-            const outTime = vol.check_out_time ? new Date(vol.check_out_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--';
-            middleColumn = `<div style="font-size: 13px;">In: <b>${inTime}</b></div><div style="font-size: 13px; color: var(--text-muted);">Out: <b>${outTime}</b></div>`;
-        } else {
-            middleColumn = `<div style="font-size: 13px;">${vol.email || '--'}</div><div style="font-size: 12px; color: var(--text-muted);">${vol.phone_number || '--'}</div>`;
-        }
+        const inTime = vol.check_in_time 
+            ? new Date(vol.check_in_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            : '--';
+        const outTime = vol.check_out_time 
+            ? new Date(vol.check_out_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            : '--';
 
         // Interactive Quick Status Override Dropdown
         const interactiveStatusHtml = `
@@ -301,18 +356,20 @@ function renderRoster(roster, dynamicStatus, eventId) {
             </select>
         `;
 
+        const hoursDisplay = `${parseFloat(vol.hours_logged || 0).toFixed(2)} hrs`;
+
         return `
         <tr>
             <td>
                 <div class="roster-user">
-                    <div class="avatar-sm">${initials.toUpperCase()}</div>
-                    <span style="font-weight: 500;">${vol.first_name || ''} ${vol.last_name || ''}</span>
+                    <span style="font-weight: 600; color: var(--text-main); font-size: 13.5px;">${vol.first_name || ''} ${vol.last_name || ''}</span>
                 </div>
             </td>
-            <td>${middleColumn}</td>
-            <td style="min-width: 120px;">${interactiveStatusHtml}</td>
-            <td>${parseFloat(vol.hours_logged || 0).toFixed(2)} hrs</td>
-            <td style="text-align: right;">
+            <td style="white-space: nowrap; font-weight: 500; font-size: 13px; color: var(--text-main);">${inTime}</td>
+            <td style="white-space: nowrap; font-weight: 500; font-size: 13px; color: var(--text-muted);">${outTime}</td>
+            <td style="min-width: 110px;">${interactiveStatusHtml}</td>
+            <td style="white-space: nowrap; font-size: 13px; font-weight: 500; color: var(--text-main);">${hoursDisplay}</td>
+            <td style="text-align: right; white-space: nowrap;">
                 <button type="button" class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px; display: inline-flex; align-items: center; gap: 4px; border-radius: 6px; cursor: pointer;" onclick="openEditAttendanceModal('${vol.user_id}', '${eventId}')" title="Edit status, check-in, and check-out">
                     <i data-lucide="edit-3" style="width: 12px; height: 12px;"></i> Edit
                 </button>
@@ -408,9 +465,12 @@ function renderLifecycleButtons(eventId, evData, dynamicStatus) {
         
     } else if (dynamicStatus === 'completed' && evData.status !== 'archived') {
         lifecycleContainer.innerHTML = `
-            <button style="background: transparent; color: #475569; border: 1px solid #CBD5E1; padding: 6px 12px; border-radius: 6px; font-weight: 500; font-size: 13px; cursor: pointer;" 
+            <button class="btn-archive" 
+                    style="background: transparent; color: var(--text-main); border: 1px solid var(--border); padding: 5px 12px; border-radius: 6px; font-weight: 500; font-size: 12.5px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s;" 
+                    onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--accent)';" 
+                    onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-main)';"
                     onclick="fireLifecycleApi('${eventId}', 'archive', '${safeTitle}')">
-                <i data-lucide="archive" style="width: 14px; height: 14px; display:inline;"></i> Archive
+                <i data-lucide="archive" style="width: 14px; height: 14px;"></i> Archive
             </button>`;
     } else if (['cancelled', 'archived'].includes(dynamicStatus)) {
         if (delBtn) {

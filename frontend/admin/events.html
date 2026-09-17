@@ -57,32 +57,49 @@
                     </button>
                 </div>
 
-                <!-- NEW: Search Matrix & Filters -->
-                <div class="events-filter-matrix"
-                    style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
-                    <div class="events-filter-search-col" style="flex: 1; min-width: 200px;">
-                        <input type="text" id="filter-search" class="form-input" style="width: 100%;"
-                            placeholder="Search events by title..." oninput="debounceLoadEvents()">
+                <!-- Search and Horizontal Status Filter -->
+                <div class="events-toolbar-matrix">
+                    <div class="events-search-wrapper">
+                        <i data-lucide="search" class="events-search-icon"></i>
+                        <input type="text" id="filter-search" class="events-search-input"
+                            placeholder="Search events by title..." oninput="debounceLoadEvents()" autocomplete="off">
+                        <button type="button" class="events-search-clear" id="filter-search-clear" onclick="clearEventSearch()" style="display: none;" title="Clear search" aria-label="Clear search">
+                            <i data-lucide="x" style="width: 14px; height: 14px;"></i>
+                        </button>
                     </div>
-                    <select id="filter-category" class="form-input" onchange="loadEvents()">
-                        <option value="">All Categories</option>
-                        <option value="Food Drive">Food Drive</option>
-                        <option value="Cleanliness">Cleanliness</option>
-                        <option value="Teaching">Teaching</option>
-                        <option value="Other">Other</option>
-                    </select>
-                    <select id="filter-status" class="form-input" onchange="loadEvents()">
-                        <option value="">All Statuses</option>
-                        <option value="upcoming">Upcoming</option>
-                        <option value="ongoing">Ongoing</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                    <select id="filter-sort" class="form-input" onchange="loadEvents()">
-                        <option value="date">Sort by Date</option>
-                        <option value="created">Sort by Created</option>
-                        <option value="volunteers">Sort by Volunteers</option>
-                    </select>
+                    <div class="events-filter-scroll-wrapper">
+                        <div class="events-status-chips" id="events-status-chips" role="tablist" aria-label="Filter events by status">
+                            <button type="button" class="status-chip active" data-status="" onclick="setStatusFilter('', this)" role="tab" aria-selected="true">
+                                <i data-lucide="layers" class="chip-icon"></i>
+                                <span>All</span>
+                            </button>
+                            <button type="button" class="status-chip" data-status="upcoming" onclick="setStatusFilter('upcoming', this)" role="tab" aria-selected="false">
+                                <i data-lucide="calendar" class="chip-icon"></i>
+                                <span>Upcoming</span>
+                            </button>
+                            <button type="button" class="status-chip" data-status="ongoing" onclick="setStatusFilter('ongoing', this)" role="tab" aria-selected="false">
+                                <i data-lucide="activity" class="chip-icon"></i>
+                                <span>Ongoing</span>
+                            </button>
+                            <button type="button" class="status-chip" data-status="completed" onclick="setStatusFilter('completed', this)" role="tab" aria-selected="false">
+                                <i data-lucide="check-circle" class="chip-icon"></i>
+                                <span>Completed</span>
+                            </button>
+                            <button type="button" class="status-chip" data-status="cancelled" onclick="setStatusFilter('cancelled', this)" role="tab" aria-selected="false">
+                                <i data-lucide="x-circle" class="chip-icon"></i>
+                                <span>Cancelled</span>
+                            </button>
+                            <button type="button" class="status-chip" data-status="archived" onclick="setStatusFilter('archived', this)" role="tab" aria-selected="false">
+                                <i data-lucide="archive" class="chip-icon"></i>
+                                <span>Archived</span>
+                            </button>
+                            <button type="button" class="status-chip" data-status="draft" onclick="setStatusFilter('draft', this)" role="tab" aria-selected="false">
+                                <i data-lucide="file-edit" class="chip-icon"></i>
+                                <span>Draft</span>
+                            </button>
+                        </div>
+                    </div>
+                    <input type="hidden" id="filter-status" value="">
                 </div>
 
                 <div class="table-container">
@@ -90,7 +107,7 @@
                         <thead>
                             <tr>
                                 <th>Event Title</th>
-                                <th>Date & Time</th>
+                                <th class="col-datetime-th">Date & Time</th>
                                 <th>Location</th>
                                 <th>Volunteers</th>
                                 <th>Status</th>
@@ -234,15 +251,15 @@
     <div class="modal-overlay" id="eventDetailsModal">
         <div class="modal-content details-modal">
             <div class="modal-header details-modal-header">
-                <div class="details-header-info">
-                    <div class="details-title-row">
-                        <h2 id="detail-title">Loading...</h2>
-                        <span id="detail-status-badge"></span>
-                    </div>
-                    <p id="detail-category" style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"></p>
+                <div class="details-header-top-row">
+                    <h2 id="detail-title">Loading...</h2>
+                    <button class="icon-btn close-modal-btn" onclick="closeDetailsModal()" aria-label="Close modal"><i data-lucide="x"></i></button>
                 </div>
-                <div class="details-header-controls">
-                    <!-- Actions container for buttons (Edit, Publish, Complete, Archive, Kiosk, Delete) -->
+                <div class="details-sub-bar">
+                    <div class="details-status-meta">
+                        <span id="detail-status-badge"></span>
+                        <span id="detail-category" class="details-category-pill"></span>
+                    </div>
                     <div class="details-actions-bar">
                         <div id="lifecycle-actions" class="lifecycle-actions-group">
                             <!-- Buttons injected via JS -->
@@ -254,7 +271,6 @@
                         <button class="btn-secondary" id="btn-delete-event"
                             style="color: #EF4444; border-color: rgba(239, 68, 68, 0.3); display: none;">Delete</button>
                     </div>
-                    <button class="icon-btn close-modal-btn" onclick="closeDetailsModal()" aria-label="Close modal"><i data-lucide="x"></i></button>
                 </div>
             </div>
 
@@ -303,7 +319,7 @@
                         <div class="info-card-header">
                             <div class="info-icon-badge"><i data-lucide="users"></i></div>
                             <span class="info-label">Capacity Tracker</span>
-                            <span class="info-value" id="detail-capacity-text" style="margin-left: auto; font-size: 13px; font-weight: 700;">--</span>
+                            <span class="info-value" id="detail-capacity-text" style="margin-left: auto; font-size: 13px; font-weight: 700; white-space: nowrap;">--</span>
                         </div>
                         <div class="info-card-body">
                             <div class="capacity-tracker" style="margin-top: 4px;">
@@ -327,14 +343,14 @@
 
                 <div class="volunteers-section">
                     <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Registered Volunteers</h3>
-                    <div class="table-container" style="max-height: 250px; overflow-y: auto; margin-bottom: 24px;">
-                        <table class="data-table">
+                    <div class="table-container" style="max-height: 250px; overflow: auto; -webkit-overflow-scrolling: touch; margin-bottom: 24px;">
+                        <table class="data-table" style="min-width: 480px;">
                             <thead id="detail-volunteers-head" style="position: sticky; top: 0; z-index: 10;">
                                 <!-- Dynamically injected based on event status -->
                             </thead>
                             <tbody id="detail-volunteers-body">
                                 <tr>
-                                    <td colspan="4" style="text-align: center;">Loading volunteers...</td>
+                                    <td colspan="6" style="text-align: center;">Loading volunteers...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -524,33 +540,6 @@
                             </span>
                         </div>
                         <p class="admin-card-email" id="modal-user-email">admin@sevalog.in</p>
-                    </div>
-                </div>
-
-                <!-- Page Navigation Links -->
-                <div class="modal-nav-section">
-                    <h4 class="sheet-section-title">Navigation</h4>
-                    <div class="modal-nav-grid">
-                        <a href="admin.html" class="modal-nav-item">
-                            <i data-lucide="layout-dashboard"></i>
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="events.html" class="modal-nav-item active">
-                            <i data-lucide="calendar"></i>
-                            <span>Events</span>
-                        </a>
-                        <a href="volunteers.html" class="modal-nav-item">
-                            <i data-lucide="users"></i>
-                            <span>Volunteers</span>
-                        </a>
-                        <a href="admin-tasks.html" class="modal-nav-item">
-                            <i data-lucide="check-square"></i>
-                            <span>Tasks</span>
-                        </a>
-                        <a href="gallery.html" class="modal-nav-item">
-                            <i data-lucide="image"></i>
-                            <span>Gallery</span>
-                        </a>
                     </div>
                 </div>
 

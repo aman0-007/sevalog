@@ -44,6 +44,26 @@ html, body {
     overscroll-behavior-y: contain;
 }
 
+/* 3. Hide all scrollbars globally across the admin interface while preserving smooth scrolling */
+html, body, *, *::before, *::after {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE 10+ and Edge */
+}
+
+::-webkit-scrollbar,
+*::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-track {
+    display: none !important;
+    background: transparent !important;
+}
+
 /* --- 1. CSS VARIABLES (Themes) --- */
 :root {
     --bg-color: #F8FAFC;      
@@ -93,7 +113,7 @@ body { background-color: var(--bg-color); color: var(--text-main); transition: b
     width: 100%; 
     min-width: 0; 
     min-height: 100vh;
-    padding-bottom: 90px;
+    padding-bottom: 0 !important;
 }
 
 /* Header with Brand Logo, Page Navigation & Admin Profile Button */
@@ -265,7 +285,7 @@ body { background-color: var(--bg-color); color: var(--text-main); transition: b
 .icon-btn i, .icon-btn svg { width: 18px; height: 18px; }
 
 /* Global Content Wrappers & Buttons */
-.content-wrapper { padding: 24px 32px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+.content-wrapper { padding: 24px 32px 80px 32px; max-width: 1400px; margin: 0 auto; width: 100%; box-sizing: border-box; }
 .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
 .page-header h1 { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
 .page-header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
@@ -479,9 +499,7 @@ body { background-color: var(--bg-color); color: var(--text-main); transition: b
     word-break: break-all;
 }
 .modal-nav-section {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: none !important;
 }
 .modal-nav-grid {
     display: grid;
@@ -978,9 +996,9 @@ body { background-color: var(--bg-color); color: var(--text-main); transition: b
         padding: 4px 6px;
     }
 
-    /* Padding to clear the floating bottom nav and FAB */
+    /* Padding to clear the floating bottom nav without excessive empty space */
     .content-wrapper {
-        padding: 16px 16px 140px 16px !important;
+        padding: 16px 16px 76px 16px !important;
     }
 
     /* Mobile Standardized Modals */

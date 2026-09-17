@@ -52,14 +52,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // 5. Deadline Formatter
-    function formatDeadline(dateString) {
+    function formatDeadline(dateString, status) {
         if (!dateString) return `<span class="deadline-text"><i data-lucide="clock" style="width:14px;"></i> No Deadline</span>`;
         const date = new Date(dateString);
-        const now = new Date();
-        const isPast = date < now;
-        
+        if (isNaN(date.getTime())) return escapeHTML(dateString);
+
         // Format: "Sep 17, 07:49 AM"
         const formatted = date.toLocaleDateString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+        // Completed, cancelled, and review-pending tasks must NOT be flagged as Overdue or Due Soon
+        const isResolvedOrSubmitted = ['completed', 'cancelled', 'pending_verification'].includes(status);
+        if (isResolvedOrSubmitted) {
+            return `<span class="deadline-text"><i data-lucide="calendar" style="width:14px;"></i> ${formatted}</span>`;
+        }
+
+        const now = new Date();
+        const isPast = date < now;
         
         if (isPast) {
             return `<span class="deadline-text deadline-danger"><i data-lucide="alert-circle" style="width:14px;"></i> Overdue: ${formatted}</span>`;
@@ -152,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${task.event_title ? `<div class="card-event"><i data-lucide="map-pin" style="width:12px;"></i> ${task.event_title}</div>` : ''}
                 <div class="card-footer">
                     <span class="status-badge" style="background: ${style.bg}; color: ${style.color};">${style.label}</span>
-                    ${formatDeadline(task.deadline)}
+                    ${formatDeadline(task.deadline, task.status)}
                 </div>
             `;
             fragment.appendChild(card);
@@ -189,7 +197,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('modal-task-event').innerHTML = task.event_title ? `<i data-lucide="map-pin" style="width:14px;"></i> ${task.event_title}` : '';
         
         // Populate Body Data
-        document.getElementById('modal-task-deadline').innerHTML = formatDeadline(task.deadline);
+        document.getElementById('modal-task-deadline').innerHTML = formatDeadline(task.deadline, task.status);
         
         // FIX: Display the actual volunteer name if public, otherwise fallback gracefully
         let assigneeText = '';
