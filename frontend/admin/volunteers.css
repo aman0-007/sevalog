@@ -21,11 +21,8 @@
 .btn-text { background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: 0.2s; }
 .btn-text:hover { background: rgba(59, 130, 246, 0.1); }
 
-/* --- PROFILE MODAL --- */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px; }
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-content { background: var(--surface); width: 100%; max-width: 500px; border-radius: var(--radius-lg); padding: 32px; transform: translateY(20px); transition: 0.3s ease; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border); box-shadow: var(--shadow-hover); }
-.modal-overlay.active .modal-content { transform: translateY(0); }
+/* --- PROFILE MODAL (Base standardized in layout.css) --- */
+.modal-content.profile-modal { max-width: 620px; }
 
 .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
 .profile-title { display: flex; align-items: center; gap: 16px; }

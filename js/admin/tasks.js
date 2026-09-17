@@ -24,17 +24,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // GLOBALLY define the ID safely
     const currentUserId = String(currentUser.user_id || currentUser.userId || currentUser.id || 'anonymous');
 
-    // Setup Top Header
-    document.getElementById('top-user-name').innerText = `${currentUser.firstName} ${currentUser.lastName}`;
-    document.getElementById('top-user-initial').innerText = currentUser.firstName.charAt(0).toUpperCase();
+    // Setup Admin Details (if present)
+    const topNameEl = document.getElementById('top-user-name');
+    const topInitEl = document.getElementById('top-user-initial');
+    if (topNameEl) topNameEl.innerText = `${currentUser.firstName} ${currentUser.lastName}`;
+    if (topInitEl) topInitEl.innerText = currentUser.firstName.charAt(0).toUpperCase();
 
     // 2. Initialize Data
     await loadDropdownData();
     await fetchTasks();
 
     // 3. Event Listeners
-    document.getElementById('task-search-input').addEventListener('input', debounceRender);
-    document.getElementById('filter-task-status').addEventListener('change', fetchTasks);
+    const searchInputEl = document.getElementById('task-search-input');
+    if (searchInputEl) searchInputEl.addEventListener('input', debounceRender);
+    const filterStatusEl = document.getElementById('filter-task-status');
+    if (filterStatusEl) filterStatusEl.addEventListener('change', fetchTasks);
     
     // Event Delegation for clicking Task Cards on the Kanban board
     document.getElementById('kanban-board').addEventListener('click', (e) => {

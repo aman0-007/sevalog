@@ -49,13 +49,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const nameEl = document.getElementById('user-name-top');
             const welcomeEl = document.getElementById('welcome-text');
             const initialEl = document.getElementById('user-initial');
+            const sidebarName = document.getElementById('sidebar-user-name');
+            const sidebarRole = document.getElementById('sidebar-user-role');
+            const sidebarAvatar = document.getElementById('sidebar-user-avatar');
 
             const fName = cachedUser.firstName || cachedUser.first_name || 'User';
             const lName = cachedUser.lastName || cachedUser.last_name || '';
+            const fullName = `${fName} ${lName}`.trim();
+            const role = cachedUser.role === 'admin' ? 'Administrator' : (cachedUser.role ? cachedUser.role.charAt(0).toUpperCase() + cachedUser.role.slice(1) : 'Admin');
 
             if (welcomeEl) welcomeEl.innerText = `Welcome back, ${fName}!`;
-            if (nameEl) nameEl.innerText = `${fName} ${lName}`.trim();
+            if (nameEl) nameEl.innerText = fullName;
             if (initialEl) initialEl.innerText = fName.charAt(0).toUpperCase();
+            if (sidebarName) sidebarName.innerText = fullName;
+            if (sidebarRole) sidebarRole.innerText = role;
+            if (sidebarAvatar) sidebarAvatar.innerText = fName.charAt(0).toUpperCase();
 
             // Auto-redirect if user lands on public/login page while authenticated
             if (currentPath.endsWith('login.html') || currentPath.endsWith('index.html') || currentPath === '/' || currentPath.endsWith('SevaLog/')) {
@@ -69,9 +77,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (freshUser) {
                     const freshFName = freshUser.firstName || freshUser.first_name || fName;
                     const freshLName = freshUser.lastName || freshUser.last_name || lName;
+                    const freshFullName = `${freshFName} ${freshLName}`.trim();
+                    const freshRole = freshUser.role === 'admin' ? 'Administrator' : (freshUser.role ? freshUser.role.charAt(0).toUpperCase() + freshUser.role.slice(1) : 'Admin');
+
                     if (welcomeEl) welcomeEl.innerText = `Welcome back, ${freshFName}!`;
-                    if (nameEl) nameEl.innerText = `${freshFName} ${freshLName}`.trim();
+                    if (nameEl) nameEl.innerText = freshFullName;
                     if (initialEl) initialEl.innerText = freshFName.charAt(0).toUpperCase();
+                    if (sidebarName) sidebarName.innerText = freshFullName;
+                    if (sidebarRole) sidebarRole.innerText = freshRole;
+                    if (sidebarAvatar) sidebarAvatar.innerText = freshFName.charAt(0).toUpperCase();
                 }
             });
 

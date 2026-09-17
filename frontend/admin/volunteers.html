@@ -32,75 +32,25 @@
 <body class="preload">
 
     <div class="dashboard-layout">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <i data-lucide="heart" class="brand-icon"></i>
-                <h2 class="nav-text">SevaLog</h2>
-                <button class="close-sidebar-btn md-hidden" onclick="toggleMobileSidebar()"><i
-                        data-lucide="x"></i></button>
+        <!-- TOP HEADER WITH APP NAME & ADMIN PROFILE INITIAL -->
+        <header class="top-header">
+            <div class="header-left">
+                <a href="admin.html" class="header-brand" title="SevaLog">
+                    <i data-lucide="heart" class="brand-icon"></i>
+                    <span>SevaLog</span>
+                </a>
             </div>
-            <nav class="sidebar-nav">
-                <a href="admin.html" class="nav-item" title="Dashboard">
-                    <i data-lucide="layout-dashboard"></i> <span class="nav-text">Dashboard</span>
-                </a>
-                <a href="events.html" class="nav-item" title="Events Management">
-                    <i data-lucide="calendar"></i> <span class="nav-text">Events Management</span>
-                </a>
-                <a href="volunteers.html" class="nav-item active" title="Volunteers">
-                    <i data-lucide="users"></i> <span class="nav-text">Volunteers</span>
-                </a>
-                <a href="gallery.html" class="nav-item" title="Gallery">
-                    <i data-lucide="image"></i> <span class="nav-text">Gallery</span>
-                </a>
-                <a href="admin-tasks.html" class="nav-item" title="Tasks">
-                    <i data-lucide="check-square"></i> <span class="nav-text">Tasks</span>
-                </a>
-                <div style="margin-top: auto; padding-top: 32px; padding-bottom: 8px; border-top: 1px solid var(--border);">
-                    <a href="#" id="logout-btn" class="nav-item" style="color: #EF4444;">
-                        <i data-lucide="log-out"></i> <span class="nav-text">Log Out</span>
-                    </a>
-                </div>
-            </nav>
-        </aside>
-
-        <script>
-            if (localStorage.getItem('sidebarState') === 'closed' && window.innerWidth > 768) {
-                document.getElementById('sidebar').classList.add('collapsed');
-            }
-        </script>
+            
+            <div class="header-right">
+                <button class="header-admin-btn" id="admin-profile-btn" onclick="openAdminModal()" title="Admin Profile" aria-label="Open Admin Profile">
+                    <div class="header-admin-avatar" id="header-user-avatar">M</div>
+                </button>
+            </div>
+        </header>
 
         <main class="main-content" id="main-content">
-            <header class="top-header">
-                <div class="header-left">
-                    <button class="icon-btn" onclick="toggleSidebar()"><i data-lucide="menu"></i></button>
-                    <div class="search-bar">
-                        <i data-lucide="search"></i>
-                        <input type="text" id="search-input" placeholder="Search by name or email...">
-                    </div>
-                </div>
-                <div class="header-right">
-                    <button class="icon-btn" onclick="toggleTheme()" title="Toggle Theme">
-                        <i data-lucide="moon" id="theme-icon-moon"></i>
-                        <i data-lucide="sun" id="theme-icon-sun" style="display: none;"></i>
-                    </button>
-                    <div class="admin-profile">
-                        <div class="avatar">A</div>
-                        <div class="admin-info">
-                            <span class="admin-name">Admin User</span>
-                            <span class="admin-role">Super Admin</span>
-                        </div>
-                    </div>
-                </div>
-            </header>
 
             <div class="content-wrapper">
-                <div class="page-header">
-                    <div>
-                        <h1>Volunteers Directory</h1>
-                        <p>View profiles, track hours, and manage your community members.</p>
-                    </div>
-                </div>
-
                 <!-- Dedicated Search & Filter Bar for Mobile & Desktop -->
                 <div class="directory-search-wrapper" style="margin-bottom: 20px;">
                     <div class="directory-search-bar">
@@ -235,77 +185,79 @@
                     <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Adjust Event Attendance</h2>
                     <p style="font-size: 12px; color: var(--text-muted); margin: 2px 0 0 0;">Update logged hours, status & audit details</p>
                 </div>
-                <button class="icon-btn" onclick="closePatchAttendanceModal()"><i data-lucide="x"></i></button>
+                <button class="icon-btn close-modal-btn" onclick="closePatchAttendanceModal()" aria-label="Close modal"><i data-lucide="x"></i></button>
             </div>
 
             <form id="patchAttendanceForm" onsubmit="savePatchAttendance(event)">
-                <input type="hidden" id="patch-reg-id" value="">
-                <input type="hidden" id="patch-event-id" value="">
-                <input type="hidden" id="patch-user-id" value="">
+                <div class="modal-body">
+                    <input type="hidden" id="patch-reg-id" value="">
+                    <input type="hidden" id="patch-event-id" value="">
+                    <input type="hidden" id="patch-user-id" value="">
 
-                <!-- Event & Volunteer Context Card -->
-                <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;">
-                    <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;" id="patch-event-title">Event Title</div>
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
-                        <span id="patch-event-date">Date</span>
-                        <span id="patch-volunteer-name" style="font-weight: 500; color: var(--accent);">Volunteer</span>
-                    </div>
-                </div>
-
-                <!-- Status -->
-                <div class="form-group">
-                    <label class="form-label" for="patch-status">Attendance Status <span style="color:red">*</span></label>
-                    <select id="patch-status" class="form-input" required>
-                        <option value="present">Present (Attended)</option>
-                        <option value="registered">Registered</option>
-                        <option value="absent">Absent (No Show)</option>
-                        <option value="withdrawn">Withdrawn (Cancelled)</option>
-                        <option value="waitlisted">Waitlisted</option>
-                    </select>
-                </div>
-
-                <!-- Hours Logged with Presets -->
-                <div class="form-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label class="form-label" for="patch-hours" style="margin: 0;">Credit / Logged Hours <span style="color:red">*</span></label>
-                        <div style="display: flex; gap: 4px;">
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(0)">0h</button>
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(1)">1h</button>
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(2)">2h</button>
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(3)">3h</button>
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(4)">4h</button>
+                    <!-- Event & Volunteer Context Card -->
+                    <div style="background: #F8FAFC; border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; margin-bottom: 20px;">
+                        <div style="font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px;" id="patch-event-title">Event Title</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted);">
+                            <span id="patch-event-date">Date</span>
+                            <span id="patch-volunteer-name" style="font-weight: 500; color: var(--accent);">Volunteer</span>
                         </div>
                     </div>
-                    <input type="number" id="patch-hours" class="form-input" step="0.1" min="0" max="24" required placeholder="0.0">
-                </div>
 
-                <!-- Timestamps -->
-                <div class="form-group" style="margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label class="form-label" style="margin: 0; font-size: 12.5px;">Check-In Time</label>
-                        <div style="display: flex; gap: 4px;">
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchCheckInNow()">Now</button>
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="clearPatchCheckIn()">Clear</button>
-                        </div>
+                    <!-- Status -->
+                    <div class="form-group">
+                        <label class="form-label" for="patch-status">Attendance Status <span style="color:red">*</span></label>
+                        <select id="patch-status" class="form-input" required>
+                            <option value="present">Present (Attended)</option>
+                            <option value="registered">Registered</option>
+                            <option value="absent">Absent (No Show)</option>
+                            <option value="withdrawn">Withdrawn (Cancelled)</option>
+                            <option value="waitlisted">Waitlisted</option>
+                        </select>
                     </div>
-                    <input type="datetime-local" id="patch-checkin-time" class="form-input" style="font-size: 12.5px;">
-                </div>
 
-                <div class="form-group" style="margin-bottom: 16px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <label class="form-label" style="margin: 0; font-size: 12.5px;">Check-Out Time</label>
-                        <div style="display: flex; gap: 4px;">
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchCheckOutNow()">Now</button>
-                            <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="clearPatchCheckOut()">Clear</button>
+                    <!-- Hours Logged with Presets -->
+                    <div class="form-group">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label" for="patch-hours" style="margin: 0;">Credit / Logged Hours <span style="color:red">*</span></label>
+                            <div style="display: flex; gap: 4px;">
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(0)">0h</button>
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(1)">1h</button>
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(2)">2h</button>
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(3)">3h</button>
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchHoursPreset(4)">4h</button>
+                            </div>
                         </div>
+                        <input type="number" id="patch-hours" class="form-input" step="0.1" min="0" max="24" required placeholder="0.0">
                     </div>
-                    <input type="datetime-local" id="patch-checkout-time" class="form-input" style="font-size: 12.5px;">
-                </div>
 
-                <!-- Optional Remarks -->
-                <div class="form-group" style="margin-bottom: 20px;">
-                    <label class="form-label" for="patch-remarks" style="font-size: 12.5px;">Coordinator Remarks / Audit Note</label>
-                    <input type="text" id="patch-remarks" class="form-input" placeholder="e.g. Verified by coordinator; adjusted hours" maxlength="255">
+                    <!-- Timestamps -->
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label" style="margin: 0; font-size: 12.5px;">Check-In Time</label>
+                            <div style="display: flex; gap: 4px;">
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchCheckInNow()">Now</button>
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="clearPatchCheckIn()">Clear</button>
+                            </div>
+                        </div>
+                        <input type="datetime-local" id="patch-checkin-time" class="form-input" style="font-size: 12.5px;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <label class="form-label" style="margin: 0; font-size: 12.5px;">Check-Out Time</label>
+                            <div style="display: flex; gap: 4px;">
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="setPatchCheckOutNow()">Now</button>
+                                <button type="button" class="btn-secondary" style="padding: 1px 6px; font-size: 11px;" onclick="clearPatchCheckOut()">Clear</button>
+                            </div>
+                        </div>
+                        <input type="datetime-local" id="patch-checkout-time" class="form-input" style="font-size: 12.5px;">
+                    </div>
+
+                    <!-- Optional Remarks -->
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" for="patch-remarks" style="font-size: 12.5px;">Coordinator Remarks / Audit Note</label>
+                        <input type="text" id="patch-remarks" class="form-input" placeholder="e.g. Verified by coordinator; adjusted hours" maxlength="255">
+                    </div>
                 </div>
 
                 <div class="modal-footer">
@@ -313,6 +265,150 @@
                     <button type="submit" class="primary-btn" id="patch-submit-btn">Save Changes</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- FLOATING BOTTOM NAVIGATION (MOBILE ONLY) -->
+    <nav class="admin-mobile-nav" aria-label="Mobile Admin Navigation">
+        <a href="admin.html" class="mobile-nav-item" title="Dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </a>
+        <a href="events.html" class="mobile-nav-item" title="Events">
+            <i data-lucide="calendar"></i>
+            <span>Events</span>
+        </a>
+        <a href="volunteers.html" class="mobile-nav-item active" title="Volunteers">
+            <i data-lucide="users"></i>
+            <span>Volunteers</span>
+        </a>
+        <a href="gallery.html" class="mobile-nav-item" title="Gallery">
+            <i data-lucide="image"></i>
+            <span>Gallery</span>
+        </a>
+        <a href="admin-tasks.html" class="mobile-nav-item" title="Tasks">
+            <i data-lucide="check-square"></i>
+            <span>Tasks</span>
+        </a>
+    </nav>
+
+    <!-- ADMIN PROFILE BOTTOM SHEET MODAL -->
+    <div id="admin-modal-overlay" class="admin-sheet-overlay" onclick="handleAdminOverlayClick(event)">
+        <div class="admin-sheet-container" role="dialog" aria-modal="true" aria-labelledby="admin-sheet-title">
+            <!-- Drag Handle -->
+            <div class="sheet-handle-bar" onclick="closeAdminModal()">
+                <div class="sheet-drag-pill"></div>
+            </div>
+
+            <!-- Sheet Header -->
+            <div class="sheet-header">
+                <div class="sheet-header-title">
+                    <h2 id="admin-sheet-title">Admin Profile</h2>
+                    <p>Manage appearance and session</p>
+                </div>
+                <button class="sheet-close-btn" onclick="closeAdminModal()" aria-label="Close Profile Modal">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <!-- Sheet Body -->
+            <div class="sheet-body">
+                <!-- Admin Card -->
+                <div class="admin-profile-card">
+                    <div class="admin-card-avatar" id="modal-user-avatar">M</div>
+                    <div class="admin-card-details">
+                        <div class="admin-card-name-row">
+                            <h3 id="modal-user-name">Master Admin</h3>
+                            <span class="admin-role-badge">
+                                <i data-lucide="shield-check"></i>
+                                <span id="modal-user-role-badge">Admin</span>
+                            </span>
+                        </div>
+                        <p class="admin-card-email" id="modal-user-email">admin@sevalog.in</p>
+                    </div>
+                </div>
+
+                <!-- Page Navigation Links -->
+                <div class="modal-nav-section">
+                    <h4 class="sheet-section-title">Navigation</h4>
+                    <div class="modal-nav-grid">
+                        <a href="admin.html" class="modal-nav-item">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="events.html" class="modal-nav-item">
+                            <i data-lucide="calendar"></i>
+                            <span>Events</span>
+                        </a>
+                        <a href="volunteers.html" class="modal-nav-item active">
+                            <i data-lucide="users"></i>
+                            <span>Volunteers</span>
+                        </a>
+                        <a href="admin-tasks.html" class="modal-nav-item">
+                            <i data-lucide="check-square"></i>
+                            <span>Tasks</span>
+                        </a>
+                        <a href="gallery.html" class="modal-nav-item">
+                            <i data-lucide="image"></i>
+                            <span>Gallery</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Admin Session Data List (No duplicate email, no user ID) -->
+                <div class="admin-info-section">
+                    <h4 class="sheet-section-title">Session Details</h4>
+                    <div class="admin-info-list">
+                        <div class="admin-info-item">
+                            <div class="info-label">
+                                <i data-lucide="shield"></i>
+                                <span>Role</span>
+                            </div>
+                            <div class="info-value" id="modal-info-role">System Administrator</div>
+                        </div>
+                        <div class="admin-info-item">
+                            <div class="info-label">
+                                <i data-lucide="activity"></i>
+                                <span>Status</span>
+                            </div>
+                            <div class="info-value">
+                                <span class="status-indicator-badge">
+                                    <span class="status-dot-active"></span>
+                                    Active Session
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Theme Toggle Row -->
+                <div class="admin-preferences-section">
+                    <h4 class="sheet-section-title">Preferences</h4>
+                    <div class="theme-switch-row" onclick="toggleTheme()" style="cursor: pointer;">
+                        <div class="theme-switch-info">
+                            <div class="theme-switch-icon">
+                                <i data-lucide="moon" id="modal-theme-icon-moon"></i>
+                                <i data-lucide="sun" id="modal-theme-icon-sun" style="display: none;"></i>
+                            </div>
+                            <div>
+                                <div class="theme-switch-title">Appearance Mode</div>
+                                <div class="theme-switch-desc" id="modal-theme-status-text">Light appearance enabled</div>
+                            </div>
+                        </div>
+                        <button type="button" class="theme-toggle-switch" id="modal-theme-toggle-switch" role="switch" aria-checked="false" aria-label="Toggle Dark Mode">
+                            <span class="theme-toggle-thumb"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions: Logout -->
+                <div class="sheet-actions">
+                    <button type="button" id="logout-btn" class="sheet-logout-btn">
+                        <i data-lucide="log-out"></i>
+                        <span>Log Out of Admin</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
