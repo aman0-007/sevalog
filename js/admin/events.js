@@ -194,7 +194,19 @@ async function openDetailsModal(eventId) {
 function renderCoreStats(evData) {
     document.getElementById('detail-title').innerText = evData.title || 'Untitled Event';
     document.getElementById('detail-status-badge').innerHTML = getEventBadges(evData);
-    document.getElementById('detail-datetime').innerText = `${dateFormatter.format(new Date(evData.event_date))} | ${formatTime(evData.start_time)} - ${formatTime(evData.end_time)}`;
+    // Date & Time formatting
+    const evDate = new Date(evData.event_date);
+    const dateFormatted = isNaN(evDate.getTime()) 
+        ? (evData.event_date || '--') 
+        : evDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const timeFormatted = `${formatTime(evData.start_time)} – ${formatTime(evData.end_time)}`;
+    
+    document.getElementById('detail-datetime').innerHTML = `
+        <div style="font-weight: 600; color: var(--text-main); font-size: 15px;">${dateFormatted}</div>
+        <div style="font-size: 13px; color: var(--text-muted); margin-top: 3px; display: flex; align-items: center; gap: 4px;">
+            <i data-lucide="clock" style="width: 13px; height: 13px;"></i> ${timeFormatted}
+        </div>
+    `;
     document.getElementById('detail-location').innerText = evData.location_name || 'No location set';
     document.getElementById('detail-desc').innerText = evData.description || 'No description provided.';
 
@@ -230,8 +242,12 @@ function renderCoreStats(evData) {
     // Registration Deadline
     const deadlineDiv = document.getElementById('detail-deadline');
     if (evData.registration_deadline && deadlineDiv) {
-        deadlineDiv.innerText = `Ends: ${new Date(evData.registration_deadline).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}`;
-        deadlineDiv.style.display = 'block';
+        const dObj = new Date(evData.registration_deadline);
+        const formattedDeadline = !isNaN(dObj.getTime())
+            ? dObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+            : evData.registration_deadline;
+        deadlineDiv.innerHTML = `<i data-lucide="alert-circle" style="width: 12px; height: 12px;"></i> Reg. closes ${formattedDeadline}`;
+        deadlineDiv.style.display = 'inline-flex';
     } else if (deadlineDiv) {
         deadlineDiv.style.display = 'none';
     }

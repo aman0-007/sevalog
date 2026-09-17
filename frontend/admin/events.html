@@ -106,9 +106,9 @@
                 </div>
 
                 <!-- NEW: Search Matrix & Filters -->
-                <div
+                <div class="events-filter-matrix"
                     style="display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; background: var(--surface); padding: 16px; border-radius: var(--radius-lg); border: 1px solid var(--border);">
-                    <div style="flex: 1; min-width: 200px;">
+                    <div class="events-filter-search-col" style="flex: 1; min-width: 200px;">
                         <input type="text" id="filter-search" class="form-input" style="width: 100%;"
                             placeholder="Search events by title..." oninput="debounceLoadEvents()">
                     </div>
@@ -279,99 +279,94 @@
     <!-- Event Details Modal -->
     <div class="modal-overlay" id="eventDetailsModal">
         <div class="modal-content details-modal">
-            <div class="modal-header">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="modal-header details-modal-header">
+                <div class="details-header-info">
+                    <div class="details-title-row">
                         <h2 id="detail-title">Loading...</h2>
                         <span id="detail-status-badge"></span>
                     </div>
                     <p id="detail-category" style="color: var(--text-muted); font-size: 13px; margin-top: 4px;"></p>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <!-- NEW: Dynamic Lifecycle Action Buttons -->
-                    <div id="lifecycle-actions"
-                        style="display: flex; gap: 8px; margin-right: 12px; padding-right: 12px; border-right: 1px solid var(--border);">
-                        <!-- Buttons injected via JS -->
+                <div class="details-header-controls">
+                    <!-- Actions container for buttons (Edit, Publish, Complete, Archive, Kiosk, Delete) -->
+                    <div class="details-actions-bar">
+                        <div id="lifecycle-actions" class="lifecycle-actions-group">
+                            <!-- Buttons injected via JS -->
+                        </div>
+                        <button class="primary-btn" id="btn-launch-qr"
+                            style="display: none; align-items: center; gap: 6px;">
+                            <i data-lucide="qr-code" style="width: 16px; height: 16px;"></i> Kiosk
+                        </button>
+                        <button class="btn-secondary" id="btn-delete-event"
+                            style="color: #EF4444; border-color: rgba(239, 68, 68, 0.3); display: none;">Delete</button>
                     </div>
-
-                    <!-- Existing Kiosk & Delete Buttons -->
-                    <button class="primary-btn" id="btn-launch-qr"
-                        style="display: none; align-items: center; gap: 6px;">
-                        <i data-lucide="qr-code" style="width: 16px; height: 16px;"></i> Kiosk
-                    </button>
-                    <button class="btn-secondary" id="btn-delete-event"
-                        style="color: #EF4444; border-color: rgba(239, 68, 68, 0.3); display: none;">Delete</button>
-                    <button class="icon-btn" onclick="closeDetailsModal()"><i data-lucide="x"></i></button>
+                    <button class="icon-btn close-modal-btn" onclick="closeDetailsModal()" aria-label="Close modal"><i data-lucide="x"></i></button>
                 </div>
             </div>
 
             <div class="details-body" id="detail-body-content">
                 <div class="info-grid">
-                    <!-- Date & Time -->
-                    <div class="info-item" style="display: flex; gap: 12px; align-items: flex-start;">
-                        <i data-lucide="calendar"
-                            style="color: var(--primary); margin-top: 2px; width: 20px; height: 20px;"></i>
-                        <div>
+                    <!-- Date & Time Card -->
+                    <div class="info-card date-card">
+                        <div class="info-card-header">
+                            <div class="info-icon-badge"><i data-lucide="calendar"></i></div>
                             <span class="info-label">Date & Time</span>
-                            <div class="info-value" id="detail-datetime">--</div>
-                            <div id="detail-deadline"
-                                style="font-size: 12px; color: #EF4444; margin-top: 4px; display: none;"></div>
+                        </div>
+                        <div class="info-card-body">
+                            <div class="info-value-highlight" id="detail-datetime">--</div>
+                            <div id="detail-deadline" class="deadline-pill" style="display: none;"></div>
                         </div>
                     </div>
 
-                    <!-- Location -->
-                    <div class="info-item" style="display: flex; gap: 12px; align-items: flex-start;">
-                        <i data-lucide="map-pin"
-                            style="color: var(--primary); margin-top: 2px; width: 20px; height: 20px;"></i>
-                        <div>
+                    <!-- Location Card -->
+                    <div class="info-card location-card">
+                        <div class="info-card-header">
+                            <div class="info-icon-badge"><i data-lucide="map-pin"></i></div>
                             <span class="info-label">Location</span>
+                        </div>
+                        <div class="info-card-body">
                             <div class="info-value" id="detail-location">--</div>
-                            <a id="detail-maps-link" href="#" target="_blank" rel="noopener noreferrer"
-                                style="font-size: 12px; color: var(--primary); display: none; margin-top: 6px; text-decoration: none; font-weight: 500; align-items: center; gap: 4px;">
-                                Open in Maps <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
+                            <a id="detail-maps-link" href="#" target="_blank" rel="noopener noreferrer" class="maps-link-btn" style="display: none;">
+                                <i data-lucide="map"></i> Open in Maps <i data-lucide="external-link" style="width: 12px; height: 12px;"></i>
                             </a>
                         </div>
                     </div>
 
-                    <!-- Contacts -->
-                    <div class="info-item" style="display: flex; gap: 12px; align-items: flex-start;">
-                        <i data-lucide="contact"
-                            style="color: var(--primary); margin-top: 2px; width: 20px; height: 20px;"></i>
-                        <div>
+                    <!-- Contacts Card -->
+                    <div class="info-card contact-card">
+                        <div class="info-card-header">
+                            <div class="info-icon-badge"><i data-lucide="user-check"></i></div>
                             <span class="info-label">Event Contacts</span>
-                            <div class="info-value" id="detail-creator" style="font-size: 13px;">--</div>
-                            <div id="detail-poc" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-                            </div>
+                        </div>
+                        <div class="info-card-body">
+                            <div class="info-value" id="detail-creator">--</div>
+                            <div id="detail-poc" class="poc-box"></div>
                         </div>
                     </div>
 
-                    <!-- Capacity & Waitlist -->
-                    <div class="info-item"
-                        style="grid-column: span 1; display: flex; gap: 12px; align-items: flex-start;">
-                        <i data-lucide="users"
-                            style="color: var(--primary); margin-top: 2px; width: 20px; height: 20px;"></i>
-                        <div style="width: 100%;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="info-label">Capacity Tracker</span>
-                                <span class="info-value" id="detail-capacity-text"
-                                    style="font-size: 13px; font-weight: 600;">--</span>
-                            </div>
-                            <div class="capacity-tracker" style="margin-top: 8px;">
+                    <!-- Capacity Tracker Card -->
+                    <div class="info-card capacity-card">
+                        <div class="info-card-header">
+                            <div class="info-icon-badge"><i data-lucide="users"></i></div>
+                            <span class="info-label">Capacity Tracker</span>
+                            <span class="info-value" id="detail-capacity-text" style="margin-left: auto; font-size: 13px; font-weight: 700;">--</span>
+                        </div>
+                        <div class="info-card-body">
+                            <div class="capacity-tracker" style="margin-top: 4px;">
                                 <div class="progress-bg">
-                                    <div class="progress-fill" id="detail-capacity-bar"
-                                        style="width: 0%; background-color: #3B82F6;"></div>
+                                    <div class="progress-fill" id="detail-capacity-bar" style="width: 0%; background-color: #3B82F6;"></div>
                                 </div>
                             </div>
-                            <div id="detail-waitlist"
-                                style="font-size: 12px; font-weight: 500; color: #F59E0B; margin-top: 6px; display: none; align-items: center; gap: 4px;">
-                            </div>
+                            <div id="detail-waitlist" class="waitlist-pill" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
 
-                <div class="info-desc" style="margin-top: 16px;">
-                    <span class="info-label">Description</span>
-                    <p class="info-value" id="detail-desc" style="margin-top: 4px; line-height: 1.5;">--</p>
+                <div class="info-desc-card" style="margin-top: 16px;">
+                    <div class="info-label" style="margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <i data-lucide="align-left" style="width: 14px; height: 14px; color: var(--text-muted);"></i> Description
+                    </div>
+                    <p class="info-value" id="detail-desc" style="line-height: 1.6; margin: 0; color: var(--text-main); font-size: 13.5px;">--</p>
                 </div>
 
                 <hr style="border: none; border-top: 1px solid var(--border); margin: 24px 0;">

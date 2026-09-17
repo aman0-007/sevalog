@@ -23,16 +23,23 @@ async function loadVolunteers() {
 // 2. Render Table Function
 function renderTable(dataToRender) {
     const tbody = document.getElementById('volunteers-table-body');
+    const searchCount = document.getElementById('directory-search-count');
     
+    if (searchCount) {
+        const total = volunteersData.length;
+        const showing = dataToRender ? dataToRender.length : 0;
+        searchCount.innerText = showing === total ? `${total} Volunteers` : `${showing} of ${total} Volunteers`;
+    }
+
     if (!dataToRender || dataToRender.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 32px;">No volunteers found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding: 32px;">No volunteers found.</td></tr>`;
         return;
     }
 
     tbody.innerHTML = dataToRender.map(vol => {
-        const fullName = `${vol.first_name} ${vol.last_name}`.trim();
+        const fullName = `${vol.first_name || ''} ${vol.last_name || ''}`.trim();
         const initial = vol.first_name ? vol.first_name.charAt(0).toUpperCase() : 'V';
-        const joinedDate = new Date(vol.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+        const joinedDate = vol.created_at ? new Date(vol.created_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' }) : '--';
 
         return `
         <tr onclick="viewProfile('${vol.user_id}')">
@@ -43,11 +50,9 @@ function renderTable(dataToRender) {
                 </div>
             </td>
             <td>
-                <div style="font-size: 13px;">${vol.email}</div>
-                <div style="font-size: 12px; color: var(--text-muted);">${vol.phone_number || '--'}</div>
+                <div style="font-size: 13px; font-weight: 500;">${vol.email || '--'}</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">${vol.phone_number || '--'}</div>
             </td>
-            <td><span class="role-badge ${vol.role === 'admin' ? 'role-admin' : 'role-volunteer'}">${vol.role}</span></td>
-            
             <td>
                 <div style="font-size: 13px;">${vol.city || 'Mumbai'}</div>
                 <div style="font-size: 12px; color: var(--text-muted);">Joined ${joinedDate}</div>
@@ -58,16 +63,62 @@ function renderTable(dataToRender) {
     `}).join('');
 }
 
-// 3. Search Bar Logic
-const searchInput = document.getElementById('search-input');
-if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-        const searchTerm = e.target.value.toLowerCase();
-        const filteredData = volunteersData.filter(vol => {
-            const fullName = `${vol.first_name} ${vol.last_name}`.toLowerCase();
-            return fullName.includes(searchTerm) || (vol.email && vol.email.toLowerCase().includes(searchTerm));
-        });
-        renderTable(filteredData);
+// 3. Search Bar Logic (Name, Email, or Mobile Number)
+function filterVolunteers(query) {
+    const cleanTerm = (query || '').toLowerCase().trim();
+    const numericTerm = cleanTerm.replace(/[^0-9]/g, '');
+
+    if (!cleanTerm) {
+        renderTable(volunteersData);
+        return;
+    }
+
+    const filteredData = volunteersData.filter(vol => {
+        const fullName = `${vol.first_name || ''} ${vol.last_name || ''}`.toLowerCase();
+        const email = (vol.email || '').toLowerCase();
+        const rawPhone = (vol.phone_number || '').toLowerCase();
+        const numericPhone = rawPhone.replace(/[^0-9]/g, '');
+
+        const matchesName = fullName.includes(cleanTerm);
+        const matchesEmail = email.includes(cleanTerm);
+        const matchesPhone = rawPhone.includes(cleanTerm) || (numericTerm && numericPhone.includes(numericTerm));
+
+        return matchesName || matchesEmail || matchesPhone;
+    });
+
+    renderTable(filteredData);
+}
+
+// Attach listeners for both header search and in-page directory search
+const dirSearchInput = document.getElementById('directory-search-input');
+const dirSearchClear = document.getElementById('directory-search-clear');
+const topSearchInput = document.getElementById('search-input');
+
+if (dirSearchInput) {
+    dirSearchInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (dirSearchClear) dirSearchClear.style.display = val ? 'inline-flex' : 'none';
+        if (topSearchInput) topSearchInput.value = val;
+        filterVolunteers(val);
+    });
+}
+
+if (dirSearchClear) {
+    dirSearchClear.addEventListener('click', () => {
+        if (dirSearchInput) dirSearchInput.value = '';
+        if (topSearchInput) topSearchInput.value = '';
+        dirSearchClear.style.display = 'none';
+        filterVolunteers('');
+        if (dirSearchInput) dirSearchInput.focus();
+    });
+}
+
+if (topSearchInput) {
+    topSearchInput.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (dirSearchInput) dirSearchInput.value = val;
+        if (dirSearchClear) dirSearchClear.style.display = val ? 'inline-flex' : 'none';
+        filterVolunteers(val);
     });
 }
 
@@ -88,7 +139,7 @@ window.viewProfile = async function(userId) {
         const fullName = `${user.first_name} ${user.last_name}`.trim();
         document.getElementById('modal-avatar').innerText = user.first_name ? user.first_name.charAt(0).toUpperCase() : 'V';
         document.getElementById('modal-name').innerText = fullName || 'Anonymous User';
-        document.getElementById('modal-role-city').innerText = `${user.role.toUpperCase()} • ${user.city || 'Mumbai'}`;
+        document.getElementById('modal-role-city').innerText = user.city ? `${user.city}` : 'Volunteer';
 
         // Stats Banner
         document.getElementById('modal-hours').innerText = user.total_hours_served || 0;

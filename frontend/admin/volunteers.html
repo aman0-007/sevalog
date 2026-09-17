@@ -101,20 +101,31 @@
                     </div>
                 </div>
 
+                <!-- Dedicated Search & Filter Bar for Mobile & Desktop -->
+                <div class="directory-search-wrapper" style="margin-bottom: 20px;">
+                    <div class="directory-search-bar">
+                        <i data-lucide="search" style="width: 18px; height: 18px; color: var(--text-muted); flex-shrink: 0;"></i>
+                        <input type="text" id="directory-search-input" placeholder="Search by name, email, or mobile number..." autocomplete="off">
+                        <button id="directory-search-clear" type="button" class="icon-btn" style="display: none; padding: 4px;" aria-label="Clear search">
+                            <i data-lucide="x" style="width: 16px; height: 16px;"></i>
+                        </button>
+                    </div>
+                    <div id="directory-search-count" style="font-size: 13px; color: var(--text-muted); font-weight: 500; white-space: nowrap;"></div>
+                </div>
+
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Volunteer Name</th>
                                 <th>Contact Info</th>
-                                <th>Role</th>
                                 <th>Location & Joined</th>
                                 <th>Total Hours</th>
                             </tr>
                         </thead>
                         <tbody id="volunteers-table-body">
                             <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Loading
+                                <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading
                                     volunteers...</td>
                             </tr>
                         </tbody>

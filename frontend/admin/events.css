@@ -51,36 +51,161 @@
 /* --- DETAILS MODAL SPECIFICS --- */
 .modal-content.details-modal {
     max-width: 800px; /* Wider to accommodate the inner table */
+    border-radius: var(--radius-lg);
 }
 
 .info-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    background: var(--bg-color);
-    padding: 16px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    background: transparent;
+    padding: 0;
+    border: none;
 }
 
-.info-item {
+.info-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
+    transition: border-color 0.2s;
+}
+
+.info-card:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.info-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.info-icon-badge svg,
+.info-icon-badge i {
+    width: 16px;
+    height: 16px;
+}
+
+.date-card .info-icon-badge {
+    background: rgba(59, 130, 246, 0.12);
+    color: #3B82F6;
+}
+
+.location-card .info-icon-badge {
+    background: rgba(16, 185, 129, 0.12);
+    color: #10B981;
+}
+
+.contact-card .info-icon-badge {
+    background: rgba(139, 92, 246, 0.12);
+    color: #8B5CF6;
+}
+
+.capacity-card .info-icon-badge {
+    background: rgba(245, 158, 11, 0.12);
+    color: #F59E0B;
+}
+
+.info-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .info-label {
-    font-size: 12px;
-    font-weight: 600;
+    font-size: 11px;
+    font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
+}
+
+.info-value-highlight {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.4;
 }
 
 .info-value {
     font-size: 14px;
     color: var(--text-main);
     font-weight: 500;
+}
+
+.deadline-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #EF4444;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 3px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-top: 4px;
+}
+
+.maps-link-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    text-decoration: none;
+    margin-top: 4px;
+    transition: opacity 0.2s;
+}
+
+.maps-link-btn:hover {
+    text-decoration: underline;
+}
+
+.poc-box {
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--surface);
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    margin-top: 4px;
+}
+
+.waitlist-pill {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #F59E0B;
+    background: rgba(245, 158, 11, 0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+    width: fit-content;
+    margin-top: 6px;
+}
+
+.info-desc-card {
+    background: var(--bg-color);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
 }
 
 /* --- QR KIOSK SPECIFICS --- */
@@ -259,4 +384,152 @@ input:checked + .toggle-slider:before {
     font-size: 12px;
     font-weight: 600;
     flex-shrink: 0;
+}
+
+/* --- EVENT DETAILS MODAL HEADER & CONTROLS --- */
+.details-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.details-header-info {
+    min-width: 0;
+    flex: 1;
+}
+.details-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.details-title-row h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    word-break: break-word;
+}
+.details-header-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.details-actions-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.lifecycle-actions-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.close-modal-btn {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--radius-md);
+}
+
+/* --- MOBILE RESPONSIVENESS FOR EVENTS PAGE & MODAL --- */
+@media (max-width: 768px) {
+    .content-wrapper {
+        padding: 16px;
+    }
+    .events-filter-matrix {
+        padding: 12px !important;
+        gap: 8px !important;
+        flex-direction: column;
+    }
+    .events-filter-search-col {
+        min-width: 100% !important;
+        width: 100%;
+    }
+    .events-filter-matrix select.form-input {
+        width: 100%;
+    }
+    .modal-overlay {
+        padding: 8px;
+    }
+    .modal-content.details-modal {
+        width: 100%;
+        max-width: calc(100vw - 16px);
+        margin: 0 auto;
+        padding: 16px;
+        max-height: 94vh;
+        box-sizing: border-box;
+    }
+    .details-modal-header {
+        position: relative;
+        padding-right: 40px; /* Leave room for close button */
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+    .close-modal-btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 10;
+        background: var(--bg-color);
+    }
+    .details-title-row h2 {
+        font-size: 17px;
+        line-height: 1.3;
+    }
+    .details-header-controls {
+        width: 100%;
+        margin-top: 6px;
+        justify-content: flex-start;
+    }
+    .details-actions-bar {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+    .details-actions-bar button {
+        font-size: 12px !important;
+        padding: 6px 10px !important;
+    }
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    .info-card {
+        padding: 12px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+    .info-value-highlight {
+        font-size: 14px;
+        line-height: 1.4;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+    .info-value {
+        font-size: 13px;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+    .capacity-tracker {
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        box-sizing: border-box;
+    }
+    .data-table {
+        min-width: 500px;
+    }
 }
