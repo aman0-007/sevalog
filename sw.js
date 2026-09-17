@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'sevalog-v7';
+const CACHE_VERSION = 'sevalog-v8';
 const CACHE_NAME = `sevalog-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `sevalog-dynamic-${CACHE_VERSION}`;
 
@@ -25,6 +25,13 @@ self.addEventListener('install', (event) => {
             return cache.addAll(STATIC_ASSETS);
         })
     );
+});
+
+// Allow clients to trigger skipWaiting directly
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
 
 // 2. Activate Event - Purge all previous caches & take control of all open windows immediately
