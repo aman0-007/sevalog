@@ -80,13 +80,14 @@
                                     placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" inputmode="tel" title="Please enter a 10-digit mobile number" required></div>
                         </div>
                         <div class="input-group">
-                            <label for="date_of_birth">Date of Birth</label>
-                            <div class="input-field"><i data-lucide="calendar"></i><input type="date"
-                                    id="date_of_birth" min="1920-01-01"></div>
+                            <label for="date_of_birth">Date of Birth <span class="label-hint">(Ages 14 – 60)</span></label>
+                            <div class="input-field" id="dob-field-wrapper"><i data-lucide="calendar"></i><input type="date"
+                                    id="date_of_birth"></div>
+                            <div id="dob-hint" class="field-live-feedback" aria-live="polite"></div>
                         </div>
                         <div class="input-group">
                             <label for="gender">Gender</label>
-                            <div class="input-field"><i data-lucide="users"></i>
+                            <div class="input-field" id="gender-field-wrapper"><i data-lucide="users"></i>
                                 <select id="gender" required>
                                     <option value="" disabled selected>Select Gender</option>
                                     <option value="Male">Male</option>
@@ -97,7 +98,7 @@
                         </div>
                         <div class="input-group">
                             <label for="blood_group">Blood Group</label>
-                            <div class="input-field"><i data-lucide="droplet"></i>
+                            <div class="input-field" id="blood-group-field-wrapper"><i data-lucide="droplet"></i>
                                 <select id="blood_group" required>
                                     <option value="" disabled selected>Select Blood Group</option>
                                     <option value="A+">A+</option>
@@ -112,24 +113,25 @@
                             </div>
                         </div>
                         <div class="input-group">
-                            <label>Education Level</label>
+                            <label for="education_level">Education Level</label>
                             <div class="input-field"><i data-lucide="book-open"></i><input type="text"
                                     id="education_level" placeholder="e.g. Undergraduate"></div>
                         </div>
 
-                        <!-- DB Schema Update: Separated College and Profession -->
+                        <!-- DB Schema: Separated College and Profession with live visual indicator -->
+                        <div class="occupation-requirement-badge" id="occupation-requirement-badge">
+                            <i data-lucide="alert-circle" style="width: 15px; height: 15px;"></i>
+                            <span>Provide at least one: College Name or Current Profession</span>
+                        </div>
+
                         <div class="input-group">
-                            <label>College Name <span
-                                    style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(Provide at
-                                    least one)</span></label>
-                            <div class="input-field"><i data-lucide="building"></i><input type="text" id="college_name"
+                            <label for="college_name">College Name</label>
+                            <div class="input-field" id="college-field-wrapper"><i data-lucide="building"></i><input type="text" id="college_name"
                                     placeholder="e.g. IIT Bombay"></div>
                         </div>
                         <div class="input-group">
-                            <label>Profession <span
-                                    style="font-size: 11px; font-weight: normal; color: var(--text-muted);">(Provide at
-                                    least one)</span></label>
-                            <div class="input-field"><i data-lucide="briefcase"></i><input type="text" id="profession"
+                            <label for="profession">Profession</label>
+                            <div class="input-field" id="profession-field-wrapper"><i data-lucide="briefcase"></i><input type="text" id="profession"
                                     placeholder="e.g. Software Engineer"></div>
                         </div>
 
@@ -231,6 +233,14 @@
                                 <button type="button" class="input-password-toggle" id="toggle-reg-password" aria-label="Toggle password visibility" title="Show or hide password">
                                     <i data-lucide="eye" style="width: 18px; height: 18px;"></i>
                                 </button>
+                            </div>
+                            <div class="password-strength-container" id="password-strength-container">
+                                <div class="strength-bars">
+                                    <div class="strength-bar" id="strength-bar-1"></div>
+                                    <div class="strength-bar" id="strength-bar-2"></div>
+                                    <div class="strength-bar" id="strength-bar-3"></div>
+                                </div>
+                                <div class="strength-text" id="strength-text">Password Strength: <span>Enter password</span></div>
                             </div>
                             <div id="password-hint" class="field-live-feedback" aria-live="polite"></div>
                         </div>

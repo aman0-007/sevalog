@@ -165,10 +165,115 @@ document.addEventListener('DOMContentLoaded', () => {
         setupPwToggle('toggle-reg-password', 'password_hash');
         setupPwToggle('toggle-reg-confirm', 'confirm_password');
 
+        // Helper: Focus and smoothly scroll to the first invalid field
+        const focusAndScrollToField = (fieldId, errorMessage) => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                const wrapper = field.closest('.input-field') || field;
+                wrapper.classList.add('is-invalid', 'field-error-pulse');
+                setTimeout(() => wrapper.classList.remove('field-error-pulse'), 600);
+                wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => {
+                    try { field.focus(); } catch (err) {}
+                }, 300);
+            }
+            if (errorMessage) {
+                showAlert('reg-alert', errorMessage, 'error');
+            }
+        };
+
+        // 3a. Dynamic Date of Birth range: Min 14 years old, Max 60 years old
         const dobInput = document.getElementById('date_of_birth');
+        const dobHint = document.getElementById('dob-hint');
+        const dobWrapper = document.getElementById('dob-field-wrapper');
+        const now = new Date();
+        const maxDobDate = new Date(now.getFullYear() - 14, now.getMonth(), now.getDate());
+        const minDobDate = new Date(now.getFullYear() - 60, now.getMonth(), now.getDate());
+        const maxDobStr = maxDobDate.toISOString().split('T')[0];
+        const minDobStr = minDobDate.toISOString().split('T')[0];
+
         if (dobInput) {
-            dobInput.max = new Date().toISOString().split('T')[0];
+            dobInput.min = minDobStr;
+            dobInput.max = maxDobStr;
+
+            const checkDobLive = () => {
+                const val = dobInput.value;
+                if (!val) {
+                    if (dobHint) { dobHint.textContent = ''; dobHint.className = 'field-live-feedback'; }
+                    dobWrapper?.classList.remove('is-valid', 'is-invalid');
+                    return null;
+                }
+                const chosenDate = new Date(val);
+                if (chosenDate > maxDobDate) {
+                    if (dobHint) {
+                        dobHint.textContent = 'Volunteers must be at least 14 years old.';
+                        dobHint.className = 'field-live-feedback is-invalid';
+                    }
+                    dobWrapper?.classList.add('is-invalid');
+                    dobWrapper?.classList.remove('is-valid');
+                    return false;
+                } else if (chosenDate < minDobDate) {
+                    if (dobHint) {
+                        dobHint.textContent = 'Volunteer age limit is up to 60 years.';
+                        dobHint.className = 'field-live-feedback is-invalid';
+                    }
+                    dobWrapper?.classList.add('is-invalid');
+                    dobWrapper?.classList.remove('is-valid');
+                    return false;
+                } else {
+                    const ageDiffMs = Date.now() - chosenDate.getTime();
+                    const ageDate = new Date(ageDiffMs);
+                    const calculatedAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+                    if (dobHint) {
+                        dobHint.textContent = `✓ Age: ${calculatedAge} years (Eligible range 14–60)`;
+                        dobHint.className = 'field-live-feedback is-valid';
+                    }
+                    dobWrapper?.classList.add('is-valid');
+                    dobWrapper?.classList.remove('is-invalid');
+                    return true;
+                }
+            };
+
+            dobInput.addEventListener('change', checkDobLive);
+            dobInput.addEventListener('input', checkDobLive);
         }
+
+        // 1c. College vs. Profession Visual Indicator
+        const collegeInput = document.getElementById('college_name');
+        const profInput = document.getElementById('profession');
+        const occBadge = document.getElementById('occupation-requirement-badge');
+        const collegeWrapper = document.getElementById('college-field-wrapper');
+        const profWrapper = document.getElementById('profession-field-wrapper');
+
+        const checkOccupationRequirement = () => {
+            const collegeVal = collegeInput?.value.trim() || '';
+            const profVal = profInput?.value.trim() || '';
+            const isMet = !!(collegeVal || profVal);
+
+            if (occBadge) {
+                if (isMet) {
+                    occBadge.className = 'occupation-requirement-badge is-satisfied';
+                    const detail = (collegeVal && profVal) ? 'Both provided' : (collegeVal ? `College: ${collegeVal}` : `Profession: ${profVal}`);
+                    occBadge.innerHTML = `<i data-lucide="check-circle-2" style="width: 15px; height: 15px;"></i> <span>✓ Requirement met (${detail})</span>`;
+                } else {
+                    occBadge.className = 'occupation-requirement-badge';
+                    occBadge.innerHTML = `<i data-lucide="alert-circle" style="width: 15px; height: 15px;"></i> <span>Provide at least one: College Name or Current Profession</span>`;
+                }
+                if (window.lucide) lucide.createIcons();
+            }
+
+            if (collegeVal) collegeWrapper?.classList.add('is-valid'); else collegeWrapper?.classList.remove('is-valid');
+            if (profVal) profWrapper?.classList.add('is-valid'); else profWrapper?.classList.remove('is-valid');
+
+            if (isMet) {
+                collegeWrapper?.classList.remove('is-invalid');
+                profWrapper?.classList.remove('is-invalid');
+            }
+            return isMet;
+        };
+
+        collegeInput?.addEventListener('input', checkOccupationRequirement);
+        profInput?.addEventListener('input', checkOccupationRequirement);
 
         // Live validation for email
         const emailInput = document.getElementById('email');
@@ -203,17 +308,46 @@ document.addEventListener('DOMContentLoaded', () => {
             emailInput.addEventListener('blur', validateEmailLive);
         }
 
-        // Live validation for password and confirm password
+        // 2a. Password Strength calculation & Live validation
         const pwInput = document.getElementById('password_hash');
         const confirmPwInput = document.getElementById('confirm_password');
         const pwHint = document.getElementById('password-hint');
         const confirmPwHint = document.getElementById('confirm-password-hint');
         const pwWrapper = document.getElementById('password-field-wrapper');
         const confirmPwWrapper = document.getElementById('confirm-password-field-wrapper');
+        const pwStrengthContainer = document.getElementById('password-strength-container');
+        const strengthText = document.getElementById('strength-text');
+
+        const evaluatePasswordStrength = (pw) => {
+            if (!pw) return { score: 0, label: 'Enter password', levelClass: '' };
+            if (pw.length < 6) return { score: 1, label: 'Too short (min 6)', levelClass: 'strength-weak' };
+
+            let score = 0;
+            if (pw.length >= 6) score++;
+            if (pw.length >= 8) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+            if (score <= 2) {
+                return { score: 1, label: 'Weak (add numbers/uppercase)', levelClass: 'strength-weak' };
+            } else if (score <= 4) {
+                return { score: 2, label: 'Medium (good password)', levelClass: 'strength-medium' };
+            } else {
+                return { score: 3, label: 'Strong (great password!)', levelClass: 'strength-strong' };
+            }
+        };
 
         const validatePasswordsLive = () => {
             const pwVal = pwInput?.value || '';
             const confirmVal = confirmPwInput?.value || '';
+
+            // Password strength evaluation
+            if (pwStrengthContainer && strengthText) {
+                const strength = evaluatePasswordStrength(pwVal);
+                pwStrengthContainer.className = 'password-strength-container ' + strength.levelClass;
+                strengthText.innerHTML = `Password Strength: <span>${strength.label}</span>`;
+            }
 
             // Password length check
             if (pwHint) {
@@ -276,27 +410,67 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 hideAlert('reg-alert');
 
-                // 1. Password validation & matching
-                const password = getVal('password_hash');
-                const confirmPassword = getVal('confirm_password');
-                if (password.length < 6) {
-                    throw new Error("Password must be at least 6 characters long.");
-                }
-                if (password !== confirmPassword) {
-                    throw new Error("Passwords do not match. Please verify your confirm password.");
+                // Basic required fields check with auto-scroll
+                const firstName = getVal('first_name');
+                if (!firstName) {
+                    focusAndScrollToField('first_name', "Please enter your first name.");
+                    return;
                 }
 
-                // 2. Email constraint
+                const lastName = getVal('last_name');
+                if (!lastName) {
+                    focusAndScrollToField('last_name', "Please enter your last name.");
+                    return;
+                }
+
+                // Email constraint
                 const email = getVal('email');
                 if (!email || !emailRegex.test(email)) {
-                    throw new Error("Please enter a valid email address (e.g. name@domain.com).");
+                    focusAndScrollToField('email', "Please enter a valid email address (e.g. name@domain.com).");
+                    return;
                 }
 
-                // 3. Phone number constraint (10 digits, optional +91)
+                // Phone number constraint (10 digits, optional +91)
                 const phone = getVal('phone_number');
                 const cleanPhone = phone.replace(/[\s\-]/g, '');
                 if (!cleanPhone || !/^(\+91)?[0-9]{10}$/.test(cleanPhone)) {
-                    throw new Error("Please enter a valid 10-digit mobile number.");
+                    focusAndScrollToField('phone_number', "Please enter a valid 10-digit mobile number.");
+                    return;
+                }
+
+                // Date of birth constraint: Eligible range 14 to 60 years
+                const dob = getVal('date_of_birth');
+                if (dob) {
+                    const dobDate = new Date(dob);
+                    if (dobDate > maxDobDate) {
+                        focusAndScrollToField('date_of_birth', "Volunteers must be at least 14 years old.");
+                        return;
+                    }
+                    if (dobDate < minDobDate) {
+                        focusAndScrollToField('date_of_birth', "Volunteer age limit is up to 60 years.");
+                        return;
+                    }
+                }
+
+                // Gender & Blood Group constraints
+                const gender = getVal('gender');
+                if (!gender) {
+                    focusAndScrollToField('gender', "Please select your Gender.");
+                    return;
+                }
+
+                const bloodGroup = getVal('blood_group');
+                if (!bloodGroup) {
+                    focusAndScrollToField('blood_group', "Please select your Blood Group.");
+                    return;
+                }
+
+                // Pre-flight check for the CHECK constraint: College or Profession
+                const college = getVal('college_name');
+                const prof = getVal('profession');
+                if (!college && !prof) {
+                    focusAndScrollToField('college_name', "Please provide either your College Name or Profession.");
+                    return;
                 }
 
                 // Emergency contact phone constraint (if provided)
@@ -304,51 +478,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (emergencyPhone) {
                     const cleanEmergPhone = emergencyPhone.replace(/[\s\-]/g, '');
                     if (!/^(\+91)?[0-9]{10}$/.test(cleanEmergPhone)) {
-                        throw new Error("Please enter a valid 10-digit emergency contact number.");
+                        focusAndScrollToField('emergency_contact_number', "Please enter a valid 10-digit emergency contact number.");
+                        return;
                     }
                 }
 
-                // 3. Date of birth constraint
-                const dob = getVal('date_of_birth');
-                if (dob) {
-                    const dobDate = new Date(dob);
-                    const today = new Date();
-                    if (dobDate > today) {
-                        throw new Error("Date of Birth cannot be in the future.");
-                    }
-                }
-
-                // 4. Pincode constraint (6 digits)
+                // Pincode constraint (6 digits if provided)
                 const pincode = getVal('pincode');
                 if (pincode && !/^[0-9]{6}$/.test(pincode.trim())) {
-                    throw new Error("Please enter a valid 6-digit postal pincode.");
+                    focusAndScrollToField('pincode', "Please enter a valid 6-digit postal pincode.");
+                    return;
                 }
 
-                // 5. Gender & Blood Group constraints
-                const gender = getVal('gender');
-                if (!gender) {
-                    throw new Error("Please select your Gender.");
+                // Password validation & matching
+                const password = getVal('password_hash');
+                const confirmPassword = getVal('confirm_password');
+                if (password.length < 6) {
+                    focusAndScrollToField('password_hash', "Password must be at least 6 characters long.");
+                    return;
                 }
-
-                const bloodGroup = getVal('blood_group');
-                if (!bloodGroup) {
-                    throw new Error("Please select your Blood Group.");
-                }
-
-                // Pre-flight check for the CHECK constraint
-                const college = getVal('college_name');
-                const prof = getVal('profession');
-                if (!college && !prof) {
-                    throw new Error("Please provide either your College Name or Profession.");
+                if (password !== confirmPassword) {
+                    focusAndScrollToField('confirm_password', "Passwords do not match. Please verify your confirm password.");
+                    return;
                 }
 
                 setButtonState(btn, true);
 
                 // Step 1: Register Core Account
                 const authPayload = {
-                    firstName: getVal('first_name'),
-                    lastName: getVal('last_name'),
-                    email: getVal('email'),
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
                     password: password,
                     phoneNumber: cleanPhone,
                     collegeName: college,

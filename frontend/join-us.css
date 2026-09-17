@@ -265,10 +265,129 @@ textarea {
     box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
 }
 
+/* Label hints */
+.label-hint {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+/* Occupation Requirement Status Badge */
+.occupation-requirement-badge {
+    grid-column: span 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 4px;
+    margin-bottom: 2px;
+    transition: all 0.25s ease;
+    background: rgba(100, 116, 139, 0.08);
+    border: 1px dashed var(--border);
+    color: var(--text-muted);
+}
+
+.occupation-requirement-badge i {
+    flex-shrink: 0;
+}
+
+.occupation-requirement-badge.is-satisfied {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #15803D;
+}
+
+[data-theme="dark"] .occupation-requirement-badge.is-satisfied {
+    color: #86EFAC;
+    background: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.4);
+}
+
+/* Password Strength Meter */
+.password-strength-container {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.strength-bars {
+    display: flex;
+    gap: 5px;
+    height: 4px;
+    width: 100%;
+}
+
+.strength-bar {
+    flex: 1;
+    height: 100%;
+    background: var(--border);
+    border-radius: 2px;
+    transition: background-color 0.25s ease;
+}
+
+.strength-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.strength-text span {
+    font-weight: 700;
+}
+
+/* Strength levels */
+.password-strength-container.strength-weak #strength-bar-1 {
+    background: #EF4444;
+}
+.password-strength-container.strength-weak .strength-text span {
+    color: #DC2626;
+}
+
+.password-strength-container.strength-medium #strength-bar-1,
+.password-strength-container.strength-medium #strength-bar-2 {
+    background: #F59E0B;
+}
+.password-strength-container.strength-medium .strength-text span {
+    color: #D97706;
+}
+
+.password-strength-container.strength-strong #strength-bar-1,
+.password-strength-container.strength-strong #strength-bar-2,
+.password-strength-container.strength-strong #strength-bar-3 {
+    background: #10B981;
+}
+.password-strength-container.strength-strong .strength-text span {
+    color: #059669;
+}
+
+[data-theme="dark"] .password-strength-container.strength-weak .strength-text span { color: #F87171; }
+[data-theme="dark"] .password-strength-container.strength-medium .strength-text span { color: #FBBF24; }
+[data-theme="dark"] .password-strength-container.strength-strong .strength-text span { color: #34D399; }
+
+/* Smooth invalid field highlight animation */
+.input-field.field-error-pulse {
+    animation: errorPulse 0.45s ease-in-out;
+}
+
+@keyframes errorPulse {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-5px); }
+    40%, 80% { transform: translateX(5px); }
+}
+
 @media (max-width: 1024px) {
     .auth-visual { display: none; }
     .form-grid { grid-template-columns: 1fr; }
     .full-width { grid-column: span 1; }
+    .occupation-requirement-badge { grid-column: span 1; }
     .header-top { flex-direction: column; align-items: flex-start; }
     .already-registered { display: none; } /* Hide top link on mobile */
     .mobile-login-hint { display: block; } /* Show bottom link on mobile */
