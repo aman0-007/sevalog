@@ -50,11 +50,15 @@
         <!-- HERO SECTION: Live Network Pulse -->
         <section class="impact-hero">
             <div class="impact-hero-content">
-                <div class="reveal">
+                <div class="reveal hero-header-row">
                     <span class="hero-badge-live">
                         <span class="live-pulse-dot"></span>
                         Live Community Metric Stream
                     </span>
+                    <button id="refresh-impact-btn" class="btn-refresh-live" title="Sync live metrics" aria-label="Sync live metrics">
+                        <i data-lucide="rotate-cw" id="refresh-icon"></i>
+                        <span id="refresh-text">Live Sync</span>
+                    </button>
                 </div>
                 <h1 class="reveal" style="transition-delay: 0.1s;">
                     Audited Service. <span class="text-gradient-accent">Measurable Lives.</span>
@@ -63,18 +67,22 @@
                     Every minute of community service logged in SevaLog is backed by dynamic QR check-ins, supervisor audits, and cryptographic milestone certificates.
                 </p>
                 <div class="hero-quick-chips reveal" style="transition-delay: 0.3s;">
-                    <div class="quick-chip">
-                        <i data-lucide="shield-check"></i>
-                        <span>100% Mathematically Audited</span>
-                    </div>
-                    <div class="quick-chip">
-                        <i data-lucide="qr-code"></i>
-                        <span>QR Check-in Enforced</span>
-                    </div>
-                    <div class="quick-chip">
+                    <a href="#overview-metrics-grid" class="quick-chip">
+                        <i data-lucide="bar-chart-2"></i>
+                        <span>Core Metrics</span>
+                    </a>
+                    <a href="#operations-matrix" class="quick-chip">
+                        <i data-lucide="activity"></i>
+                        <span>Operations Matrix</span>
+                    </a>
+                    <a href="#rank-roadmap-section" class="quick-chip">
                         <i data-lucide="award"></i>
-                        <span>University & NSS Compliant</span>
-                    </div>
+                        <span>Rank Roadmap</span>
+                    </a>
+                    <a href="#category-impact-section" class="quick-chip">
+                        <i data-lucide="pie-chart"></i>
+                        <span>Service Domains</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -157,7 +165,7 @@
         </section>
 
         <!-- OPERATIONAL EFFICIENCY & CONVERSION BREAKDOWN -->
-        <section class="section-wrapper">
+        <section class="section-wrapper" id="operations-matrix">
             <div class="section-head reveal">
                 <span class="section-head-badge"><i data-lucide="activity"></i> Operations Matrix</span>
                 <h2>Integrity at Every Step</h2>
@@ -246,11 +254,56 @@
         </section>
 
         <!-- VOLUNTEER RANK JOURNEY (INTERACTIVE TIERS) -->
-        <section class="section-wrapper">
+        <section class="section-wrapper" id="rank-roadmap-section">
             <div class="section-head reveal">
                 <span class="section-head-badge"><i data-lucide="sparkles"></i> Recognition Roadmap</span>
                 <h2>Volunteer Rank & Milestone Distribution</h2>
                 <p>Volunteers progress through accredited tiers based on audited service hours. Click on any tier to explore requirements.</p>
+            </div>
+
+            <!-- Visual Milestone Progression Rail -->
+            <div class="rank-milestone-rail reveal" aria-label="Volunteer Tier Progression Ladder">
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #94A3B8;"></span>
+                    <span class="milestone-hours">0h</span>
+                    <span class="milestone-name">Initiate</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #3B82F6;"></span>
+                    <span class="milestone-hours">10h</span>
+                    <span class="milestone-name">Sahayyak</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #06B6D4;"></span>
+                    <span class="milestone-hours">25h</span>
+                    <span class="milestone-name">Karyakarta</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #10B981;"></span>
+                    <span class="milestone-hours">40h</span>
+                    <span class="milestone-name">Niyojak</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #F59E0B;"></span>
+                    <span class="milestone-hours">60h</span>
+                    <span class="milestone-name">Margdarshak</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #EC4899;"></span>
+                    <span class="milestone-hours">80h</span>
+                    <span class="milestone-name">Prerak</span>
+                </div>
+                <div class="milestone-line"></div>
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: #8B5CF6;"></span>
+                    <span class="milestone-hours">100h+</span>
+                    <span class="milestone-name">Visionary</span>
+                </div>
             </div>
 
             <div class="rank-journey-container reveal">

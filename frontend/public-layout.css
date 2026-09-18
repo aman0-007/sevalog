@@ -220,6 +220,20 @@ h1, h2, h3 { font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; }
         pointer-events: auto;
     }
 
+    .navbar.menu-active .nav-links .nav-link,
+    body.hero-top .navbar.menu-active .nav-links .nav-link {
+        color: #0F172A !important;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 4px 0;
+    }
+
+    .navbar.menu-active .nav-links .nav-link.active,
+    body.hero-top .navbar.menu-active .nav-links .nav-link.active {
+        color: var(--accent-primary) !important;
+        font-weight: 700;
+    }
+
     .navbar.scrolled .nav-links { border-radius: 0 0 32px 32px; }
 
     .footer-container { grid-template-columns: 1fr; gap: 40px; }

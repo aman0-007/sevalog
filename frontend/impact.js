@@ -57,7 +57,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 1. Fetch live metrics from /api/public/impact-stats
-    async function loadImpactStats() {
+    async function loadImpactStats(isRefresh = false) {
+        const refreshIcon = document.getElementById('refresh-icon');
+        const refreshText = document.getElementById('refresh-text');
+        
+        if (isRefresh && refreshIcon) {
+            refreshIcon.classList.add('spin');
+            if (refreshText) refreshText.innerText = 'Syncing...';
+        }
+
         try {
             const response = await ApiClient.request('/public/impact-stats', 'GET');
             if (response && response.success && response.data) {
@@ -70,6 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.warn("Could not reach /public/impact-stats, using verified benchmark data:", err.message);
             rawImpactData = fallbackData;
+        } finally {
+            if (isRefresh) {
+                setTimeout(() => {
+                    if (refreshIcon) refreshIcon.classList.remove('spin');
+                    if (refreshText) refreshText.innerText = 'Live Synced';
+                    setTimeout(() => {
+                        if (refreshText) refreshText.innerText = 'Live Sync';
+                    }, 2000);
+                }, 400);
+            }
         }
 
         renderOverview(rawImpactData);
@@ -88,6 +106,36 @@ document.addEventListener('DOMContentLoaded', () => {
             "'": '&#39;',
             '"': '&quot;'
         }[tag] || tag));
+    }
+
+    // Fluid numeric roll-up
+    function animateNumber(el, targetVal, suffix = '') {
+        const startVal = parseInt(el.getAttribute('data-current') || '0', 10);
+        const startTime = performance.now();
+        const duration = 1000;
+
+        function step(now) {
+            const elapsed = Math.min((now - startTime) / duration, 1);
+            const easeOut = 1 - Math.pow(1 - elapsed, 3);
+            const current = Math.floor(startVal + (targetVal - startVal) * easeOut);
+            el.innerText = `${current.toLocaleString()}${suffix}`;
+            if (elapsed < 1) {
+                requestAnimationFrame(step);
+            } else {
+                el.innerText = `${targetVal.toLocaleString()}${suffix}`;
+                el.setAttribute('data-current', targetVal);
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    // Helper: Set counter attribute and animate
+    function setCounter(elementId, val, suffix = '') {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.setAttribute('data-target', val);
+        el.setAttribute('data-suffix', suffix);
+        animateNumber(el, Number(val) || 0, suffix);
     }
 
     // 2. Render Hero & Overview Counters
@@ -140,15 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (bCerts) bCerts.innerText = `${ov.total_certificates_issued || 0}`;
         const bVols = document.getElementById('banner-stat-vols');
         if (bVols) bVols.innerText = `${ov.total_registered_volunteers || 0}`;
-    }
-
-    // Helper: Set counter attribute and animate
-    function setCounter(elementId, val, suffix = '') {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-        el.setAttribute('data-target', val);
-        el.setAttribute('data-suffix', suffix);
-        el.innerText = `${val}${suffix}`;
     }
 
     // 3. Render Operational Efficiency & Recognition Matrix
@@ -326,6 +365,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }).join('');
 
         if (window.lucide) lucide.createIcons();
+    }
+
+    // Attach Refresh Button Handler
+    const refreshBtn = document.getElementById('refresh-impact-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            loadImpactStats(true);
+        });
     }
 
     // Kick off initialization
