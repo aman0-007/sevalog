@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderOverview(rawImpactData);
         renderOperationsMatrix(rawImpactData);
+        renderMilestoneRail(rawImpactData.volunteer_rank_distribution || []);
         renderRankJourney(rawImpactData.volunteer_rank_distribution || []);
         renderCategoryCards(rawImpactData.impact_by_category || []);
     }
@@ -251,7 +252,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (barMCerts) barMCerts.style.width = mCerts > 0 ? `${Math.min(100, Math.round((mCerts / totalCerts) * 100))}%` : '4%';
     }
 
-    // 4. Render Interactive Volunteer Rank Distribution
+    // 4. Render Milestone Progression Ladder from API Ranks
+    function renderMilestoneRail(ranks) {
+        const rail = document.getElementById('rank-milestone-rail');
+        if (!rail || !ranks || ranks.length === 0) return;
+
+        rail.innerHTML = ranks.map((rank, idx) => {
+            const hex = rank.color_hex || '#3B82F6';
+            const hours = rank.min_hours || 0;
+            const isLast = idx === ranks.length - 1;
+            const hoursDisplay = isLast ? `${hours}h+` : `${hours}h`;
+
+            return `
+                <div class="milestone-step">
+                    <span class="milestone-dot" style="background: ${hex};"></span>
+                    <span class="milestone-hours">${hoursDisplay}</span>
+                    <span class="milestone-name">${escapeHTML(rank.rank_name)}</span>
+                </div>
+                ${!isLast ? '<div class="milestone-line"></div>' : ''}
+            `;
+        }).join('');
+    }
+
+    // 5. Render Interactive Volunteer Rank Distribution
     function renderRankJourney(ranks) {
         const grid = document.getElementById('ranks-grid');
         if (!grid) return;
