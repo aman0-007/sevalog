@@ -24,6 +24,7 @@
     <meta name="theme-color" content="#3B82F6">
 </head>
 <body>
+    <div class="app-content">
 
         <!-- TOP HEADER WITH APP NAME & VOLUNTEER PROFILE INITIAL (ADMIN-STYLE) -->
         <header class="top-header">
@@ -45,30 +46,50 @@
 
         <main class="main-viewport">
             
-            <div class="community-grid animate-up delay-1">
-                <div class="feed-column">
+            <!-- MOBILE VIEW TOGGLE TABS (Clean switch on mobile, hidden on desktop) -->
+            <div class="community-mobile-tabs" id="community-mobile-tabs" aria-label="Community sections">
+                <button type="button" class="comm-mobile-tab-btn active" data-target="feed" id="tab-btn-feed">
+                    <i data-lucide="activity"></i>
+                    <span>Live Stream</span>
+                </button>
+                <button type="button" class="comm-mobile-tab-btn" data-target="leaderboard" id="tab-btn-leaderboard">
+                    <i data-lucide="trophy"></i>
+                    <span>Top Changemakers</span>
+                </button>
+            </div>
+
+            <div class="community-grid animate-up delay-1 show-feed" id="community-grid">
+                <div class="feed-column" id="feed-column">
                     <div class="section-header">
                         <h2>Live Impact Stream</h2>
                         <p>See what your fellow volunteers are achieving right now.</p>
                     </div>
                     
                     <div class="social-feed" id="live-feed">
-                        </div>
+                    </div>
                 </div>
 
-                <div class="leaderboard-column">
+                <div class="leaderboard-column" id="leaderboard-column">
+                    <div class="section-header leaderboard-section-header">
+                        <h2>Top Changemakers</h2>
+                        <p>Celebrating volunteers driving impact in our communities.</p>
+                    </div>
+
                     <div class="leaderboard-card">
                         <div class="lb-header">
-                            <h3>Top Changemakers</h3>
+                            <div class="lb-header-title">
+                                <h3>Rankings</h3>
+                                <span class="lb-header-badge"><i data-lucide="award"></i> Leaderboard</span>
+                            </div>
                             <div class="lb-tabs">
-                                <button class="lb-tab active" data-board="city">City</button>
-                                <button class="lb-tab" data-board="college">College</button>
-                                <button class="lb-tab" data-board="global">Global</button>
+                                <button type="button" class="lb-tab active" data-board="global">Global</button>
+                                <button type="button" class="lb-tab" data-board="city">City</button>
+                                <button type="button" class="lb-tab" data-board="college">College</button>
                             </div>
                         </div>
                         
                         <div class="lb-content" id="leaderboard-list">
-                            </div>
+                        </div>
                     </div>
                     
                     <div class="spotlight-card">

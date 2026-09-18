@@ -14,6 +14,10 @@ const ApiClient = {
     },
 
     setSession: (token, user) => {
+        if (user) {
+            if (!user.firstName && user.first_name) user.firstName = user.first_name;
+            if (!user.lastName && user.last_name) user.lastName = user.last_name;
+        }
         localStorage.setItem('samithi_token', token);
         localStorage.setItem('samithi_user', JSON.stringify(user));
         ApiClient._tokenCache = token;
@@ -99,18 +103,29 @@ const ApiClient = {
         window.location.href = '../404.html'; 
     },
 
-    request: async (endpoint, method = 'GET', body = null) => {
+    request: async (endpoint, method = 'GET', body = null, timeoutMs = 15000) => {
         const headers = { 'Content-Type': 'application/json' };
         const token = ApiClient.getToken();
         
         if (token) headers['Authorization'] = `Bearer ${token}`;
 
-        const config = { method, headers };
+        const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timeoutId = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
+
+        const config = { method, headers, signal: controller?.signal };
         if (body) config.body = JSON.stringify(body);
 
         try {
             const response = await fetch(`${BASE_URL}${endpoint}`, config);
-            const data = await response.json();
+            if (timeoutId) clearTimeout(timeoutId);
+
+            let data;
+            const text = await response.text();
+            try {
+                data = text ? JSON.parse(text) : {};
+            } catch (_) {
+                data = { message: text || `HTTP ${response.status} ${response.statusText}` };
+            }
 
             if (!response.ok) {
                 // Handle unauthorized access (Session Expiry) gracefully
@@ -123,6 +138,10 @@ const ApiClient = {
 
             return data;
         } catch (error) {
+            if (timeoutId) clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error(`Request to ${endpoint} timed out. Please check your network connection.`);
+            }
             console.error(`[API Error] ${method} ${endpoint}:`, error.message);
             throw error; 
         }
