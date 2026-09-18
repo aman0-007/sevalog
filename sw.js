@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'sevalog-v15';
+const CACHE_VERSION = 'sevalog-v18';
 const CACHE_NAME = `sevalog-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `sevalog-dynamic-${CACHE_VERSION}`;
 

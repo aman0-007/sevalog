@@ -1,8 +1,58 @@
 // ==========================================
-// COMMUNITY.JS (Real API Integration)
+// COMMUNITY.JS (Real API Integration & PWA Tab Switcher)
 // ==========================================
 
-document.addEventListener('DOMContentLoaded', async () => {
+// Global Mobile Tab Switcher: Immediately available regardless of lifecycle state
+window.switchCommunityTab = function(target) {
+    const communityGrid = document.getElementById('community-grid');
+    const mobileTabs = document.querySelectorAll('.comm-mobile-tab-btn');
+    const feedBtn = document.getElementById('tab-btn-feed');
+    const lbBtn = document.getElementById('tab-btn-leaderboard');
+
+    if (!communityGrid) return;
+
+    if (target === 'leaderboard') {
+        communityGrid.classList.remove('show-feed');
+        communityGrid.classList.add('show-leaderboard');
+        if (feedBtn) {
+            feedBtn.classList.remove('active');
+            feedBtn.setAttribute('aria-selected', 'false');
+        }
+        if (lbBtn) {
+            lbBtn.classList.add('active');
+            lbBtn.setAttribute('aria-selected', 'true');
+        }
+        // If board renderer exists and hasn't loaded, trigger load
+        if (typeof window.renderCommunityBoard === 'function') {
+            window.renderCommunityBoard(window.currentBoardFilter || 'global');
+        }
+    } else {
+        communityGrid.classList.remove('show-leaderboard');
+        communityGrid.classList.add('show-feed');
+        if (lbBtn) {
+            lbBtn.classList.remove('active');
+            lbBtn.setAttribute('aria-selected', 'false');
+        }
+        if (feedBtn) {
+            feedBtn.classList.add('active');
+            feedBtn.setAttribute('aria-selected', 'true');
+        }
+    }
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+};
+
+window.onCommunityTabSwitched = function(target) {
+    if (target === 'leaderboard' && typeof window.renderCommunityBoard === 'function') {
+        window.renderCommunityBoard(window.currentBoardFilter || 'global');
+    }
+};
+
+let communityInitialized = false;
+
+async function initCommunity() {
+    if (communityInitialized) return;
+    communityInitialized = true;
 
     // 1. Auth Check
     const token = typeof ApiClient !== 'undefined' ? ApiClient.getToken() : null;
@@ -11,29 +61,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // Mobile View Toggle Tabs
+    // 2. Attach Mobile View Toggle Tab Listeners with Touch/Click Dual-Support
     const mobileTabs = document.querySelectorAll('.comm-mobile-tab-btn');
-    const communityGrid = document.getElementById('community-grid');
+    let lastTabTapTime = 0;
 
-    if (mobileTabs.length > 0 && communityGrid) {
-        mobileTabs.forEach(btn => {
-            btn.addEventListener('click', () => {
-                mobileTabs.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                const target = btn.dataset.target;
-                if (target === 'leaderboard') {
-                    communityGrid.classList.remove('show-feed');
-                    communityGrid.classList.add('show-leaderboard');
-                } else {
-                    communityGrid.classList.remove('show-leaderboard');
-                    communityGrid.classList.add('show-feed');
-                }
-                if (typeof lucide !== 'undefined') lucide.createIcons();
-            });
-        });
-    }
+    mobileTabs.forEach(btn => {
+        const handleTabSwitch = (e) => {
+            const now = Date.now();
+            if (now - lastTabTapTime < 300) return; // Prevent double-triggering from touch+click
+            lastTabTapTime = now;
 
-    // 2. Render Real Activity Feed
+            const target = btn.dataset.target || (btn.id === 'tab-btn-leaderboard' ? 'leaderboard' : 'feed');
+            window.switchCommunityTab(target);
+        };
+
+        btn.addEventListener('click', handleTabSwitch);
+        btn.addEventListener('touchend', handleTabSwitch, { passive: true });
+    });
+
+    // 3. Render Real Activity Feed
     async function renderFeed() {
         const feedContainer = document.getElementById('live-feed');
         if (!feedContainer) return;
@@ -121,12 +167,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Expose refresh function
     window.refreshCommunityFeed = renderFeed;
 
-    // 3. Leaderboard Logic
+    // 4. Leaderboard Logic
     const lbTabs = document.querySelectorAll('.lb-tab');
     const lbContent = document.getElementById('leaderboard-list');
+    window.currentBoardFilter = 'global';
 
     async function renderBoard(filterType) {
         if (!lbContent) return;
+        window.currentBoardFilter = filterType;
         lbContent.innerHTML = '<div class="loading-state"><i data-lucide="loader-2" class="spin"></i> Loading rankings...</div>';
         if (typeof lucide !== 'undefined') lucide.createIcons();
 
@@ -182,13 +230,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    window.renderCommunityBoard = renderBoard;
+
     // Tab Listeners for Leaderboard (Global, City, College)
     lbTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
+        const switchLbTab = () => {
             lbTabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
             renderBoard(tab.dataset.board);
-        });
+        };
+        tab.addEventListener('click', switchLbTab);
+        tab.addEventListener('touchend', switchLbTab, { passive: true });
     });
 
     // Initialize
@@ -197,5 +249,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     // Periodically refresh the live feed every 60 seconds
     setInterval(renderFeed, 60000); 
+}
 
-});
+// Lifecycle Safe Execution (works in cached PWA and normal navigation)
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCommunity);
+} else {
+    initCommunity();
+}

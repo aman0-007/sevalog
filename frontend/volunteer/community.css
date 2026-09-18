@@ -5,12 +5,16 @@
 /* --- MOBILE TABS (Segmented Control) --- */
 .community-mobile-tabs {
     display: none; /* hidden by default on desktop */
+    position: relative;
+    z-index: 20;
     background: var(--bg-surface);
-    padding: 4px;
+    padding: 5px;
     border-radius: 14px;
     border: 1px solid var(--border);
     margin-bottom: 24px;
     gap: 6px;
+    box-sizing: border-box;
+    touch-action: manipulation;
 }
 
 .comm-mobile-tab-btn {
@@ -19,7 +23,8 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 10px 16px;
+    padding: 12px 16px;
+    min-height: 46px; /* Meets 44px mobile touch target requirements */
     border: none;
     border-radius: 10px;
     background: transparent;
@@ -27,16 +32,31 @@
     font-weight: 700;
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.comm-mobile-tab-btn i {
+/* Ensure child elements (SVG icons, text spans) do NOT absorb or block touch/click events */
+.comm-mobile-tab-btn * {
+    pointer-events: none;
+}
+
+.comm-mobile-tab-btn i,
+.comm-mobile-tab-btn svg {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
 }
 
 .comm-mobile-tab-btn:hover {
     color: var(--text-main);
+}
+
+.comm-mobile-tab-btn:active {
+    transform: scale(0.98);
 }
 
 .comm-mobile-tab-btn.active {

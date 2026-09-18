@@ -735,7 +735,7 @@ window.openEditEventModal = async function(eventId) {
 
         const form = document.getElementById('createEventForm');
         form.querySelector('#ev-title').value = ev.title || '';
-        form.querySelector('#ev-category').value = ev.category || 'Food Drive';
+        form.querySelector('#ev-category').value = ev.category || 'Teaching & Mentorship';
         
         if (ev.event_date) {
             const dateObj = new Date(ev.event_date);

@@ -4,17 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Our Impact | SevaLog</title>
+    <title>Live Impact Matrix | SevaLog Community</title>
+    <meta name="description" content="Explore real-time audited community service hours, event completion rates, volunteer rank milestones, and verified civic impact across Chembur Samithi.">
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <link rel="stylesheet" href="public-layout.css">
     <link rel="stylesheet" href="impact.css">
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="../manifest.json" <!-- iOS Support -->
+    <!-- PWA Manifest & iOS Support -->
+    <link rel="manifest" href="../manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="SevaLog">
@@ -26,6 +26,7 @@
 
 <body class="hero-top">
 
+    <!-- Navigation Bar -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="../index.html" class="brand-logo">
@@ -33,7 +34,7 @@
                 SevaLog
             </a>
 
-            <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <button id="mobile-menu-btn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
                 <i data-lucide="menu"></i>
             </button>
 
@@ -46,65 +47,274 @@
     </nav>
 
     <main>
+        <!-- HERO SECTION: Live Network Pulse -->
         <section class="impact-hero">
             <div class="impact-hero-content">
-                <div class="reveal" style="transition-delay: 0s;">
-                    <span class="hero-badge">Measuring What Matters</span>
+                <div class="reveal">
+                    <span class="hero-badge-live">
+                        <span class="live-pulse-dot"></span>
+                        Live Community Metric Stream
+                    </span>
                 </div>
-                <h1 class="reveal" style="transition-delay: 0.1s;">Numbers that tell a <span
-                        class="text-gradient">Story.</span></h1>
-                <p class="reveal" style="transition-delay: 0.2s;">Every hour logged is a life touched, a park cleaned,
-                    or a student mentored. Here is the collective footprint of the SevaLog community.</p>
+                <h1 class="reveal" style="transition-delay: 0.1s;">
+                    Audited Service. <span class="text-gradient-accent">Measurable Lives.</span>
+                </h1>
+                <p class="reveal" style="transition-delay: 0.2s;">
+                    Every minute of community service logged in SevaLog is backed by dynamic QR check-ins, supervisor audits, and cryptographic milestone certificates.
+                </p>
+                <div class="hero-quick-chips reveal" style="transition-delay: 0.3s;">
+                    <div class="quick-chip">
+                        <i data-lucide="shield-check"></i>
+                        <span>100% Mathematically Audited</span>
+                    </div>
+                    <div class="quick-chip">
+                        <i data-lucide="qr-code"></i>
+                        <span>QR Check-in Enforced</span>
+                    </div>
+                    <div class="quick-chip">
+                        <i data-lucide="award"></i>
+                        <span>University & NSS Compliant</span>
+                    </div>
+                </div>
             </div>
         </section>
 
+        <!-- TOP 4 REAL-TIME OVERVIEW STATS -->
         <section class="impact-metrics">
-            <div class="metrics-container">
+            <div class="metrics-container" id="overview-metrics-grid">
+                <!-- Card 1: Total Seva Hours -->
                 <div class="impact-stat-card reveal" style="transition-delay: 0.1s;">
-                    <div class="stat-icon"><i data-lucide="utensils"></i></div>
-                    <h3 class="counter" data-target="12500" data-suffix="+">0</h3>
-                    <p>Meals Distributed</p>
+                    <div class="card-top">
+                        <div class="stat-icon primary">
+                            <i data-lucide="clock"></i>
+                        </div>
+                        <span class="stat-tag highlight" id="stat-hours-tag">Verified</span>
+                    </div>
+                    <div class="stat-value-group">
+                        <h3 class="counter" id="total-seva-hours" data-target="47" data-suffix=" hrs">47 hrs</h3>
+                        <p>Total Seva Hours Logged</p>
+                    </div>
+                    <div class="stat-subtext">
+                        <i data-lucide="calendar" style="width: 13px; height: 13px;"></i>
+                        <span id="subtext-hours">46 hrs Events &bull; 1 hr Tasks</span>
+                    </div>
                 </div>
+
+                <!-- Card 2: Registered Volunteers -->
                 <div class="impact-stat-card reveal" style="transition-delay: 0.2s;">
-                    <div class="stat-icon"><i data-lucide="trees"></i></div>
-                    <h3 class="counter" data-target="4200">0</h3>
-                    <p>Trees Planted</p>
+                    <div class="card-top">
+                        <div class="stat-icon emerald">
+                            <i data-lucide="users"></i>
+                        </div>
+                        <span class="stat-tag" id="stat-engagement-tag">26% Active</span>
+                    </div>
+                    <div class="stat-value-group">
+                        <h3 class="counter" id="total-volunteers" data-target="73">73</h3>
+                        <p>Registered Volunteers</p>
+                    </div>
+                    <div class="stat-subtext">
+                        <i data-lucide="user-check" style="width: 13px; height: 13px;"></i>
+                        <span id="subtext-volunteers">19 Active Changemakers</span>
+                    </div>
                 </div>
+
+                <!-- Card 3: Activities & Events Completed -->
                 <div class="impact-stat-card reveal" style="transition-delay: 0.3s;">
-                    <div class="stat-icon"><i data-lucide="book-open"></i></div>
-                    <h3 class="counter" data-target="850" data-suffix="+">0</h3>
-                    <p>Hours of Tutoring</p>
+                    <div class="card-top">
+                        <div class="stat-icon amber">
+                            <i data-lucide="check-circle-2"></i>
+                        </div>
+                        <span class="stat-tag" id="stat-events-tag">4 Conducted</span>
+                    </div>
+                    <div class="stat-value-group">
+                        <h3 class="counter" id="total-activities" data-target="5">5</h3>
+                        <p>Activities Completed</p>
+                    </div>
+                    <div class="stat-subtext">
+                        <i data-lucide="sparkles" style="width: 13px; height: 13px;"></i>
+                        <span id="subtext-activities">25 Verified Attendances</span>
+                    </div>
                 </div>
+
+                <!-- Card 4: Official Certificates Issued -->
                 <div class="impact-stat-card reveal" style="transition-delay: 0.4s;">
-                    <div class="stat-icon"><i data-lucide="users"></i></div>
-                    <h3 class="counter" data-target="320">0</h3>
-                    <p>NGO Partners</p>
+                    <div class="card-top">
+                        <div class="stat-icon purple">
+                            <i data-lucide="award"></i>
+                        </div>
+                        <span class="stat-tag highlight" id="stat-badges-tag">20 Badges</span>
+                    </div>
+                    <div class="stat-value-group">
+                        <h3 class="counter" id="total-certificates" data-target="26">26</h3>
+                        <p>Certificates Awarded</p>
+                    </div>
+                    <div class="stat-subtext">
+                        <i data-lucide="shield" style="width: 13px; height: 13px;"></i>
+                        <span id="subtext-certificates">Tamper-Proof & Verifiable</span>
+                    </div>
                 </div>
             </div>
         </section>
 
+        <!-- OPERATIONAL EFFICIENCY & CONVERSION BREAKDOWN -->
+        <section class="section-wrapper">
+            <div class="section-head reveal">
+                <span class="section-head-badge"><i data-lucide="activity"></i> Operations Matrix</span>
+                <h2>Integrity at Every Step</h2>
+                <p>Tracking participation, task fulfillment, and service milestones with mathematical transparency.</p>
+            </div>
+
+            <div class="highlights-grid">
+                <!-- Box 1: Volunteer Engagement & Events -->
+                <div class="highlight-box reveal" style="transition-delay: 0.1s;">
+                    <div class="highlight-title-row">
+                        <h4><i data-lucide="trending-up" style="color: #2563EB;"></i> Event & Service Execution</h4>
+                        <span class="stat-tag highlight" id="badge-engagement-rate">26% Engagement</span>
+                    </div>
+                    <div class="breakdown-list">
+                        <div class="breakdown-item">
+                            <div class="breakdown-label-row">
+                                <span>Volunteer Attendance Rate</span>
+                                <strong id="val-attendance-rate">100%</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="bar-attendance" style="width: 100%; background: #10B981;"></div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-item">
+                            <div class="breakdown-label-row">
+                                <span>Event Service Delivery (4 / 5 Scheduled)</span>
+                                <strong id="val-event-rate">80%</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="bar-event-delivery" style="width: 80%; background: #3B82F6;"></div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-item">
+                            <div class="breakdown-label-row">
+                                <span>Task Completion Success Rate</span>
+                                <strong id="val-task-rate">100%</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="bar-task-rate" style="width: 100%; background: #8B5CF6;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Box 2: Recognition & Recognition Breakdown -->
+                <div class="highlight-box reveal" style="transition-delay: 0.2s;">
+                    <div class="highlight-title-row">
+                        <h4><i data-lucide="medal" style="color: #F59E0B;"></i> Credential Recognition Matrix</h4>
+                        <span class="stat-tag" id="badge-total-creds">26 Issued</span>
+                    </div>
+                    <div class="breakdown-list">
+                        <div class="breakdown-item">
+                            <div class="breakdown-label-row">
+                                <span>Event Attendance Certificates</span>
+                                <strong id="val-cert-events">25 issued</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="bar-cert-events" style="width: 96%; background: #F59E0B;"></div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-item">
+                            <div class="breakdown-label-row">
+                                <span>Special Task Completion Certs</span>
+                                <strong id="val-cert-tasks">1 issued</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="bar-cert-tasks" style="width: 12%; background: #6366F1;"></div>
+                            </div>
+                        </div>
+
+                        <div class="breakdown-item">
+                            <div class="breakdown-label-row">
+                                <span>Milestone 60-Hour Master Certificates</span>
+                                <strong id="val-cert-master">0 unlocked</strong>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-bar" id="bar-cert-master" style="width: 6%; background: #EC4899;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VOLUNTEER RANK JOURNEY (INTERACTIVE TIERS) -->
+        <section class="section-wrapper">
+            <div class="section-head reveal">
+                <span class="section-head-badge"><i data-lucide="sparkles"></i> Recognition Roadmap</span>
+                <h2>Volunteer Rank & Milestone Distribution</h2>
+                <p>Volunteers progress through accredited tiers based on audited service hours. Click on any tier to explore requirements.</p>
+            </div>
+
+            <div class="rank-journey-container reveal">
+                <!-- Interactive Filter Tabs for Fast Filtering -->
+                <div class="rank-filter-tabs" id="rank-tabs-container">
+                    <button type="button" class="rank-tab-btn active" data-filter="all">
+                        <i data-lucide="layers"></i> All Tiers (7)
+                    </button>
+                    <button type="button" class="rank-tab-btn" data-filter="achieved">
+                        <i data-lucide="check"></i> With Volunteers
+                    </button>
+                    <button type="button" class="rank-tab-btn" data-filter="leadership">
+                        <i data-lucide="crown"></i> Leadership Tiers (60h+)
+                    </button>
+                </div>
+
+                <!-- Dynamic Rank Cards Grid -->
+                <div class="ranks-grid" id="ranks-grid">
+                    <!-- Cards will be populated dynamically from API -->
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                        <i data-lucide="loader-2" class="spin"></i> Loading Volunteer Tiers...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- IMPACT BY CATEGORY -->
+        <section class="section-wrapper" id="category-impact-section">
+            <div class="section-head reveal">
+                <span class="section-head-badge"><i data-lucide="pie-chart"></i> Service Distribution</span>
+                <h2>Impact Across Community Domains</h2>
+                <p>Categorized footprint detailing volunteer participations and service hours delivered across our focus areas.</p>
+            </div>
+
+            <div class="category-cards-grid" id="category-cards-grid">
+                <!-- Will be populated dynamically from API -->
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted);">
+                    <i data-lucide="loader-2" class="spin"></i> Loading Category Breakdown...
+                </div>
+            </div>
+        </section>
+
+        <!-- STUDENT OPPORTUNITIES (ZIGZAG EDITORIAL STORY) -->
         <section class="student-opportunities">
-            <div class="section-title reveal">
-                <h2>Empowering the Next Generation</h2>
-                <p>SevaLog isn't just about helping communities; it's about giving students the platform to lead, learn,
-                    and grow.</p>
+            <div class="section-head reveal">
+                <span class="section-head-badge"><i data-lucide="graduation-cap"></i> Student Growth</span>
+                <h2>Empowering Tomorrow's Leaders</h2>
+                <p>SevaLog translates genuine compassion into proven skills, civic accountability, and an unforgeable track record.</p>
             </div>
 
             <div class="zigzag-row reveal">
                 <div class="zigzag-image">
                     <img src="https://images.unsplash.com/photo-1529390079861-591de354faf5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Students leading">
+                        alt="Students leading community service" loading="lazy">
                     <div class="image-decoration"></div>
                 </div>
                 <div class="zigzag-content">
                     <div class="feature-icon"><i data-lucide="trending-up"></i></div>
-                    <h3>Leadership Opportunities</h3>
-                    <p>Students transition from participants to organizers. By using our platform, young volunteers
-                        learn event management, team coordination, and real-world problem-solving skills that textbooks
-                        can't teach.</p>
+                    <h3>Executive Leadership & Project Coordination</h3>
+                    <p>Volunteers transition seamlessly from participants to community coordinators. By orchestrating supply chains, managing rosters, and solving on-the-ground challenges, students acquire organizational acumen that textbooks simply cannot provide.</p>
                     <ul class="benefit-list">
-                        <li><i data-lucide="check-circle-2"></i> Verified Leadership Certificates</li>
-                        <li><i data-lucide="check-circle-2"></i> Project Management Experience</li>
+                        <li><i data-lucide="check-circle-2"></i> Verified Leadership Credentials</li>
+                        <li><i data-lucide="check-circle-2"></i> Hands-on Project Management & Execution</li>
+                        <li><i data-lucide="check-circle-2"></i> Team Leadership in High-Impact Settings</li>
                     </ul>
                 </div>
             </div>
@@ -112,37 +322,58 @@
             <div class="zigzag-row reverse reveal">
                 <div class="zigzag-image">
                     <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                        alt="Students networking">
+                        alt="Students celebrating seva hours" loading="lazy">
                     <div class="image-decoration alternate"></div>
                 </div>
                 <div class="zigzag-content">
-                    <div class="feature-icon"><i data-lucide="briefcase"></i></div>
-                    <h3>Building a Verified Portfolio</h3>
-                    <p>Every hour a student serves is digitally verified by administrators. This creates an unforgeable,
-                        lifelong portfolio of civic engagement that dramatically strengthens college applications and
-                        resumes.</p>
+                    <div class="feature-icon"><i data-lucide="shield-check"></i></div>
+                    <h3>Tamper-Proof Civic Portfolio</h3>
+                    <p>Every single hour a volunteer serves is digitally audited through QR check-ins and verified by licensed supervisors. This creates an unforgeable, lifelong public portfolio for university admissions, study-abroad applications, and corporate recruiters.</p>
                     <ul class="benefit-list">
-                        <li><i data-lucide="check-circle-2"></i> Unforgeable Digital Resume</li>
-                        <li><i data-lucide="check-circle-2"></i> Stand out in University Admissions</li>
+                        <li><i data-lucide="check-circle-2"></i> Instant Public Online Verification</li>
+                        <li><i data-lucide="check-circle-2"></i> Direct Credential Recognition for NSS & CSR</li>
+                        <li><i data-lucide="check-circle-2"></i> High-Resolution Downloadable Certificates</li>
                     </ul>
                 </div>
             </div>
         </section>
 
-        <section class="leaderboard-section">
-            <div class="section-title reveal">
-                <h2>Hall of Fame</h2>
-                <p>Recognizing the students who have dedicated the most hours to uplifting our community this year.</p>
-            </div>
-
-            <div class="leaderboard-container reveal" style="transition-delay: 0.2s;">
-                <div class="podium-wrapper" id="podium-container">
-                    <p style="text-align: center; color: var(--text-muted); width: 100%;">Loading Top Volunteers...</p>
+        <!-- AUDIT & VERIFICATION BANNER -->
+        <section class="section-wrapper">
+            <div class="trust-audit-banner reveal">
+                <div class="trust-content">
+                    <span class="trust-badge"><i data-lucide="check"></i> 100% Transparent</span>
+                    <h3>Have a Certificate to Verify?</h3>
+                    <p>Recruiters, admissions committees, and university deans can verify any volunteer's hours, date, and milestone badges in real-time with our zero-friction public verification portal.</p>
+                    <div class="trust-stats-badges">
+                        <div class="trust-stat-pill">
+                            <strong id="banner-stat-hours">47+</strong>
+                            <span>Audited Hours</span>
+                        </div>
+                        <div class="trust-stat-pill">
+                            <strong id="banner-stat-certs">26</strong>
+                            <span>Valid Credentials</span>
+                        </div>
+                        <div class="trust-stat-pill">
+                            <strong id="banner-stat-vols">73</strong>
+                            <span>Volunteers</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="trust-actions">
+                    <a href="verify.html" class="btn-trust-verify">
+                        <i data-lucide="search"></i>
+                        <span>Verify Certificate Now</span>
+                    </a>
+                    <a href="opportunities.html" class="btn-trust-secondary">
+                        <span>Browse Opportunities</span>
+                    </a>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Global Public Footer -->
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-brand">
@@ -150,54 +381,51 @@
                     <i data-lucide="heart" style="color: var(--accent-primary);"></i>
                     SevaLog
                 </a>
-                <p>Building a better tomorrow through organized, impactful community service. Join thousands of
-                    volunteers making a difference today.</p>
+                <p>Building a better tomorrow through organized, impactful community service. Sri Sathya Sai Seva Organisations, Chembur Samithi.</p>
                 <div style="display: flex; gap: 16px; margin-top: 24px;">
-                    <a href="#" aria-label="Twitter" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg></a>
-                    <a href="#" aria-label="Instagram" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg></a>
-                    <a href="#" aria-label="LinkedIn" style="color: #94A3B8; transition: 0.2s; display: inline-flex; align-items: center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#94A3B8'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg></a>
+                    <a href="#" aria-label="Community"><i data-lucide="globe" style="width: 20px; height: 20px; color: #94A3B8;"></i></a>
+                    <a href="#" aria-label="Mail"><i data-lucide="mail" style="width: 20px; height: 20px; color: #94A3B8;"></i></a>
+                    <a href="verify.html" aria-label="Verification"><i data-lucide="award" style="width: 20px; height: 20px; color: #94A3B8;"></i></a>
                 </div>
             </div>
 
             <div class="footer-links">
                 <h4>Platform</h4>
                 <a href="opportunities.html">Upcoming Events</a>
-                <a href="impact.html">Our Impact</a>
+                <a href="impact.html">Live Impact Matrix</a>
                 <a href="join-us.html">Become a Volunteer</a>
-                <a href="about.html">About the Team</a>
+                <a href="about.html">Our Mission</a>
             </div>
 
             <div class="footer-links">
                 <h4>Credentials</h4>
                 <a href="verify.html">Verify Certificate</a>
-                <a href="opportunities.html#initiatives">Programs & Domains</a>
-                <a href="impact.html">Impact Report</a>
+                <a href="opportunities.html">Seva Hub</a>
+                <a href="impact.html#category-impact-section">Focus Categories</a>
             </div>
 
             <div class="footer-links">
-                <h4>Legal</h4>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
+                <h4>Administration</h4>
                 <a href="admin/login.html"
-                    style="margin-top: 24px; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.05); border-radius: 8px; font-size: 12px;">
-                    <i data-lucide="lock" style="width: 12px;"></i> Admin Portal
+                    style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.08); border-radius: 8px; font-size: 12px; color: #CBD5E1; text-decoration: none;">
+                    <i data-lucide="lock" style="width: 12px; height: 12px;"></i> Admin Portal
                 </a>
             </div>
         </div>
 
         <div class="footer-bottom">
-            <div>&copy; 2026 SevaLog Initiative. All rights reserved.</div>
+            <div>&copy; 2026 SevaLog Initiative. All metrics verified in real time.</div>
             <div style="display: flex; gap: 20px;">
                 <span>System Status: <span style="color: #10B981;">● Online</span></span>
             </div>
         </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="../js/api.js"></script>
     <script src="public-main.js"></script>
     <script src="impact.js"></script>
+    <script src="../js/pwa.js"></script>
+    <script src="../js/protect.js"></script>
 </body>
-<script src="../js/pwa.js"></script>
-<script src="../js/protect.js"></script>
-
 </html>

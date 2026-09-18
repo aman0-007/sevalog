@@ -22,6 +22,34 @@
 
     <!-- Theme Color for Browser Chrome -->
     <meta name="theme-color" content="#3B82F6">
+
+    <!-- Immediate Mobile Tab Switcher: Guarantees zero-latency interaction in PWA -->
+    <script>
+        function switchCommunityTab(target) {
+            const grid = document.getElementById('community-grid');
+            const feedBtn = document.getElementById('tab-btn-feed');
+            const lbBtn = document.getElementById('tab-btn-leaderboard');
+            if (!grid) return;
+
+            if (target === 'leaderboard') {
+                grid.classList.remove('show-feed');
+                grid.classList.add('show-leaderboard');
+                if (feedBtn) { feedBtn.classList.remove('active'); feedBtn.setAttribute('aria-selected', 'false'); }
+                if (lbBtn) { lbBtn.classList.add('active'); lbBtn.setAttribute('aria-selected', 'true'); }
+            } else {
+                grid.classList.remove('show-leaderboard');
+                grid.classList.add('show-feed');
+                if (lbBtn) { lbBtn.classList.remove('active'); lbBtn.setAttribute('aria-selected', 'false'); }
+                if (feedBtn) { feedBtn.classList.add('active'); feedBtn.setAttribute('aria-selected', 'true'); }
+            }
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            if (typeof window.onCommunityTabSwitched === 'function') {
+                window.onCommunityTabSwitched(target);
+            }
+        }
+        window.switchCommunityTab = switchCommunityTab;
+    </script>
 </head>
 <body>
     <div class="app-content">
@@ -47,12 +75,12 @@
         <main class="main-viewport">
             
             <!-- MOBILE VIEW TOGGLE TABS (Clean switch on mobile, hidden on desktop) -->
-            <div class="community-mobile-tabs" id="community-mobile-tabs" aria-label="Community sections">
-                <button type="button" class="comm-mobile-tab-btn active" data-target="feed" id="tab-btn-feed">
+            <div class="community-mobile-tabs" id="community-mobile-tabs" role="tablist" aria-label="Community sections">
+                <button type="button" class="comm-mobile-tab-btn active" data-target="feed" id="tab-btn-feed" onclick="switchCommunityTab('feed')" role="tab" aria-selected="true" aria-controls="feed-column">
                     <i data-lucide="activity"></i>
                     <span>Live Stream</span>
                 </button>
-                <button type="button" class="comm-mobile-tab-btn" data-target="leaderboard" id="tab-btn-leaderboard">
+                <button type="button" class="comm-mobile-tab-btn" data-target="leaderboard" id="tab-btn-leaderboard" onclick="switchCommunityTab('leaderboard')" role="tab" aria-selected="false" aria-controls="leaderboard-column">
                     <i data-lucide="trophy"></i>
                     <span>Top Changemakers</span>
                 </button>
