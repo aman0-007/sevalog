@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'sevalog-v14';
+const CACHE_VERSION = 'sevalog-v15';
 const CACHE_NAME = `sevalog-cache-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `sevalog-dynamic-${CACHE_VERSION}`;
 
@@ -9,6 +9,9 @@ const STATIC_ASSETS = [
     '/offline.html',
     '/layout.css',
     '/public-layout.css',
+    '/frontend/reset-password.html',
+    '/frontend/forgot-password.html',
+    '/frontend/login.html',
     '/js/api.js',
     '/js/auth.js',
     'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
@@ -84,7 +87,36 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // STRATEGY B: Web Pages, JS, CSS, and Assets (Always Network-First)
+    // STRATEGY B: Navigation to clean reset-password paths (/reset-password/:userId/:token)
+    if (req.mode === 'navigate' && (url.pathname.includes('/reset-password') || url.pathname.includes('/reset_password'))) {
+        const uuidMatch = url.pathname.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+        const jwtMatch = url.pathname.match(/eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+/);
+        let target = '/frontend/reset-password.html';
+        const parts = [];
+        if (uuidMatch) parts.push('userId=' + encodeURIComponent(uuidMatch[0]));
+        if (jwtMatch) parts.push('token=' + encodeURIComponent(jwtMatch[0]));
+        if (parts.length > 0) {
+            target += '?' + parts.join('&');
+        } else if (url.search) {
+            target += url.search;
+        }
+        if (url.hash) target += url.hash;
+
+        event.respondWith(
+            fetch(target)
+                .then((res) => {
+                    if (res && res.status === 200) {
+                        const copy = res.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(target, copy));
+                    }
+                    return res;
+                })
+                .catch(() => caches.match('/frontend/reset-password.html').then((c) => c || caches.match('/offline.html')))
+        );
+        return;
+    }
+
+    // STRATEGY C: Web Pages, JS, CSS, and Assets (Always Network-First)
     event.respondWith(
         fetch(req)
             .then((networkRes) => {

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>SevaLog | Empowering Communities</title>
@@ -9,23 +10,51 @@
     <meta property="og:description" content="NGO management and volunteer tracking platform empowering communities through action, event coordination, and service hour logging.">
     
     <!-- ========================================== -->
-    <!-- INSTANT AUTH REDIRECT (Prevents Layout Flash) -->
+    <!-- SPA SUBROUTE FALLBACK DISPATCHER & AUTH    -->
     <!-- ========================================== -->
     <script>
         (function() {
+            const path = window.location.pathname;
+            const href = window.location.href;
+
+            // Handle clean URL reset-password paths (e.g. when Nginx falls back to index.html)
+            if (path.includes('/reset-password') || path.includes('/reset_password')) {
+                const uuidMatch = href.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+                const jwtMatch = href.match(/eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+/);
+                let target = '/frontend/reset-password.html';
+                const parts = [];
+                if (uuidMatch) parts.push('userId=' + encodeURIComponent(uuidMatch[0]));
+                if (jwtMatch) parts.push('token=' + encodeURIComponent(jwtMatch[0]));
+                if (parts.length > 0) {
+                    target += '?' + parts.join('&');
+                } else if (window.location.search) {
+                    target += window.location.search;
+                }
+                if (window.location.hash) target += window.location.hash;
+                window.location.replace(target);
+                return;
+            }
+
+            if (path.includes('/forgot-password') || path.includes('/forgot_password')) {
+                window.location.replace('/frontend/forgot-password.html' + (window.location.search || ''));
+                return;
+            }
+
+            if (path.includes('/verify')) {
+                window.location.replace('/frontend/verify.html' + (window.location.search || ''));
+                return;
+            }
+
+            // Standard logged-in user dashboard redirect
             const token = localStorage.getItem('samithi_token');
             const userStr = localStorage.getItem('samithi_user');
             
             if (token && userStr) {
                 try {
                     const user = JSON.parse(userStr);
-                    // Routes based on user role from the root index file
-                    const dest = user.role === 'admin' ? 'frontend/admin/admin.html' : 'frontend/volunteer/dashboard.html';
-                    
-                    // Instantly warp to dashboard without saving index.html in the Back Button history
+                    const dest = user.role === 'admin' ? '/frontend/admin/admin.html' : '/frontend/volunteer/dashboard.html';
                     window.location.replace(dest);
                 } catch (e) {
-                    // Fail silently if storage is corrupted
                     localStorage.removeItem('samithi_token');
                     localStorage.removeItem('samithi_user');
                 }
@@ -36,11 +65,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <link rel="stylesheet" href="frontend/public-layout.css">
-    <link rel="stylesheet" href="frontend/index.css">
+    <link rel="stylesheet" href="/frontend/public-layout.css">
+    <link rel="stylesheet" href="/frontend/index.css">
 
     <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
 
     <!-- iOS Support -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -249,10 +278,10 @@
         </div>
     </footer>
 
-    <script src="frontend/public-main.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/home.js"></script>
-    <script src="js/pwa.js"></script>
-    <script src="js/protect.js"></script>
+    <script src="/frontend/public-main.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/home.js"></script>
+    <script src="/js/pwa.js"></script>
+    <script src="/js/protect.js"></script>
 </body>
 </html>
