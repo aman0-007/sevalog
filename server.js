@@ -31,25 +31,62 @@ app.use(express.static(path.join(__dirname, 'frontend', 'volunteer'), {
     extensions: ['html', 'htm']
 }));
 
-// Route fallback helper for direct clean URLs
-app.get('/verify', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'verify.html'));
+// Nested asset recovery: In case any client requests assets relative to nested paths (e.g. /reset-password/.../login.css or /reset-password/js/api.js)
+app.use((req, res, next) => {
+    if (/\.(css|js|png|jpg|jpeg|svg|ico|json|woff|woff2|map)$/i.test(req.path)) {
+        const jsMatch = req.path.match(/\/(js\/[^\/]+)$/);
+        if (jsMatch) {
+            const candidate = path.join(__dirname, jsMatch[1]);
+            if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+                return res.sendFile(candidate);
+            }
+        }
+        const frontendMatch = req.path.match(/\/(frontend\/[^\/]+)$/);
+        if (frontendMatch) {
+            const candidate = path.join(__dirname, frontendMatch[1]);
+            if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) {
+                return res.sendFile(candidate);
+            }
+        }
+        const filenameMatch = req.path.match(/\/([^\/]+\.(?:css|js|png|svg|ico|json))$/);
+        if (filenameMatch) {
+            const fname = filenameMatch[1];
+            const inFrontend = path.join(__dirname, 'frontend', fname);
+            if (fs.existsSync(inFrontend) && fs.statSync(inFrontend).isFile()) {
+                return res.sendFile(inFrontend);
+            }
+            const inJs = path.join(__dirname, 'js', fname);
+            if (fs.existsSync(inJs) && fs.statSync(inJs).isFile()) {
+                return res.sendFile(inJs);
+            }
+        }
+    }
+    next();
 });
 
-app.get('/verify/:id', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'verify.html'));
+// Route handlers for direct clean URLs and subpath parameters
+// Reset Password: handle /reset-password, /frontend/reset-password, /reset-password.html, /frontend/reset-password.html and any nested :userId/:token paths
+app.get(/^\/(?:frontend\/)?reset-password(?:\.html)?(?:\/.*)?$/, (req, res, next) => {
+    if (/\.(css|js|png|jpg|jpeg|svg|ico|json|woff|woff2|map)$/i.test(req.path)) {
+        return next();
+    }
+    res.sendFile(path.join(__dirname, 'frontend', 'reset-password.html'));
 });
 
-app.get('/forgot-password', (req, res) => {
+// Forgot Password
+app.get(/^\/(?:frontend\/)?forgot-password(?:\.html)?(?:\/.*)?$/, (req, res, next) => {
+    if (/\.(css|js|png|jpg|jpeg|svg|ico|json|woff|woff2|map)$/i.test(req.path)) {
+        return next();
+    }
     res.sendFile(path.join(__dirname, 'frontend', 'forgot-password.html'));
 });
 
-app.get('/reset-password', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'reset-password.html'));
-});
-
-app.get('/reset-password/:userId/:token', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'reset-password.html'));
+// Verify Certificate: handle clean URLs and subpaths
+app.get(/^\/(?:frontend\/)?verify(?:\.html)?(?:\/.*)?$/, (req, res, next) => {
+    if (/\.(css|js|png|jpg|jpeg|svg|ico|json|woff|woff2|map)$/i.test(req.path)) {
+        return next();
+    }
+    res.sendFile(path.join(__dirname, 'frontend', 'verify.html'));
 });
 
 app.use((req, res, next) => {

@@ -639,7 +639,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setButtonState(btn, true);
 
                 const response = await ApiClient.request('/auth/forgot-password', 'POST', { email });
-                const successMsg = response.message || "A password reset link has been dispatched to your email.";
+                let successMsg = response.message || "A password reset link has been dispatched to your email.";
+                if (response.dev_reset_link) {
+                    successMsg += `<div style="margin-top: 10px;"><a href="${response.dev_reset_link}" class="btn btn-primary" style="font-size: 12.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-weight: 700;"><i data-lucide="key" style="width: 14px;"></i> Continue to Reset Password &rarr;</a></div>`;
+                }
                 showAlert('forgot-modal-alert', successMsg, 'success');
                 btn.disabled = true;
                 btn.innerHTML = `<i data-lucide="check" style="width:18px;"></i> Reset Link Sent`;
@@ -665,7 +668,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 setButtonState(btn, true);
 
                 const response = await ApiClient.request('/auth/forgot-password', 'POST', { email });
-                const successMsg = response.message || "A password reset link has been dispatched to your email address.";
+                let successMsg = response.message || "A password reset link has been dispatched to your email address.";
+                if (response.dev_reset_link) {
+                    successMsg += `<div style="margin-top: 12px;"><a href="${response.dev_reset_link}" class="btn btn-primary" style="font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-weight: 700;"><i data-lucide="key" style="width: 14px;"></i> Proceed to Reset Password &rarr;</a></div>`;
+                }
                 showAlert('forgot-page-alert', successMsg, 'success');
                 btn.disabled = true;
                 btn.innerHTML = `<i data-lucide="check" style="width:18px;"></i> Reset Link Sent`;
@@ -693,8 +699,121 @@ document.addEventListener('DOMContentLoaded', () => {
         const linkInput = document.getElementById('reset-link-input');
         const parseLinkBtn = document.getElementById('btn-parse-link');
         const linkFeedback = document.getElementById('link-extract-feedback');
+        const pasteGroup = document.getElementById('reset-link-paste-group');
+        const togglePasteWrap = document.getElementById('toggle-paste-link-wrap');
+        const togglePasteBtn = document.getElementById('btn-toggle-paste');
 
-        // Helper to parse reset links in any format
+        // Account Details Card elements
+        const accountCard = document.getElementById('account-info-card');
+        const accountStatusLabel = document.getElementById('account-status-label');
+        const accountBadgeChip = document.getElementById('account-badge-chip');
+        const accountEmailRow = document.getElementById('account-email-row');
+        const accountEmailText = document.getElementById('account-email-text');
+        const accountIdText = document.getElementById('account-id-text');
+        const accountExpiryRow = document.getElementById('account-expiry-row');
+        const accountActionRow = document.getElementById('account-action-row');
+        const btnRequestFreshToken = document.getElementById('btn-request-fresh-token');
+        const accountEmailGroup = document.getElementById('account-email-input-group');
+        const resetUserEmailInput = document.getElementById('reset-user-email');
+
+        // Helper to safely decode JWT base64url payload
+        const decodeJwtPayload = (jwtToken) => {
+            if (!jwtToken || typeof jwtToken !== 'string') return null;
+            const parts = jwtToken.split('.');
+            if (parts.length < 2) return null;
+            try {
+                let base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                while (base64.length % 4 !== 0) {
+                    base64 += '=';
+                }
+                const jsonPayload = decodeURIComponent(
+                    atob(base64)
+                        .split('')
+                        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                        .join('')
+                );
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                try {
+                    return JSON.parse(atob(parts[1]));
+                } catch (_) {
+                    return null;
+                }
+            }
+        };
+
+        // Helper to request a brand new reset link for the user
+        const requestFreshResetLink = async (targetEmail, triggeringBtn = null) => {
+            let email = (targetEmail || (accountEmailText && accountEmailText.textContent.trim()) || (resetUserEmailInput && resetUserEmailInput.value.trim()) || '').trim();
+            if (!email) {
+                const entered = prompt("Please enter your account email address to receive a fresh reset link:");
+                if (!entered || !entered.trim()) return;
+                email = entered.trim();
+            }
+
+            let origBtnHtml = '';
+            if (triggeringBtn) {
+                origBtnHtml = triggeringBtn.innerHTML;
+                triggeringBtn.disabled = true;
+                triggeringBtn.innerHTML = `<i data-lucide="loader-2" style="width: 14px; animation: spin 1s linear infinite;"></i> Requesting New Link...`;
+                if (window.lucide) lucide.createIcons();
+            }
+
+            try {
+                const res = await ApiClient.request('/auth/forgot-password', 'POST', { email });
+
+                // If backend provided dev_reset_link directly in API response
+                if (res && res.dev_reset_link) {
+                    const freshParsed = parseResetLink(res.dev_reset_link);
+                    if (freshParsed) {
+                        applyExtractedDetails(freshParsed, true);
+                        try {
+                            window.history.replaceState({}, '', res.dev_reset_link);
+                        } catch (_) {}
+
+                        showAlert(
+                            'reset-page-alert',
+                            `<strong>Fresh Reset Link Activated!</strong> An active security token has been loaded for <strong>${email}</strong>. Enter your new password below to update your account.`,
+                            'success'
+                        );
+                        const newPwInput = document.getElementById('reset-new-password');
+                        if (newPwInput) newPwInput.focus();
+                        return;
+                    }
+                }
+
+                // If email dispatch only
+                showAlert(
+                    'reset-page-alert',
+                    `<strong>Fresh Link Dispatched!</strong> A new password reset link was sent to <strong>${email}</strong>. Please check your inbox and click the new link or paste it below.`,
+                    'success'
+                );
+                if (pasteGroup) pasteGroup.style.display = 'block';
+                if (togglePasteWrap) togglePasteWrap.style.display = 'none';
+                if (linkInput) {
+                    linkInput.focus();
+                    linkInput.placeholder = "Paste the fresh link from your email...";
+                }
+            } catch (err) {
+                showAlert('reset-page-alert', err.message || "Failed to generate new reset link. Please try again or visit the Forgot Password page.", 'error');
+            } finally {
+                if (triggeringBtn) {
+                    triggeringBtn.disabled = false;
+                    triggeringBtn.innerHTML = origBtnHtml;
+                    if (window.lucide) lucide.createIcons();
+                }
+            }
+        };
+
+        if (btnRequestFreshToken) {
+            btnRequestFreshToken.addEventListener('click', (e) => {
+                e.preventDefault();
+                const email = (accountEmailText && accountEmailText.textContent.trim()) || (resetUserEmailInput && resetUserEmailInput.value.trim());
+                requestFreshResetLink(email, btnRequestFreshToken);
+            });
+        }
+
+        // Helper to parse reset links in any format (URL, pathname, query params, hash, or raw string)
         const parseResetLink = (linkStr) => {
             if (!linkStr || typeof linkStr !== 'string') return null;
             linkStr = linkStr.trim();
@@ -714,10 +833,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 userId = urlObj.searchParams.get('userId') || urlObj.searchParams.get('user_id') || urlObj.searchParams.get('id');
                 token = urlObj.searchParams.get('token') || urlObj.searchParams.get('t');
 
-                // 2. Check path segments (/reset-password/:userId/:token)
+                // 2. Check path segments (/reset-password/:userId/:token or /frontend/reset-password.html/:userId/:token)
                 if (!userId || !token) {
                     const segments = urlObj.pathname.split('/').filter(Boolean);
-                    const resetIdx = segments.findIndex(s => s === 'reset-password' || s === 'reset-password.html');
+                    const resetIdx = segments.findIndex(s => {
+                        const lower = s.toLowerCase();
+                        return lower === 'reset-password' || lower === 'reset-password.html';
+                    });
                     if (resetIdx !== -1 && segments.length >= resetIdx + 3) {
                         userId = segments[resetIdx + 1];
                         token = segments[resetIdx + 2];
@@ -727,16 +849,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 // URL parsing failed, fall through to regex
             }
 
-            // 3. Fallback regex matching for path segment (/reset-password/UUID/TOKEN)
+            // 3. Fallback regex matching for standard UUID and JWT anywhere in the string
+            if (!userId) {
+                const uuidMatch = linkStr.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i);
+                if (uuidMatch) userId = uuidMatch[0];
+            }
+            if (!token) {
+                const jwtMatch = linkStr.match(/eyJ[a-zA-Z0-9_-]+\.eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_.-]+/);
+                if (jwtMatch) token = jwtMatch[0];
+            }
+
+            // 4. Secondary fallback regex for path segment (/reset-password/UUID/TOKEN)
             if (!userId || !token) {
                 const pathMatch = linkStr.match(/reset-password(?:\.html)?\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_.-]+)/i);
                 if (pathMatch) {
-                    userId = pathMatch[1];
-                    token = pathMatch[2];
+                    if (!userId) userId = pathMatch[1];
+                    if (!token) token = pathMatch[2];
                 }
             }
 
-            // 4. Fallback regex for query parameters
+            // 5. Secondary fallback regex for query parameters
             if (!userId) {
                 const uMatch = linkStr.match(/[?&](?:userId|user_id|id)=([a-zA-Z0-9_-]+)/i);
                 if (uMatch) userId = uMatch[1];
@@ -746,19 +878,115 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tMatch) token = tMatch[1];
             }
 
+            // Decode JWT payload to retrieve user email and fallback userId
+            let payload = null;
+            if (token) {
+                payload = decodeJwtPayload(token);
+                if (payload && !userId && (payload.userId || payload.user_id || payload.id)) {
+                    userId = payload.userId || payload.user_id || payload.id;
+                }
+            }
+
             if (userId && token) {
-                return { userId, token };
+                return { userId, token, payload };
             }
             return null;
         };
 
-        // Helper to apply extracted details to DOM
-        const applyExtractedDetails = (userId, token, fromInput = false) => {
+        // Helper to apply and enter extracted details into the page
+        const applyExtractedDetails = (data, fromInput = false) => {
+            const { userId, token, payload } = data;
+
+            // Populate hidden inputs for form submission
             if (hiddenUserIdInput) hiddenUserIdInput.value = userId;
             if (hiddenTokenInput) hiddenTokenInput.value = token;
+
+            // Populate manual inputs
             if (manualUserIdInput) manualUserIdInput.value = userId;
             if (manualTokenInput) manualTokenInput.value = token;
 
+            // Update Account Details Card
+            if (accountCard) {
+                accountCard.style.display = 'block';
+
+                if (accountIdText) {
+                    accountIdText.textContent = userId;
+                }
+
+                // If email is present in payload, enter into email input and display
+                const email = payload && (payload.email || payload.userEmail || payload.sub);
+                if (email) {
+                    if (accountEmailText) accountEmailText.textContent = email;
+                    if (accountEmailRow) accountEmailRow.style.display = 'block';
+                    if (resetUserEmailInput) resetUserEmailInput.value = email;
+                    if (accountEmailGroup) accountEmailGroup.style.display = 'block';
+                } else {
+                    if (accountEmailRow) accountEmailRow.style.display = 'none';
+                    if (accountEmailGroup) accountEmailGroup.style.display = 'none';
+                }
+
+                // Handle token expiration verification
+                if (payload && payload.exp) {
+                    const expMs = payload.exp * 1000;
+                    const isExpired = expMs < Date.now();
+                    const expDateStr = new Date(expMs).toLocaleString(undefined, {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+
+                    if (isExpired) {
+                        if (accountStatusLabel) accountStatusLabel.textContent = 'Reset Link Expired';
+                        if (accountBadgeChip) {
+                            accountBadgeChip.textContent = 'Expired';
+                            accountBadgeChip.style.background = '#DC2626';
+                        }
+                        if (accountCard) {
+                            accountCard.style.background = '#FEF2F2';
+                            accountCard.style.borderColor = '#FECACA';
+                        }
+                        if (accountExpiryRow) {
+                            accountExpiryRow.innerHTML = `<span style="color: #DC2626; font-weight: 700;">Link expired on ${expDateStr}.</span> Security tokens are valid for 15 minutes.`;
+                        }
+                        if (accountActionRow) {
+                            accountActionRow.style.display = 'block';
+                        }
+                        showAlert(
+                            'reset-page-alert',
+                            `<div><strong>This reset link has expired</strong><p style="margin: 4px 0 8px 0; font-size: 13px;">This security token expired at <strong>${expDateStr}</strong> (tokens are active for 15 minutes). Click the button below to generate an active link.</p><button type="button" id="btn-alert-resend-fresh" class="btn btn-primary" style="font-size: 12.5px; padding: 6px 12px; border-radius: 8px; font-weight: 700;"><i data-lucide="refresh-cw" style="width: 14px;"></i> Request Fresh Reset Link</button></div>`,
+                            'info'
+                        );
+                        const alertResendBtn = document.getElementById('btn-alert-resend-fresh');
+                        if (alertResendBtn) {
+                            alertResendBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                requestFreshResetLink(email, alertResendBtn);
+                            });
+                        }
+                    } else {
+                        if (accountStatusLabel) accountStatusLabel.textContent = 'Valid Reset Link Verified';
+                        if (accountBadgeChip) {
+                            accountBadgeChip.textContent = 'Active';
+                            accountBadgeChip.style.background = '#16A34A';
+                        }
+                        if (accountCard) {
+                            accountCard.style.background = '#F0FDF4';
+                            accountCard.style.borderColor = '#BBF7D0';
+                        }
+                        if (accountExpiryRow) {
+                            accountExpiryRow.innerHTML = `<span style="color: #166534;">Token active and valid until ${expDateStr}.</span>`;
+                        }
+                        if (accountActionRow) {
+                            accountActionRow.style.display = 'none';
+                        }
+                    }
+                } else if (accountExpiryRow) {
+                    accountExpiryRow.textContent = 'Token attached and ready to set new password.';
+                }
+            }
+
+            // Security token badge
             if (tokenBadge) {
                 tokenBadge.style.display = 'inline-flex';
                 if (tokenBadgeText) {
@@ -771,26 +999,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 manualFields.style.display = 'none';
             }
 
+            // If parsed on initial URL load, collapse paste group to streamline UI
+            if (!fromInput) {
+                if (pasteGroup && togglePasteWrap) {
+                    pasteGroup.style.display = 'none';
+                    togglePasteWrap.style.display = 'block';
+                }
+                const newPwInput = document.getElementById('reset-new-password');
+                if (newPwInput) setTimeout(() => newPwInput.focus(), 150);
+            }
+
+            // Feedback when filled via the input
             if (fromInput && linkFeedback) {
                 linkFeedback.style.display = 'block';
                 linkFeedback.style.color = '#166534';
-                linkFeedback.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 5px;"><i data-lucide="check-circle" style="width: 14px;"></i> Link verified! Details auto-fetched.</span>`;
+                linkFeedback.innerHTML = `<span style="display: inline-flex; align-items: center; gap: 5px;"><i data-lucide="check-circle" style="width: 14px;"></i> Reset details auto-fetched and entered!</span>`;
                 if (window.lucide) lucide.createIcons();
 
-                // Focus new password input for instant smooth UX
                 const newPwInput = document.getElementById('reset-new-password');
                 if (newPwInput) newPwInput.focus();
             }
+
+            if (window.lucide) lucide.createIcons();
         };
 
         // Step 1: Detect userId and token from existing browser URL (Path or Query Parameter)
         const initialParsed = parseResetLink(window.location.href);
         if (initialParsed) {
             if (linkInput) linkInput.value = window.location.href;
-            applyExtractedDetails(initialParsed.userId, initialParsed.token, false);
+            applyExtractedDetails(initialParsed, false);
         } else {
             if (manualFields) manualFields.style.display = 'block';
             if (tokenBadge) tokenBadge.style.display = 'none';
+        }
+
+        // Toggle paste link box if user wants to use a different link
+        if (togglePasteBtn && pasteGroup && togglePasteWrap) {
+            togglePasteBtn.addEventListener('click', () => {
+                const isHidden = pasteGroup.style.display === 'none';
+                pasteGroup.style.display = isHidden ? 'block' : 'none';
+                togglePasteBtn.innerHTML = isHidden
+                    ? `<i data-lucide="chevron-up" style="width: 14px; height: 14px;"></i> Hide Link Box`
+                    : `<i data-lucide="link-2" style="width: 14px; height: 14px;"></i> Using a different link?`;
+                if (window.lucide) lucide.createIcons();
+                if (isHidden && linkInput) linkInput.focus();
+            });
         }
 
         // Handler for parsing pasted/entered link
@@ -808,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const parsed = parseResetLink(rawVal);
             if (parsed) {
-                applyExtractedDetails(parsed.userId, parsed.token, true);
+                applyExtractedDetails(parsed, true);
             } else {
                 if (linkFeedback) {
                     linkFeedback.style.display = 'block';
@@ -886,11 +1139,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Smooth redirect to login page after 2 seconds
                 setTimeout(() => {
-                    window.location.href = 'login.html';
+                    window.location.href = '/frontend/login.html';
                 }, 2000);
 
             } catch (error) {
-                showAlert('reset-page-alert', error.message || "Failed to reset password. The link or token may be invalid or expired.", 'error');
+                const errorMsg = error.message || "Failed to reset password. The link or token may be invalid or expired.";
+                const isExpiredOrInvalid = /expired|invalid/i.test(errorMsg);
+
+                if (isExpiredOrInvalid) {
+                    const email = (accountEmailText && accountEmailText.textContent.trim()) || (resetUserEmailInput && resetUserEmailInput.value.trim());
+                    const emailTarget = email ? ` for <strong>${email}</strong>` : '';
+                    showAlert(
+                        'reset-page-alert',
+                        `<div><strong>Password Reset Link Expired or Invalid</strong><p style="margin: 4px 0 8px 0; font-size: 13px; color: #7F1D1D;">${errorMsg}</p><div style="display: flex; gap: 8px; flex-wrap: wrap;"><button type="button" id="btn-submit-resend-fresh" class="btn btn-primary" style="font-size: 12.5px; padding: 6px 12px; border-radius: 8px; font-weight: 700;"><i data-lucide="refresh-cw" style="width: 14px;"></i> Request Fresh Link${emailTarget}</button><a href="/frontend/forgot-password.html" class="btn btn-outline" style="font-size: 12.5px; padding: 6px 12px; border-radius: 8px; text-decoration: none; font-weight: 600;">Use Another Email</a></div></div>`,
+                        'error'
+                    );
+                    const submitResendBtn = document.getElementById('btn-submit-resend-fresh');
+                    if (submitResendBtn) {
+                        submitResendBtn.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            requestFreshResetLink(email, submitResendBtn);
+                        });
+                    }
+                    if (accountActionRow) accountActionRow.style.display = 'block';
+                } else {
+                    showAlert('reset-page-alert', errorMsg, 'error');
+                }
                 setButtonState(btn, false, origHtml);
             }
         });
